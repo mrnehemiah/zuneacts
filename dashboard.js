@@ -18,8 +18,8 @@ if(storeError)console.warn("Store details:",storeError);const store=Array.isArra
 const name=store?.store_name||store?.name||"Duka lako la ZUNE";$("#storeName").textContent=name;$("#sideStoreName").textContent=name;$("#profileButton").textContent=name.trim().charAt(0).toUpperCase()||"Z";
 const verified=String(store?.verification_status||"").toLowerCase()==="verified";const badge=$("#storeVerifiedBadge");if(badge)badge.hidden=!verified;
 if(store?.store_status)$("#storeStatus").textContent=store.store_status;
-const{data:productRows,error:productError,count:productCount}=await db.from("products").select("id,stock_quantity",{count:"exact"}).eq("vendor_id",owner).is("removed_at",null).limit(5000);
-if(productError)throw productError;$("#productCount").textContent=fmt(productCount??productRows?.length??0);
+const{data:productRows,error:productError,count:productCount}=await db.from("products").select("id,stock_quantity,removed_at").eq("vendor_id",owner).limit(5000);
+if(productError)throw productError;const activeProducts=(productRows||[]).filter(p=>!p.removed_at);$("#productCount").textContent=fmt(activeProducts.length);
 const ids=(productRows||[]).map(p=>p.id);let orders=[];
 if(ids.length){const{data,error}=await db.from("orders").select("id,buyer_id,product_id,total_price,status,created_at,recipient_name").in("product_id",ids).order("created_at",{ascending:false}).limit(2000);if(error)throw error;orders=data||[]}
 window.__zuneOrders=orders;const today=new Date();today.setHours(0,0,0,0);const newOrders=orders.filter(o=>o.status==="pending");const sales=orders.filter(o=>o.status==="completed"&&new Date(o.created_at)>=today).reduce((s,o)=>s+Number(o.total_price||0),0);const customers=new Set(orders.map(o=>o.buyer_id).filter(Boolean));
