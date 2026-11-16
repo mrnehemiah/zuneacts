@@ -1,23 +1,37 @@
-# ZUNEMAR Seller Portal
+# ZUNE Seller Portal
 
-Standalone, mobile-first seller portal for ZUNE Marketplace.
+Standalone, mobile-first seller portal for ZUNE Marketplace. Built with vanilla HTML, CSS, and JavaScript.
 
-## Current build stage
-- Step 1: Seller Login interface.
-- Login uses Store Name + separate Store Password only.
-- No ZUNE Marketplace password field.
-- Seller access must be blocked until Head Admin approval.
-- Kiswahili / English switch.
+## Current milestone
+- Premium centered login card in emerald and white.
+- Official ZUNE mark: four circular letters (Z, U, N, E) with continuous wave motion.
+- Store Name + separate Store Password fields; placeholder example: **Zuhura Shop**.
+- Kiswahili / English language switch.
+- Admin Mkuu approval is required before seller access.
+- Customer store-entry transition with animated ZUNE circles and a dynamic store name.
 
-## Authentication boundary
-The login page expects the Supabase Edge Function `zunemar-seller-login`. That independent login backend has **not yet been deployed**. The page must show a service-not-ready message until secure server authentication is implemented and tested. Never use client-side password checks.
+## Authentication and security
+The login interface is deployed as a visual milestone, but secure independent Store Name + Store Password authentication is **not yet enabled**. The form intentionally reports that sign-in is unavailable rather than simulating a successful login. The existing legacy store-login Edge Function is disabled and must not be used.
 
-Supabase project: `rpkogiieegqgxqbzwxwo`. Only the publishable key is used in browser code. Never commit a service-role key.
+The next backend milestone must verify the store password server-side, enforce Admin approval and seller account status, issue a valid Supabase Auth session, and include rate limiting and password recovery. Never check passwords in browser JavaScript, store plaintext passwords, or expose a service-role key.
+
+Supabase project: `rpkogiieegqgxqbzwxwo`. Browser code uses only the publishable key if/when required.
 
 ## Files
-- `index.html` — login page
-- `login.css` — responsive styling
-- `login.js` — form, language switch, Edge Function client
+- `index.html` — Seller Login
+- `login.css` — responsive login card and continuous circular-letter wave animation
+- `login.js` — language switch, password visibility, and safe not-ready state
+- `store-entry.html` — customer welcome transition preview
+- `store-entry.css` — customer transition styling and animations
+- `store-entry.js` — reads the store name from the `store` or `name` query parameter
+- `.github/workflows/pages.yml` — GitHub Pages deployment workflow
+
+## Preview
+- Login: `/`
+- Store transition example: `/store-entry.html?store=Zuhura%20Shop`
+
+## Deployment
+Pushing to `main` triggers the GitHub Pages workflow. The repository's Pages deployment must be enabled with **GitHub Actions** as its source.
 
 ## Next
-Implement and test independent Store Name + Store Password server authentication, approval checks, secure sessions, recovery, rate limiting, and audit events.
+Complete and test the independent seller authentication backend before enabling sign-in or building protected dashboard pages.
