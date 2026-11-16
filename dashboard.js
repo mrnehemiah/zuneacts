@@ -6,11 +6,16 @@ const words={sw:{myStore:"DUKA LANGU",workspace:"WORKSPACE",home:"Business Overv
 let lang="sw";function setLang(next){lang=next;document.documentElement.lang=next;document.querySelectorAll("[data-i18n]").forEach(e=>{const v=words[next][e.dataset.i18n];if(v)e.textContent=v});document.querySelectorAll(".lang-btn").forEach(b=>b.classList.toggle("active",b.dataset.lang===next));localStorage.setItem("zune-seller-language",next)}
 document.querySelectorAll(".lang-btn").forEach(b=>b.addEventListener("click",()=>setLang(b.dataset.lang)));setLang(localStorage.getItem("zune-seller-language")==="en"?"en":"sw");
 $("#todayLabel").textContent=new Intl.DateTimeFormat(lang==="sw"?"sw-TZ":"en-TZ",{weekday:"short",day:"numeric",month:"short"}).format(new Date());
-async function init(){const {data:{session},error}=await supabase.auth.getSession();if(error||!session){location.replace("./index.html");return}
+async function init(){
+const {data:{session},error}=await supabase.auth.getSession();if(error||!session){location.replace("./index.html");return}
+const {data:ownerId,error:ownerError}=await supabase.rpc("zune_seller_owner_id");
+if(ownerError||!ownerId){console.error("Product count owner lookup:",ownerError);$("#productCount").textContent="—";}
+else{const {count,error:countError}=await supabase.from("products").select("id",{count:"exact",head:true}).eq("vendor_id",ownerId);if(countError){console.error("Product count lookup:",countError);$("#productCount").textContent="—";}else{$("#productCount").textContent=new Intl.NumberFormat(lang==="sw"?"sw-TZ":"en-TZ").format(count||0);}}
 const {data,error:storeError}=await supabase.rpc("zune_seller_portal_current_store");
 if(storeError){console.error("Current store lookup:",storeError);$("#storeStatus").textContent=lang==="sw"?"Imeshindwa kusoma taarifa za duka":"Could not load store details";return}
 const store=Array.isArray(data)?data[0]:data;if(!store){$("#storeName").textContent="ZUNE";return}
 const name=store.store_name||store.name||store.name_of_store||"Duka lako la ZUNE";$("#storeName").textContent=name;const verified=store.is_verified===true||store.verified===true||store.store_verified===true||String(store.verification_status||"").toLowerCase()==="verified";const seal=$("#storeVerifiedBadge");if(seal)seal.hidden=!verified;$("#sideStoreName").textContent=name;$("#profileButton").textContent=name.trim().charAt(0).toUpperCase()||"Z";
-const state=store.status||store.store_status||"";if(state)$("#storeStatus").textContent=state;\nconst {data:ownerId,error:ownerError}=await supabase.rpc("zune_seller_owner_id");if(ownerError||!ownerId){console.error("Product count owner lookup:",ownerError);$("#productCount").textContent="—";return;}const {count,error:countError}=await supabase.from("products").select("id",{count:"exact",head:true}).eq("vendor_id",ownerId);if(countError){console.error("Product count lookup:",countError);$("#productCount").textContent="—";}else{$("#productCount").textContent=new Intl.NumberFormat(lang==="sw"?"sw-TZ":"en-TZ").format(count||0);}}
+const state=store.status||store.store_status||"";if(state)$("#storeStatus").textContent=state;
+}
 $("#logoutBtn").addEventListener("click",async()=>{await supabase.auth.signOut();location.replace("./index.html")});$("#profileButton").addEventListener("click",()=>toast(lang==="sw"?"Mipangilio ya akaunti itaongezwa kwenye Zaidi.":"Account settings are available under More."));
 init();
