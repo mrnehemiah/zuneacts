@@ -13,6 +13,13 @@ Standalone, mobile-first seller portal for ZUNE Marketplace. Built with vanilla 
 - Login and OTP requests are rate-limited server-side.
 - Existing store, product, and order rows are not re-created or reassigned.
 
+## Dashboard milestone
+- `dashboard.html` and `dashboard.css` provide the responsive Premium Emerald seller workspace.
+- `dashboard.js` loads the authenticated seller's current store using `zune_seller_portal_current_store`.
+- The dashboard includes a bilingual navigation shell, store identity/status, overview cards, recent activity empty state, and quick-access actions.
+- Product, order, analytics, customer, verification, store-customization, and settings modules are staged in the navigation and will be implemented as dedicated pages. Until those modules are built, selecting them shows a clear in-progress message rather than pretending the feature is ready.
+- Business statistic values remain placeholders until the relevant existing Supabase tables and relationships are wired and verified.
+
 ## Backend
 - Supabase project: `rpkogiieegqgxqbzwxwo`
 - Edge Function: `seller-portal-auth` (JWT verification is disabled at the gateway because it performs its own checks and handles first-time OTP setup; never trust browser-supplied owner IDs).
@@ -21,7 +28,7 @@ Standalone, mobile-first seller portal for ZUNE Marketplace. Built with vanilla 
 - The Supabase service-role key is used only inside the Edge Function environment and is never placed in the repository or browser code.
 
 ### Required Supabase email template setting
-To send a six-digit code instead of a magic link, open **Supabase Dashboard → Authentication → Email Templates → Magic Link** and make the message include the OTP token variable:
+To send a numeric code, open **Supabase Dashboard → Authentication → Email Templates → Magic Link** and make the message include the OTP token variable:
 
 ```html
 <h2>ZUNE Seller Portal verification</h2>
@@ -31,8 +38,9 @@ To send a six-digit code instead of a magic link, open **Supabase Dashboard → 
 Save the template. Keep OTP expiry and rate limits enabled. The Seller Portal uses the Email OTP flow and will not ask for the Marketplace password.
 
 ## Files
-- `index.html`, `login.css`, `login.js` — login, first-time password setup, OTP verification, and password recovery.
-- `dashboard.html`, `dashboard.js` — authenticated Seller Portal landing page and current-store lookup.
+- `index.html`, `login.css`, `login.js` — seller login.
+- `setup.html`, `setup.js`, `setup-verify.html`, `setup-verify.js` — first-time password setup, OTP verification, and password recovery.
+- `dashboard.html`, `dashboard.css`, `dashboard.js` — authenticated seller workspace and current-store lookup.
 - `store-entry.html`, `store-entry.css`, `store-entry.js` — customer store welcome transition.
 - `.github/workflows/pages.yml` — GitHub Pages deployment.
 
