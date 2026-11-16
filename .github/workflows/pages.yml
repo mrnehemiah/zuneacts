@@ -28,6 +28,9 @@ jobs:
           test -f store-entry.js
           test -f dashboard.html
           test -f dashboard.js
+      - name: Validate JavaScript syntax
+        run: |
+          for file in *.js; do node --input-type=module --check < "$file"; done
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
