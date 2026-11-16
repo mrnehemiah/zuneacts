@@ -17,8 +17,8 @@ async function init(){
  const {data:{session},error:authError}=await db.auth.getSession();if(authError||!session){location.replace("./index.html");return}
  const today=$("#todayLabel");if(today)today.textContent=new Intl.DateTimeFormat(lang==="sw"?"sw-TZ":"en-TZ",{weekday:"short",day:"numeric",month:"short"}).format(new Date());
  const {data:ownerId,error:ownerError}=await db.rpc("zune_seller_owner_id");if(ownerError||!ownerId){console.error("Seller owner lookup:",ownerError);showError($("#productCount"),"—");showError($("#storeStatus"),lang==="sw"?"Imeshindikana kuthibitisha duka":"Could not verify store");return}
- const {data:productRows,error:productError,count:productCount}=await db.from("products").select("id", {count:"exact"}).eq("vendor_id",ownerId).is("removed_at",null).limit(2000);
- if(productError){console.error("Dashboard products:",productError);showError($("#productCount"),"—")}else showError($("#productCount"),fmt(productCount??productRows?.length??0));
+ const [{count:productCount,error:countError},{data:productRows,error:productError}]=await Promise.all([db.from("products").select("id",{count:"exact",head:true}).eq("vendor_id",ownerId).is("removed_at",null),db.from("products").select("id").eq("vendor_id",ownerId).limit(2000)]);
+ if(countError||productError){console.error("Dashboard products:",countError||productError);showError($("#productCount"),"—")}else showError($("#productCount"),fmt(productCount??0));
  const ids=(productRows||[]).map(p=>p.id);
  let orders=[];
  if(ids.length){const {data,error}=await db.from("orders").select("id,buyer_id,product_id,total_price,status,created_at,recipient_name").in("product_id",ids).order("created_at",{ascending:false}).limit(2000);if(error){console.error("Dashboard orders:",error);showError($("#newOrders"),"—");showError($("#todaySales"),"—");showError($("#customerCount"),"—")}else orders=data||[]}
