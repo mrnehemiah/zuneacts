@@ -14,10 +14,10 @@ let toastTimer;
 
 const copy = {
   sw: {
-    workspace:"WORKSPACE",overview:"Muhtasari",products:"Bidhaa",orders:"Oda",analytics:"Takwimu",storeManagement:"USIMAMIZI WA DUKA",myStore:"Duka Langu",customers:"Wateja",verification:"Uthibitishaji",settings:"Mipangilio",needHelp:"Unahitaji msaada?",contactSupport:"Wasiliana na ZUNE",sellerWorkspace:"SELLER WORKSPACE",hello:"Habari",welcomeText:"Huu hapa muhtasari wa shughuli za duka lako leo.",yourStore:"DUKA LAKO",checking:"Inathibitisha...",verifiedStore:"Duka limethibitishwa",businessOverview:"Muhtasari wa biashara",overviewHint:"Takwimu zitaonekana hapa kadri shughuli zinavyofanyika.",accountConnected:"Akaunti imeunganishwa",totalProducts:"Jumla ya bidhaa",productsStatHint:"Bidhaa za duka lako",newOrders:"Oda mpya",ordersStatHint:"Zinazosubiri kushughulikiwa",sales:"Mauzo",salesStatHint:"Muhtasari wa mauzo",customersStat:"Wateja",customersStatHint:"Wateja wa duka lako",recentActivity:"Shughuli za hivi karibuni",activityHint:"Taarifa za oda na bidhaa zitaonekana hapa.",noActivity:"Bado hakuna shughuli",noActivityHint:"Shughuli mpya za duka lako zitaonekana hapa zitakapoanza.",quickAccess:"Njia za mkato",quickHint:"Fungua sehemu za usimamizi.",addProduct:"Ongeza bidhaa",addProductHint:"Weka bidhaa mpya dukani",manageOrders:"Simamia oda",manageOrdersHint:"Angalia oda za wateja",customizeStore:"Boresha duka",customizeStoreHint:"Badilisha muonekano wa duka",footerText:"Seller Portal · Biashara yako, kwa urahisi.",open:"Duka liko wazi",closed:"Duka limefungwa",unknown:"Hali ya duka haijapatikana",coming:"Sehemu hii bado inajengwa. Tutaifungua ikikamilika.",loadError:"Imeshindikana kupata taarifa za duka. Tafadhali jaribu kuingia tena.",signOut:"Toka",profile:"Taarifa za duka"
+    workspace:"WORKSPACE",overview:"Muhtasari",products:"Bidhaa",orders:"Oda",analytics:"Takwimu",storeManagement:"USIMAMIZI WA DUKA",myStore:"Duka Langu",customers:"Wateja",verification:"Uthibitishaji",settings:"Mipangilio",needHelp:"Unahitaji msaada?",contactSupport:"Wasiliana na ZUNE",sellerWorkspace:"SELLER WORKSPACE",hello:"Habari",welcomeText:"Dhibiti biashara yako kwa urahisi.",yourStore:"DUKA LAKO",checking:"Inathibitisha...",verifiedStore:"Duka limethibitishwa",businessOverview:"Muhtasari wa biashara",overviewHint:"Takwimu zitaonekana hapa kadri shughuli zinavyofanyika.",accountConnected:"Akaunti imeunganishwa",totalProducts:"Jumla ya bidhaa",productsStatHint:"Bidhaa za duka lako",newOrders:"Oda mpya",ordersStatHint:"Zinazosubiri kushughulikiwa",sales:"Mauzo",salesStatHint:"Muhtasari wa mauzo",customersStat:"Wateja",customersStatHint:"Wateja wa duka lako",recentActivity:"Shughuli za hivi karibuni",activityHint:"Taarifa za oda na bidhaa zitaonekana hapa.",noActivity:"Bado hakuna shughuli",noActivityHint:"Shughuli mpya za duka lako zitaonekana hapa zitakapoanza.",quickAccess:"Njia za mkato",quickHint:"Fungua sehemu za usimamizi.",addProduct:"Ongeza bidhaa",addProductHint:"Weka bidhaa mpya dukani",manageOrders:"Simamia oda",manageOrdersHint:"Angalia oda za wateja",customizeStore:"Boresha duka",customizeStoreHint:"Badilisha muonekano wa duka",footerText:"Seller Portal · Biashara yako, kwa urahisi.",open:"Duka liko wazi",closed:"Duka limefungwa",unknown:"Hali ya duka haijapatikana",coming:"Sehemu hii bado inajengwa. Tutaifungua ikikamilika.",loadError:"Imeshindikana kupata taarifa za duka. Tafadhali jaribu kuingia tena.",signOut:"Toka",profile:"Taarifa za duka",activityLabel:"SHUGHULI",manageLabel:"USIMAMIZI"
   },
   en: {
-    workspace:"WORKSPACE",overview:"Overview",products:"Products",orders:"Orders",analytics:"Analytics",storeManagement:"STORE MANAGEMENT",myStore:"My Store",customers:"Customers",verification:"Verification",settings:"Settings",needHelp:"Need help?",contactSupport:"Contact ZUNE",sellerWorkspace:"SELLER WORKSPACE",hello:"Hello",welcomeText:"Here is an overview of your store activity today.",yourStore:"YOUR STORE",checking:"Checking...",verifiedStore:"Verified store",businessOverview:"Business overview",overviewHint:"Your statistics will appear here as activity takes place.",accountConnected:"Account connected",totalProducts:"Total products",productsStatHint:"Products in your store",newOrders:"New orders",ordersStatHint:"Waiting for your attention",sales:"Sales",salesStatHint:"Sales summary",customersStat:"Customers",customersStatHint:"Your store customers",recentActivity:"Recent activity",activityHint:"Order and product updates will appear here.",noActivity:"No activity yet",noActivityHint:"New activity from your store will appear here.",quickAccess:"Quick access",quickHint:"Open store management areas.",addProduct:"Add a product",addProductHint:"List a new product in your store",manageOrders:"Manage orders",manageOrdersHint:"View customer orders",customizeStore:"Customize store",customizeStoreHint:"Change your store appearance",footerText:"Seller Portal · Your business, made easier.",open:"Store is open",closed:"Store is closed",unknown:"Store status unavailable",coming:"This section is still being built. It will open when ready.",loadError:"Could not load store details. Please sign in again.",signOut:"Sign out",profile:"Store information"
+    workspace:"WORKSPACE",overview:"Overview",products:"Products",orders:"Orders",analytics:"Analytics",storeManagement:"STORE MANAGEMENT",myStore:"My Store",customers:"Customers",verification:"Verification",settings:"Settings",needHelp:"Need help?",contactSupport:"Contact ZUNE",sellerWorkspace:"SELLER WORKSPACE",hello:"Hello",welcomeText:"Manage your business with ease.",yourStore:"YOUR STORE",checking:"Checking...",verifiedStore:"Verified store",businessOverview:"Business overview",overviewHint:"Your statistics will appear here as activity takes place.",accountConnected:"Account connected",totalProducts:"Total products",productsStatHint:"Products in your store",newOrders:"New orders",ordersStatHint:"Waiting for your attention",sales:"Sales",salesStatHint:"Sales summary",customersStat:"Customers",customersStatHint:"Your store customers",recentActivity:"Recent activity",activityHint:"Order and product updates will appear here.",noActivity:"No activity yet",noActivityHint:"New activity from your store will appear here.",quickAccess:"Quick access",quickHint:"Open store management areas.",addProduct:"Add a product",addProductHint:"List a new product in your store",manageOrders:"Manage orders",manageOrdersHint:"View customer orders",customizeStore:"Customize store",customizeStoreHint:"Change your store appearance",footerText:"Seller Portal · Your business, made easier.",open:"Store is open",closed:"Store is closed",unknown:"Store status unavailable",coming:"This section is still being built. It will open when ready.",loadError:"Could not load store details. Please sign in again.",signOut:"Sign out",profile:"Store information",activityLabel:"ACTIVITY",manageLabel:"MANAGEMENT"
   }
 };
 
@@ -35,7 +35,6 @@ function applyLanguage(){
     if(copy[currentLanguage][key]) el.textContent = copy[currentLanguage][key];
   });
   $("#languageToggle").innerHTML = (currentLanguage === "sw" ? "SW" : "EN") + " <span>⌄</span>";
-  $("#breadcrumbCurrent").textContent = t("overview");
   localStorage.setItem("zune-seller-language", currentLanguage);
 }
 function safe(value){
@@ -61,11 +60,9 @@ function setStore(store){
 }
 function showModule(view){
   const names = {products:"products",orders:"orders",analytics:"analytics","my-store":"myStore",customers:"customers",verification:"verification",settings:"settings"};
-  if(view === "overview"){ $("#breadcrumbCurrent").textContent = t("overview"); return; }
+  document.querySelectorAll("[data-view]").forEach(item => item.classList.toggle("active", item.dataset.view === view));
+  if(view === "overview") return;
   showToast(t("coming"));
-  document.querySelectorAll(".nav-item").forEach(item => item.classList.toggle("active", item.dataset.view === "overview"));
-  $("#breadcrumbCurrent").textContent = t(names[view] || "overview");
-  $("#sidebar").classList.remove("open");
 }
 async function boot(){
   $("#todayDate").textContent = niceDate();
@@ -82,9 +79,10 @@ async function boot(){
 }
 document.querySelectorAll("[data-view]").forEach(button => button.addEventListener("click", () => showModule(button.dataset.view)));
 $("#languageToggle").addEventListener("click", () => { currentLanguage = currentLanguage === "sw" ? "en" : "sw"; applyLanguage(); $("#todayDate").textContent = niceDate(); });
-$("#menuToggle").addEventListener("click", () => $("#sidebar").classList.toggle("open"));
 $("#profileButton").addEventListener("click", () => showToast(t("profile") + ": " + ($("#storeName").textContent || "")));
-document.addEventListener("click", event => {
-  if(window.innerWidth <= 760 && !event.target.closest("#sidebar") && !event.target.closest("#menuToggle")) $("#sidebar").classList.remove("open");
+$("#signOutButton").addEventListener("click", async () => {
+  const {error} = await supabase.auth.signOut();
+  if(error){ showToast(error.message); return; }
+  location.replace("./index.html");
 });
 boot();
