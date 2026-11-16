@@ -2,58 +2,65 @@
 <html lang="sw">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#087f5b">
-  <meta name="description" content="ZUNEMAR Seller Portal — salama ya kuingia kwenye akaunti ya duka lako.">
-  <title>ZUNEMAR | Seller Login</title>
+  <meta name="description" content="ZUNE Seller Portal — ingia kusimamia duka lako.">
+  <title>ZUNE | Seller Login</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="login.css">
 </head>
 <body>
-  <main class="page-shell">
-    <section class="brand-panel" aria-label="ZUNEMAR">
-      <div class="brand-top"><span class="brand-mark">Z</span><span class="brand-name">ZUNE<span>MAR</span></span></div>
-      <div class="brand-copy">
-        <span class="eyebrow" data-i18n="seller_portal">SELLER PORTAL</span>
-        <h1 data-i18n="brand_title">Duka lako.<br>Biashara yako.<br><em>Udhibiti wako.</em></h1>
-       <p data-i18n="brand_desc">Simamia biashara yako ya ZUNE kwa sehemu moja, kwa usalama na urahisi.</p>
+  <main class="login-page">
+    <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+    <header class="brand-lockup" aria-label="ZUNE">
+      <div class="circle-logo" aria-label="Z U N E">
+        <span class="logo-letter">Z</span><span class="logo-letter">U</span><span class="logo-letter">N</span><span class="logo-letter">E</span>
       </div>
-      <div class="brand-bottom"><span class="pulse-dot"></span><span data-i18n="secure_access">Ufikiaji salama wa wauzaji</span><span class="brand-version">ZUNEMAR 2.0</span></div>
-      <div class="decor decor-one"></div><div class="decor decor-two"></div>
+      <span class="portal-label" data-i18n="portal">SELLER PORTAL</span>
+    </header>
+
+    <section class="login-card" aria-labelledby="loginTitle">
+      <div class="card-topline">
+        <div class="secure-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5 19 7v5.2c0 4.2-2.8 7.1-7 8.8-4.2-1.7-7-4.6-7-8.8V7l7-3.5Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <div class="language-switch" aria-label="Language">
+          <button type="button" class="lang-btn active" data-lang="sw">SW</button>
+          <span></span><button type="button" class="lang-btn" data-lang="en">EN</button>
+        </div>
+      </div>
+      <div class="card-heading">
+        <p class="eyebrow" data-i18n="welcome">KARIBU TENA</p>
+        <h1 id="loginTitle" data-i18n="title">Ingia kwenye duka lako</h1>
+        <p class="subtitle" data-i18n="subtitle">Tumia jina la duka na password yake kuendelea.</p>
+      </div>
+
+      <form id="loginForm" novalidate>
+        <label for="storeName" data-i18n="storeLabel">Jina la duka</label>
+        <div class="field">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 9 12 4l8.5 5v10.5H3.5V9Z"/><path d="M8 19.5v-6h8v6M3.5 9h17"/></svg>
+          <input id="storeName" name="storeName" type="text" autocomplete="username" placeholder="Zuhura Shop" maxlength="80" required>
+        </div>
+
+        <div class="password-row">
+          <label for="storePassword" data-i18n="passwordLabel">Password ya duka</label>
+          <button type="button" class="link-button" id="forgotBtn" data-i18n="forgot">Umesahau password?</button>
+        </div>
+        <div class="field">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v2"/></svg>
+          <input id="storePassword" name="storePassword" type="password" autocomplete="current-password" placeholder="Ingiza password ya duka" minlength="8" maxlength="128" required>
+          <button type="button" class="eye-button" id="togglePassword" aria-label="Onyesha password"><svg viewBox="0 0 24 24"><path d="M2.5 12s3.2-6 9.5-6 9.5 6 9.5 6-3.2 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></button>
+        </div>
+
+        <div class="password-note"><span>i</span><p data-i18n="note">Password hii ni ya duka la ZUNE pekee; si password ya ZUNE Marketplace.</p></div>
+        <p id="formMessage" class="form-message" role="status" aria-live="polite"></p>
+        <button class="submit-button" type="submit" id="loginButton"><span data-i18n="login">INGIA KWENYE DUKA</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
+      </form>
+
+      <div class="approval-note"><span class="check">✓</span><p data-i18n="approval">Ni wauzaji walioidhinishwa na Admin Mkuu pekee wanaoweza kuingia.</p></div>
+      <div class="card-footer"><span data-i18n="footer">Duka jipya? Omba kufungua duka kupitia ZUNE Marketplace.</span></div>
     </section>
-
-    <section class="login-panel">
-      <div class="mobile-brand"><span class="brand-mark">Z</span><span class="brand-name">ZUNE<span>MAR</span></span></div>
-      <div class="language-switch" aria-label="Language">
-        <button type="button" class="lang-btn active" data-lang="sw">SW</button>
-        <span></span>
-        <button type="button" class="lang-btn" data-lang="en">EN</button>
-      </div>
-      <div class="login-content">
-        <div class="welcome-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 19 7v5.2c0 4.2-2.8 7.1-7 8.8-4.2-1.7-7-4.6-7-8.8V7l7-3.5Z"/><path d="m9 12 2 2 4-4"/></svg></div>
-        <span class="eyebrow green" data-i18n="welcome_back">KARIBU TENA</span>
-        <h2 data-i18n="login_title">Ingia kwenye duka lako</h2>
-        <p class="subheading" data-i18n="login_subtitle">Tumia jina la duka na Store Password yako kuendelea.</p>
-
-        <form id="loginForm" novalidate>
-          <label for="storeName" data-i18n="store_name">Jina la duka</label>
-          <div class="input-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 9 12 4l8.5 5v10.5H3.5V9Z"/><path d="M8 19.5v-6h8v6M3.5 9h17"/></svg><input id="storeName" name="storeName" type="text" autocomplete="username" placeholder="Mf. Zuri Fashion" required maxlength="80"></div>
-
-          <div class="password-label"><label for="storePassword" data-i18n="store_password">Store Password</label><button class="text-button" type="button" id="forgotBtn" data-i18n="forgot_password">Umesahau password?</button></div>
-          <div class="input-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v2"/></svg><input id="storePassword" name="storePassword" type="password" autocomplete="current-password" placeholder="Ingiza Store Password" required minlength="8" maxlength="128"><button type="button" class="eye-button" id="togglePassword" aria-label="Show password"><svg viewBox="0 0 24 24"><path d="M2.5 12s3.2-6 9.5-6 9.5 6 9.5 6-3.2 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></button></div>
-
-          <div class="notice" role="note"><span class="notice-icon">i</span><span data-i18n="password_note">Hii ni password ya ZUNEMAR pekee — si password ya ZUNE Marketplace.</span></div>
-          <div id="formMessage" class="form-message" role="status" aria-live="polite"></div>
-          <button class="submit-button" type="submit" id="loginButton"><span data-i18n="login_button">Ingia kwenye duka</span><svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
-        </form>
-        <div class="approval-note"><span class="lock-icon">✓</span><span data-i18n="approval_note">Ni maduka yaliyoidhinishwa na Admin Mkuu pekee yanayoweza kuingia.</span></div>
-        <div class="divider"><span data-i18n="new_seller">Huna duka la ZUNEMAR?</span></div>
-        <a class="register-link" href="register.html" data-i18n="apply_link">Omba kufungua duka <span>↗</span></a>
-      </div>
-      <footer class="login-footer"><span>© 2026 ZUNEMAR</span><a href="https://whatsapp.com/channel/0029Vb98cx12v1J0skZQ5K36" target="_blank" rel="noopener" data-i18n="help">Unahitaji msaada?</a></footer>
-    </section>
+    <footer class="page-footer"><span>© 2026 ZUNE</span><a href="https://whatsapp.com/channel/0029Vb98cx12v1J0skZQ5K36" target="_blank" rel="noopener" data-i18n="help">Unahitaji msaada?</a></footer>
   </main>
   <script type="module" src="login.js"></script>
 </body>
