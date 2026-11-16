@@ -16,6 +16,7 @@ async function init(){
  if(key==="reports"){location.replace("sales-reports.html");return;}
  if(key==="downloads"){location.replace("download-reports.html");return;}
  if(key==="customers"){location.replace("customers.html");return;}
+ if(key==="messages"){location.replace("messages.html");return;}
  if(key==="store"){
   const{data:storeId,error:storeError}=await supabase.rpc("zune_seller_portal_current_store_id");
   if(storeError||!storeId){
