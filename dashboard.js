@@ -9,7 +9,7 @@ async function boot(){
  const store=Array.isArray(stores)?stores[0]:stores;
  if(error||!store){content.innerHTML='<p class="error">Imeshindikana kuthibitisha taarifa za duka. Tafadhali ingia tena au wasiliana na ZUNE Support.</p>';return}
  const first=(store.store_name||"Z").trim().charAt(0).toUpperCase();
- const logo=store.logo_url?'<img src="'+String(store.logo_url).replace(/"/g,"&quot;")+'" alt="">':first;
+ const logo=store.logo_url?'<img src="'+escapeHtml(store.logo_url)+'" alt="">':first;
  content.className="";
  content.innerHTML='<div class="welcome"><span class="eyebrow">ZUNE SELLER PORTAL</span><h1>Karibu kwenye Seller Dashboard</h1><p>Umeingia kwa utambulisho maalum wa duka lako. Password ya Marketplace haijabadilishwa.</p></div><section class="store-card"><div class="store-logo">'+logo+'</div><div class="store-meta"><h2>'+escapeHtml(store.store_name)+'</h2><p>'+escapeHtml([store.category,store.district,store.region].filter(Boolean).join(" · "))+'</p><span class="status">'+escapeHtml(store.store_status||"Open")+'</span></div></section><div class="notice">Akaunti yako ya Seller Dashboard imetenganishwa na akaunti ya ZUNE Marketplace. Hapa ndipo tutakapoongeza vipengele vya kusimamia bidhaa, oda na taarifa za duka.</div>';
 }
