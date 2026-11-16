@@ -22,6 +22,16 @@ const copy = {
     passwordPlaceholder:"Ingiza password ya duka", missing:"Jaza jina la duka na password.",
     firstSetup:"Mara ya kwanza? Tengeneza password ya duka",
     loading:"Please wait...", loginError:"Store name or password is incorrect."
+  },
+  en: {
+    portal:"SELLER PORTAL", welcome:"WELCOME BACK", title:"Sign in to your store",
+    subtitle:"Continue with your store name and its password.", storeLabel:"Store name",
+    passwordLabel:"Store password", forgot:"Forgot password?", note:"This password is only for your ZUNE store, not your ZUNE Marketplace account.",
+    login:"SIGN IN TO YOUR STORE", approval:"Only sellers approved by the Head Admin can sign in.",
+    footer:"New store? Apply through ZUNE Marketplace.", help:"Need help?",
+    passwordPlaceholder:"Enter your store password", missing:"Enter your store name and password.",
+    firstSetup:"First time here? Create your store password",
+    loading:"Please wait...", loginError:"Store name or password is incorrect."
   }
 };
 
