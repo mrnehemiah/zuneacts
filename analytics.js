@@ -8,7 +8,8 @@ async function load(){const days=Number($("#period").value)||30;$("#periodLabel"
 try{const{data:{session},error:authError}=await db.auth.getSession();if(authError)throw authError;if(!session){location.replace("index.html");return}
 const{data:owner,error:ownerError}=await db.rpc("zune_seller_owner_id");if(ownerError)throw ownerError;if(!owner)throw new Error(t("Duka halijathibitishwa.","Seller store could not be verified."));
 const since=new Date(Date.now()-days*86400000).toISOString();
-const{data:products,error:productError,count:productCount}=await db.from("products").select("id",{count:"exact"}).eq("vendor_id",owner).is("removed_at",null).limit(2000);if(productError)throw productError;
+const[{count:productCount,error:countError},{data:products,error:productError}]=await Promise.all([db.from("products").select("id",{count:"exact",head:true}).eq("vendor_id",owner).is("removed_at",null),db.from("products").select("id").eq("vendor_id",owner).limit(2000)]);
+if(countError)throw countError;if(productError)throw productError;
 const ids=(products||[]).map(p=>p.id);let orders=[];
 if(ids.length){const{data,error}=await db.from("orders").select("id,buyer_id,product_id,total_price,status,created_at").in("product_id",ids).gte("created_at",since).order("created_at",{ascending:true}).limit(2000);if(error)throw error;orders=data||[]}
 const completed=orders.filter(x=>x.status==="completed"),sales=completed.reduce((s,x)=>s+Number(x.total_price||0),0),buyers=new Set(orders.map(x=>x.buyer_id).filter(Boolean));
