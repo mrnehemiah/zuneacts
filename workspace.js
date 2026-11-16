@@ -9,6 +9,10 @@ async function init(){
  if(key==="products"){location.replace("products.html");return;}
  if(key==="orders"){location.replace("orders.html");return;}
  if(key==="analytics"){location.replace("analytics.html");return;}
+ if(key==="store"){location.replace("store-appearance.html");return;}
+ if(key==="customize"){location.replace("store-customize.html");return;}
+ if(key==="schedule"){location.replace("store-schedule.html");return;}
+ if(key==="vacation"){location.replace("store-vacation.html");return;}
  if(key==="store"){
   const{data:storeId,error:storeError}=await supabase.rpc("zune_seller_portal_current_store_id");
   if(storeError||!storeId){
