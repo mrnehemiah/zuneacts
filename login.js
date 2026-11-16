@@ -22,7 +22,7 @@ const copy = {
     passwordPlaceholder:"Ingiza password ya duka", missing:"Jaza jina la duka na password.",
     firstSetup:"Mara ya kwanza? Tengeneza password ya duka",
     otpSent:"OTP imetumwa kwenye email ya maombi ya duka.", invalidPassword:"Password lazima iwe na angalau herufi/namba 4.",
-    mismatch:"Password ulizoweka hazifanani.", otpMissing:"Weka OTP yenye tarakimu 6.",
+    mismatch:"Password ulizoweka hazifanani.", otpMissing:"Weka OTP yenye tarakimu 8.",
     setupTitle:"Thibitisha email ya maombi", setupDescription:"Tutakutumia OTP kwenye email uliyotumia kuomba duka.",
     resetTitle:"Thibitisha umiliki wa duka", resetDescription:"Tutakutumia OTP kwenye email ya maombi ili kuweka password mpya.",
     complete:"THIBITISHA NA HIFADHI", resetComplete:"BADILISHA PASSWORD", back:"Rudi kwenye login",
@@ -37,7 +37,7 @@ const copy = {
     passwordPlaceholder:"Enter your store password", missing:"Enter your store name and password.",
     firstSetup:"First time here? Create your store password",
     otpSent:"A verification code was sent to your application email.", invalidPassword:"Password must contain at least 4 characters.",
-    mismatch:"The passwords do not match.", otpMissing:"Enter the 6-digit email code.",
+    mismatch:"The passwords do not match.", otpMissing:"Enter the 8-digit email code.",
     setupTitle:"Verify your application email", setupDescription:"We will send a code to the email used in your store application.",
     resetTitle:"Verify store ownership", resetDescription:"We will send a code to your application email so you can set a new password.",
     complete:"VERIFY AND SAVE", resetComplete:"CHANGE PASSWORD", back:"Back to sign in",
@@ -171,7 +171,7 @@ completeButton.addEventListener("click", async () => {
   const otp = document.querySelector("#otpCode").value.trim();
   const password = document.querySelector("#newStorePassword").value;
   const confirm = document.querySelector("#confirmStorePassword").value;
-  if (!/^\d{6}$/.test(otp)) {
+  if (!/^\d{8}$/.test(otp)) {
     setupMessage.textContent = copy[lang].otpMissing;
     return;
   }
