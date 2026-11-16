@@ -13,3 +13,6 @@
 
 /* ZUNE scalloped verified seal */
 .store-name-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.verified-seal{width:25px;height:25px;flex:0 0 25px;color:#1877d2;vertical-align:middle;filter:drop-shadow(0 1px 2px #001b1430)}.verified-seal[hidden]{display:none!important}
+
+/* Business Overview uses the same ZUNE Admin SVG line icons as bottom navigation */
+.store-icon,.store-banner-icon,.stat-icon,.chart-symbol,.activity-empty>span,.quick-card>span{display:grid;place-items:center}.store-icon .icon{width:23px;height:23px;color:#e6c46a}.store-banner-icon .icon{width:25px;height:25px;color:#e6c46a}.stat-icon .icon{width:24px;height:24px;color:var(--emerald);stroke-width:1.8}.chart-symbol .icon{width:30px;height:30px;color:#75a995;stroke-width:1.8}.activity-empty>span .icon{width:25px;height:25px;color:#75a995}.quick-card>span .icon{width:25px;height:25px;color:var(--emerald)}.icon-button .icon{width:20px;height:20px;color:var(--green)}
