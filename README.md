@@ -2,36 +2,42 @@
 
 Standalone, mobile-first seller portal for ZUNE Marketplace. Built with vanilla HTML, CSS, and JavaScript.
 
-## Current milestone
-- Premium centered login card in emerald and white.
-- Official ZUNE mark: four circular letters (Z, U, N, E) with continuous wave motion.
-- Store Name + separate Store Password fields; placeholder example: **Zuhura Shop**.
-- Kiswahili / English language switch.
-- Admin Mkuu approval is required before seller access.
-- Customer store-entry transition with animated ZUNE circles and a dynamic store name.
+## Authentication milestone
+- ZUNE Seller Portal has an independent Supabase Auth identity for each approved store.
+- Store login uses **Store Name + Store Password** only; it never uses the Marketplace password.
+- Seller password is stored as a bcrypt hash on the server and accepts the agreed minimum of 4 characters.
+- First-time setup and password recovery use a one-time code sent to the email on the Seller Application.
+- The email on the application must match the Marketplace Auth account email, and the OTP must verify the original owner account.
+- Only an active, Admin-approved store with a verified owner link can create or use a Seller Portal identity.
+- The Seller Portal uses a separate browser storage key (`zune-seller-portal-auth`) so it does not overwrite the Marketplace Supabase session.
+- Login and OTP requests are rate-limited server-side.
+- Existing store, product, and order rows are not re-created or reassigned.
 
-## Authentication and security
-The login interface is deployed as a visual milestone, but secure independent Store Name + Store Password authentication is **not yet enabled**. The form intentionally reports that sign-in is unavailable rather than simulating a successful login. The existing legacy store-login Edge Function is disabled and must not be used.
+## Backend
+- Supabase project: `rpkogiieegqgxqbzwxwo`
+- Edge Function: `seller-portal-auth` (JWT verification is disabled at the gateway because it performs its own checks and handles first-time OTP setup; never trust browser-supplied owner IDs).
+- Private table: `private.seller_portal_identities`
+- RLS maps the dedicated seller auth identity to its verified Marketplace owner for the seller's own store, products, orders, order items, profile, and notifications.
+- The Supabase service-role key is used only inside the Edge Function environment and is never placed in the repository or browser code.
 
-The next backend milestone must verify the store password server-side, enforce Admin approval and seller account status, issue a valid Supabase Auth session, and include rate limiting and password recovery. Never check passwords in browser JavaScript, store plaintext passwords, or expose a service-role key.
+### Required Supabase email template setting
+To send a six-digit code instead of a magic link, open **Supabase Dashboard → Authentication → Email Templates → Magic Link** and make the message include the OTP token variable:
 
-Supabase project: `rpkogiieegqgxqbzwxwo`. Browser code uses only the publishable key if/when required.
+```html
+<h2>ZUNE Seller Portal verification</h2>
+<p>Your one-time verification code is: {{ .Token }}</p>
+```
+
+Save the template. Keep OTP expiry and rate limits enabled. The Seller Portal uses the Email OTP flow and will not ask for the Marketplace password.
 
 ## Files
-- `index.html` — Seller Login
-- `login.css` — responsive login card and continuous circular-letter wave animation
-- `login.js` — language switch, password visibility, and safe not-ready state
-- `store-entry.html` — customer welcome transition preview
-- `store-entry.css` — customer transition styling and animations
-- `store-entry.js` — reads the store name from the `store` or `name` query parameter
-- `.github/workflows/pages.yml` — GitHub Pages deployment workflow
-
-## Preview
-- Login: `/`
-- Store transition example: `/store-entry.html?store=Zuhura%20Shop`
+- `index.html`, `login.css`, `login.js` — login, first-time password setup, OTP verification, and password recovery.
+- `dashboard.html`, `dashboard.js` — authenticated Seller Portal landing page and current-store lookup.
+- `store-entry.html`, `store-entry.css`, `store-entry.js` — customer store welcome transition.
+- `.github/workflows/pages.yml` — GitHub Pages deployment.
 
 ## Deployment
-Pushing to `main` triggers the GitHub Pages workflow. The repository's Pages deployment must be enabled with **GitHub Actions** as its source.
+Pushes to `main` trigger GitHub Pages deployment. In repository Settings → Pages, the source must be **GitHub Actions**.
 
-## Next
-Complete and test the independent seller authentication backend before enabling sign-in or building protected dashboard pages.
+## Important
+The authentication backend and schema are deployed, but the end-to-end OTP/password login still requires a real email-template check and a controlled test with an approved seller account. Do not announce production readiness until that test succeeds.
