@@ -16,3 +16,6 @@
 
 /* Business Overview uses the same ZUNE Admin SVG line icons as bottom navigation */
 .store-icon,.store-banner-icon,.stat-icon,.chart-symbol,.activity-empty>span,.quick-card>span{display:grid;place-items:center}.store-icon .icon{width:23px;height:23px;color:#e6c46a}.store-banner-icon .icon{width:25px;height:25px;color:#e6c46a}.stat-icon .icon{width:24px;height:24px;color:var(--emerald);stroke-width:1.8}.chart-symbol .icon{width:30px;height:30px;color:#75a995;stroke-width:1.8}.activity-empty>span .icon{width:25px;height:25px;color:#75a995}.quick-card>span .icon{width:25px;height:25px;color:var(--emerald)}.icon-button .icon{width:20px;height:20px;color:var(--green)}
+
+/* Keep seller navigation visible and consistent on tablet-width screens */
+@media(max-width:900px){.sidebar{display:none!important}.main-area{margin-left:0!important}body{padding-bottom:88px}.bottom-nav{position:fixed!important;display:flex!important;inset:auto 0 0!important;z-index:50!important;justify-content:space-around;background:#073f32;padding:9px 5px calc(9px + env(safe-area-inset-bottom));box-shadow:0 -5px 20px #102f2418}.bottom-link{flex:1;min-width:0}}
