@@ -10,3 +10,6 @@
 
 /* Shared ZUNE Admin icon sprite */
 .zune-icon-sprite{position:absolute;width:0;height:0;overflow:hidden}.icon{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}.bottom-nav a .icon{width:27px;height:27px;color:#9db3a8;stroke-width:1.9}.bottom-nav a.active .icon{color:#e6c46a}.bottom-nav a.active{background:#143026;color:#e6c46a;border-radius:14px}
+
+/* Final consistent SVG icon sizing for every More service and category */
+.group-icon .icon{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.service-icon svg,.list-icon svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.service-card b{font-size:0}.service-card b:after{content:"";display:block;width:10px;height:10px;border-top:1.7px solid currentColor;border-right:1.7px solid currentColor;transform:rotate(0deg)}
