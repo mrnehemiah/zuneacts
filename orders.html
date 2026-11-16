@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="sw">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#073f32"><title>ZUNE | Orders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="orders.css?v=orders-1">
+</head>
+<body>
+<header class="topbar"><a class="logo" href="dashboard.html">ⓏⓊⓃⒺ <small>SELLER WORKSPACE</small></a><div class="top-actions"><a href="dashboard.html" class="back-link">← Dashboard</a><div class="lang"><button class="lang-btn active" data-lang="sw">SW</button><button class="lang-btn" data-lang="en">EN</button></div><button class="avatar" id="avatar">Z</button></div></header>
+<main class="page">
+<div class="page-head"><div><p class="eyebrow">ZUNE SELLER WORKSPACE</p><h1 data-i18n="title">Oda za duka</h1><p class="muted" data-i18n="subtitle">Pokea, kagua na simamia oda za wateja wako.</p></div><button class="refresh" id="refreshBtn">↻ <span data-i18n="refresh">Onyesha upya</span></button></div>
+<section class="summary" aria-label="Order summary">
+<article class="summary-card"><span data-i18n="all">Oda zote</span><strong id="allCount">—</strong></article>
+<article class="summary-card"><span data-i18n="pending">Zinasubiri</span><strong id="pendingCount">—</strong></article>
+<article class="summary-card"><span data-i18n="confirmed">Zimethibitishwa</span><strong id="confirmedCount">—</strong></article>
+<article class="summary-card"><span data-i18n="completed">Zimekamilika</span><strong id="completedCount">—</strong></article>
+</section>
+<section class="orders-panel">
+<div class="toolbar"><div class="tabs" id="statusTabs"><button class="tab active" data-status="all" data-i18n="all">Zote</button><button class="tab" data-status="pending" data-i18n="pending">Zinasubiri</button><button class="tab" data-status="confirmed" data-i18n="confirmed">Zimethibitishwa</button><button class="tab" data-status="completed" data-i18n="completed">Zimekamilika</button><button class="tab" data-status="cancelled" data-i18n="cancelled">Zimekataliwa</button></div><label class="search"><span>⌕</span><input id="searchInput" type="search" placeholder="Tafuta oda au mteja..." data-i18n-placeholder="search"></label></div>
+<div id="ordersList" class="orders-list"><div class="loading"><span class="spinner"></span><p data-i18n="loading">Inapakia oda...</p></div></div>
+</section>
+</main>
+<div class="drawer-backdrop" id="drawerBackdrop" hidden></div><aside class="drawer" id="orderDrawer" aria-hidden="true"><div class="drawer-head"><div><p class="eyebrow" data-i18n="details">TAARIFA ZA ODA</p><h2 id="drawerTitle">Order details</h2></div><button class="close" id="closeDrawer" aria-label="Close">×</button></div><div id="drawerBody" class="drawer-body"></div><div id="drawerActions" class="drawer-actions"></div></aside>
+<div class="toast" id="toast" role="status"></div>
+<nav class="bottom-nav"><a href="dashboard.html"><span>⌂</span><small data-i18n="home">Home</small></a><a href="products.html"><span>▧</span><small data-i18n="products">Bidhaa</small></a><a class="active" href="orders.html"><span>▣</span><small data-i18n="orders">Oda</small></a><a href="workspace.html?feature=analytics"><span>⌁</span><small>Analytics</small></a><a href="more.html"><span>☰</span><small data-i18n="more">Zaidi</small></a></nav>
+<script type="module" src="orders.js?v=orders-1"></script>
+</body></html>
