@@ -44,7 +44,7 @@
 
         <div class="password-row">
           <label for="storePassword" data-i18n="passwordLabel">Password ya duka</label>
-          <button type="button" class="link-button" id="forgotBtn" data-i18n="forgot">Umesahau password?</button>
+          <a class="link-button" href="./setup.html?mode=reset" data-i18n="forgot">Umesahau password?</a>
         </div>
         <div class="field">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v2"/></svg>
@@ -53,22 +53,10 @@
         </div>
 
         <div class="password-note"><span>i</span><p data-i18n="note">Password hii ni ya duka la ZUNE pekee; si password ya ZUNE Marketplace.</p></div>
-        <button type="button" class="setup-link" id="firstSetupBtn" data-i18n="firstSetup">Mara ya kwanza? Tengeneza password ya duka</button>
+        <a class="setup-link" href="./setup.html" data-i18n="firstSetup">Mara ya kwanza? Tengeneza password ya duka</a>
         <p id="formMessage" class="form-message" role="status" aria-live="polite"></p>
         <button class="submit-button" type="submit" id="loginButton"><span data-i18n="login">INGIA KWENYE DUKA</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
       </form>
-      <section id="setupPanel" class="setup-panel" hidden>
-        <div class="setup-heading"><span class="setup-step">UTHIBITISHO WA DUKA</span><h2 id="setupTitle">Thibitisha email ya maombi</h2><p id="setupDescription">Tutakutumia OTP kwenye email uliyotumia kuomba duka.</p></div>
-        <label for="otpCode">OTP ya email</label>
-        <div class="field"><input id="otpCode" type="tel" inputmode="numeric" pattern="[0-9]{8}" minlength="8" maxlength="8" autocomplete="one-time-code" autocapitalize="off" spellcheck="false" placeholder="Ingiza tarakimu zote 8"></div>
-        <label for="newStorePassword">Password mpya ya duka</label>
-        <div class="field"><input id="newStorePassword" type="password" minlength="4" maxlength="128" autocomplete="new-password" placeholder="Angalau herufi/namba 4"></div>
-        <label for="confirmStorePassword">Rudia password mpya</label>
-        <div class="field"><input id="confirmStorePassword" type="password" minlength="4" maxlength="128" autocomplete="new-password" placeholder="Thibitisha password"></div>
-        <p id="setupMessage" class="form-message" role="status" aria-live="polite"></p>
-        <button type="button" class="submit-button" id="completeSetupBtn"><span id="completeSetupText">THIBITISHA NA HIFADHI</span></button>
-        <button type="button" class="setup-back" id="backToLoginBtn">Rudi kwenye login</button>
-      </section>
 
       <div class="approval-note"><span class="check">✓</span><p data-i18n="approval">Ni wauzaji walioidhinishwa na Admin Mkuu pekee wanaoweza kuingia.</p></div>
       <div class="card-footer"><a class="marketplace-apply-link" href="https://mrnehemiah.github.io/Z-marketing-/" target="_blank" rel="noopener noreferrer" data-i18n="footer">Duka jipya? Omba kufungua duka kupitia ZUNE Marketplace. <span aria-hidden="true">↗</span></a></div>
