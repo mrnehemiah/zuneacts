@@ -7,15 +7,15 @@ async function init(){
  const{data:{session},error}=await supabase.auth.getSession();
  if(error||!session){location.replace("./index.html");return}
  if(key==="store"){
-  const{data,error:storeError}=await supabase.rpc("zune_seller_portal_current_store");
-  const store=Array.isArray(data)?data[0]:data;
-  if(storeError||!store?.id){
+  const{data:storeId,error:storeError}=await supabase.rpc("zune_seller_portal_current_store_id");
+  if(storeError||!storeId){
+   console.error("Storefront link lookup:",storeError);
    document.querySelector("#moduleTitle").textContent="Duka halijapatikana";
-   document.querySelector("#moduleText").textContent="Imeshindikana kupata kitambulisho cha duka lako. Rudi kwenye dashboard au wasiliana na msaada.";
+   document.querySelector("#moduleText").textContent="Imeshindikana kupata kiungo cha duka lako. Hakikisha duka limeidhinishwa na akaunti yako iko hai.";
    document.querySelector(".status").textContent="HAKUNA TAARIFA";
    return;
   }
-  location.replace("storefront.html?store="+encodeURIComponent(store.id)+"&preview=1");
+  location.replace("storefront.html?store="+encodeURIComponent(storeId)+"&preview=1");
   return;
  }
  const item=modules[key]||["Business Tools","This workspace module is being prepared.","✦"];
