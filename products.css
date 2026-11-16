@@ -30,3 +30,6 @@
 @media(prefers-reduced-motion:reduce){
   .product-card{animation:none}
 }
+
+/* Keep seller navigation visible on phones and tablet-width screens */
+@media(max-width:900px){.sidebar{display:none!important}.main{margin-left:0!important}body{padding-bottom:86px}.bottom-nav{position:fixed!important;display:flex!important;inset:auto 0 0!important;z-index:50!important;justify-content:space-around;background:#073f32;padding:9px 4px calc(9px + env(safe-area-inset-bottom));box-shadow:0 -5px 20px #102f2418}.bottom-nav a{flex:1;min-width:0}}
