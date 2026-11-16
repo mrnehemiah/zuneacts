@@ -5,7 +5,8 @@ document.querySelector("#signOut").addEventListener("click",async()=>{await supa
 async function boot(){
  const {data:{session},error:sessionError}=await supabase.auth.getSession();
  if(sessionError||!session){location.replace("./index.html");return}
- const {data:store,error}=await supabase.from("stores").select("store_name,category,logo_url,store_status,region,district").maybeSingle();
+ const {data:stores,error}=await supabase.rpc("zune_seller_portal_current_store");
+ const store=Array.isArray(stores)?stores[0]:stores;
  if(error||!store){content.innerHTML='<p class="error">Imeshindikana kuthibitisha taarifa za duka. Tafadhali ingia tena au wasiliana na ZUNE Support.</p>';return}
  const first=(store.store_name||"Z").trim().charAt(0).toUpperCase();
  const logo=store.logo_url?'<img src="'+String(store.logo_url).replace(/"/g,"&quot;")+'" alt="">':first;
