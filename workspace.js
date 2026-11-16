@@ -6,7 +6,9 @@ const key=new URLSearchParams(location.search).get("feature")||"products";
 async function init(){
  const{data:{session},error}=await supabase.auth.getSession();
  if(error||!session){location.replace("./index.html");return}
- if(key==="products"){location.replace("products.html");return;}\n if(key==="orders"){location.replace("orders.html");return;}
+ if(key==="products"){location.replace("products.html");return;}
+ if(key==="orders"){location.replace("orders.html");return;}
+ if(key==="analytics"){location.replace("analytics.html");return;}
  if(key==="store"){
   const{data:storeId,error:storeError}=await supabase.rpc("zune_seller_portal_current_store_id");
   if(storeError||!storeId){
