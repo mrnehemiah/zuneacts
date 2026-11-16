@@ -1,20 +1,104 @@
 <!doctype html>
 <html lang="sw">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#087f5b"><meta name="description" content="ZUNE Seller Dashboard">
-<title>ZUNE | Seller Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{font-family:"DM Sans",sans-serif;color:#18352a;background:#f4f8f5}*{box-sizing:border-box}body{margin:0;min-height:100vh}.shell{max-width:1080px;margin:auto;padding:22px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:flex;align-items:center;gap:10px;font:800 18px Manrope;color:#087f5b}.mark{display:flex;gap:3px}.mark span{width:27px;height:27px;border:1.5px solid #087f5b;border-radius:50%;display:grid;place-items:center;font-size:12px;animation:wave 1.3s ease-in-out infinite}.mark span:nth-child(2){animation-delay:.12s}.mark span:nth-child(3){animation-delay:.24s}.mark span:nth-child(4){animation-delay:.36s}@keyframes wave{50%{transform:translateY(-5px)}}.signout{border:1px solid #dce8df;background:#fff;color:#315344;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}.welcome{margin:38px 0 20px}.eyebrow{font-size:10px;letter-spacing:2px;color:#087f5b;font-weight:800}.welcome h1{font:800 clamp(26px,5vw,38px) Manrope;margin:8px 0;color:#173d2d}.welcome p{color:#78877f;font-size:13px}.store-card{background:#fff;border:1px solid #e5eee8;border-radius:22px;padding:24px;box-shadow:0 14px 40px #174a320d;display:flex;align-items:center;gap:18px}.store-logo{width:64px;height:64px;border-radius:18px;background:#eaf6ef;display:grid;place-items:center;color:#087f5b;font:800 24px Manrope;overflow:hidden;flex:none}.store-logo img{width:100%;height:100%;object-fit:cover}.store-meta{min-width:0}.store-meta h2{margin:0 0 5px;font:800 20px Manrope;color:#183b2d}.store-meta p{margin:0;color:#78877f;font-size:12px}.status{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 10px;border-radius:30px;background:#eaf6ef;color:#087f5b;font-size:10px;font-weight:800}.status:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}.notice{margin-top:18px;padding:16px 18px;border:1px solid #e3eee7;border-radius:14px;background:#f8fbf9;color:#60766a;font-size:12px;line-height:1.6}.loading{padding:70px 10px;text-align:center;color:#78877f;font-size:13px}.error{color:#b42318}@media(max-width:560px){.shell{padding:17px}.store-card{align-items:flex-start;padding:18px}.store-logo{width:54px;height:54px;border-radius:15px}.welcome{margin-top:28px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#087f5b">
+  <meta name="description" content="ZUNE Seller Dashboard — simamia duka lako.">
+  <title>ZUNE | Seller Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./dashboard.css">
 </head>
 <body>
-<main class="shell">
-<header class="top"><div class="brand"><div class="mark"><span>Z</span><span>U</span><span>N</span><span>E</span></div><span>SELLER</span></div><button id="signOut" class="signout">Toka</button></header>
-<section id="content" class="loading" aria-live="polite">Tunafungua akaunti yako salama...</section>
-</main>
-<script type="module" src="./dashboard.js"></script>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="./dashboard.html" aria-label="ZUNE Dashboard">
+        <span class="brand-mark"><i>Z</i><i>U</i><i>N</i><i>E</i></span>
+        <span class="brand-caption">SELLER PORTAL</span>
+      </a>
+      <div class="side-label" data-i18n="workspace">WORKSPACE</div>
+      <nav class="side-nav" aria-label="Main navigation">
+        <button class="nav-item active" data-view="overview"><span class="nav-icon">⌂</span><span data-i18n="overview">Muhtasari</span></button>
+        <button class="nav-item" data-view="products"><span class="nav-icon">▦</span><span data-i18n="products">Bidhaa</span><span class="nav-soon">•</span></button>
+        <button class="nav-item" data-view="orders"><span class="nav-icon">▤</span><span data-i18n="orders">Oda</span><span class="nav-soon">•</span></button>
+        <button class="nav-item" data-view="analytics"><span class="nav-icon">▥</span><span data-i18n="analytics">Takwimu</span><span class="nav-soon">•</span></button>
+      </nav>
+      <div class="side-label store-label" data-i18n="storeManagement">USIMAMIZI WA DUKA</div>
+      <nav class="side-nav">
+        <button class="nav-item" data-view="my-store"><span class="nav-icon">⌂</span><span data-i18n="myStore">Duka Langu</span><span class="nav-soon">•</span></button>
+        <button class="nav-item" data-view="customers"><span class="nav-icon">♧</span><span data-i18n="customers">Wateja</span><span class="nav-soon">•</span></button>
+        <button class="nav-item" data-view="verification"><span class="nav-icon">✓</span><span data-i18n="verification">Uthibitishaji</span><span class="nav-soon">•</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span><span data-i18n="settings">Mipangilio</span><span class="nav-soon">•</span></button>
+        <div class="sidebar-help"><span class="help-dot"></span><div><b data-i18n="needHelp">Unahitaji msaada?</b><a href="https://whatsapp.com/channel/0029Vb98cx12v1J0skZQ5K36" target="_blank" rel="noopener" data-i18n="contactSupport">Wasiliana na ZUNE</a></div></div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <button class="mobile-menu" id="menuToggle" aria-label="Fungua menyu">☰</button>
+        <div class="breadcrumb"><span>ZUNE</span><b>/</b><strong id="breadcrumbCurrent">Muhtasari</strong></div>
+        <div class="top-actions">
+          <button class="language-button" id="languageToggle" aria-label="Change language">SW <span>⌄</span></button>
+          <a class="icon-button" href="https://whatsapp.com/channel/0029Vb98cx12v1J0skZQ5K36" target="_blank" rel="noopener" aria-label="Msaada">?</a>
+          <button class="avatar-button" id="profileButton" aria-label="Taarifa za duka">Z</button>
+        </div>
+      </header>
+
+      <div class="page-content" id="pageContent" aria-live="polite">
+        <section class="welcome-row">
+          <div>
+            <p class="eyebrow" data-i18n="sellerWorkspace">SELLER WORKSPACE</p>
+            <h1><span data-i18n="hello">Habari</span>, <span id="sellerName">...</span> <span class="wave">👋</span></h1>
+            <p class="muted" data-i18n="welcomeText">Huu hapa muhtasari wa shughuli za duka lako leo.</p>
+          </div>
+          <div class="date-chip" id="todayDate">Leo</div>
+        </section>
+
+        <section class="store-banner">
+          <div class="store-avatar" id="storeAvatar">Z</div>
+          <div class="store-info">
+            <span class="store-kicker" data-i18n="yourStore">DUKA LAKO</span>
+            <h2 id="storeName">Tunapakia duka...</h2>
+            <p id="storeLocation">—</p>
+          </div>
+          <div class="store-banner-right">
+            <span class="status-pill" id="storeStatus"><i></i><span data-i18n="checking">Inathibitisha...</span></span>
+            <span class="verified-label" id="verifiedLabel" hidden>✓ <span data-i18n="verifiedStore">Duka limethibitishwa</span></span>
+          </div>
+        </section>
+
+        <section class="section-heading">
+          <div><h2 data-i18n="businessOverview">Muhtasari wa biashara</h2><p data-i18n="overviewHint">Takwimu zitaonekana hapa kadri shughuli zinavyofanyika.</p></div>
+          <span class="live-tag"><i></i><span data-i18n="accountConnected">Akaunti imeunganishwa</span></span>
+        </section>
+        <section class="stats-grid" aria-label="Business statistics">
+          <article class="stat-card"><div class="stat-top"><span data-i18n="totalProducts">Jumla ya bidhaa</span><span class="stat-icon green">▦</span></div><strong>—</strong><small data-i18n="productsStatHint">Bidhaa za duka lako</small></article>
+          <article class="stat-card"><div class="stat-top"><span data-i18n="newOrders">Oda mpya</span><span class="stat-icon amber">▤</span></div><strong>—</strong><small data-i18n="ordersStatHint">Zinazosubiri kushughulikiwa</small></article>
+          <article class="stat-card"><div class="stat-top"><span data-i18n="sales">Mauzo</span><span class="stat-icon blue">↗</span></div><strong>—</strong><small data-i18n="salesStatHint">Muhtasari wa mauzo</small></article>
+          <article class="stat-card"><div class="stat-top"><span data-i18n="customersStat">Wateja</span><span class="stat-icon purple">♧</span></div><strong>—</strong><small data-i18n="customersStatHint">Wateja wa duka lako</small></article>
+        </section>
+
+        <section class="lower-grid">
+          <article class="panel activity-panel">
+            <div class="panel-heading"><div><h2 data-i18n="recentActivity">Shughuli za hivi karibuni</h2><p data-i18n="activityHint">Taarifa za oda na bidhaa zitaonekana hapa.</p></div><span class="panel-symbol">◷</span></div>
+            <div class="empty-state"><span class="empty-icon">▤</span><b data-i18n="noActivity">Bado hakuna shughuli</b><p data-i18n="noActivityHint">Shughuli mpya za duka lako zitaonekana hapa zitakapoanza.</p></div>
+          </article>
+          <article class="panel shortcuts-panel">
+            <div class="panel-heading"><div><h2 data-i18n="quickAccess">Njia za mkato</h2><p data-i18n="quickHint">Fungua sehemu za usimamizi.</p></div></div>
+            <button class="shortcut" data-view="products"><span class="shortcut-icon">＋</span><span><b data-i18n="addProduct">Ongeza bidhaa</b><small data-i18n="addProductHint">Weka bidhaa mpya dukani</small></span><span class="arrow">›</span></button>
+            <button class="shortcut" data-view="orders"><span class="shortcut-icon amber">▤</span><span><b data-i18n="manageOrders">Simamia oda</b><small data-i18n="manageOrdersHint">Angalia oda za wateja</small></span><span class="arrow">›</span></button>
+            <button class="shortcut" data-view="my-store"><span class="shortcut-icon blue">⌂</span><span><b data-i18n="customizeStore">Boresha duka</b><small data-i18n="customizeStoreHint">Badilisha muonekano wa duka</small></span><span class="arrow">›</span></button>
+          </article>
+        </section>
+        <footer class="page-footer">© 2026 ZUNE <span data-i18n="footerText">Seller Portal · Biashara yako, kwa urahisi.</span></footer>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="./dashboard.js"></script>
 </body>
 </html>
