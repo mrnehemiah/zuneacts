@@ -10,7 +10,7 @@ async function init(){const {data:{session},error}=await supabase.auth.getSessio
 const {data,error:storeError}=await supabase.rpc("zune_seller_portal_current_store");
 if(storeError){console.error("Current store lookup:",storeError);$("#storeStatus").textContent=lang==="sw"?"Imeshindwa kusoma taarifa za duka":"Could not load store details";return}
 const store=Array.isArray(data)?data[0]:data;if(!store){$("#storeName").textContent="ZUNE";return}
-const name=store.store_name||store.name||store.name_of_store||"Duka lako la ZUNE";$("#storeName").textContent=name;$("#sideStoreName").textContent=name;$("#profileButton").textContent=name.trim().charAt(0).toUpperCase()||"Z";
+const name=store.store_name||store.name||store.name_of_store||"Duka lako la ZUNE";$("#storeName").textContent=name;const verified=store.is_verified===true||store.verified===true||store.store_verified===true||String(store.verification_status||"").toLowerCase()==="verified";const seal=$("#storeVerifiedBadge");if(seal)seal.hidden=!verified;$("#sideStoreName").textContent=name;$("#profileButton").textContent=name.trim().charAt(0).toUpperCase()||"Z";
 const state=store.status||store.store_status||"";if(state)$("#storeStatus").textContent=state}
 $("#logoutBtn").addEventListener("click",async()=>{await supabase.auth.signOut();location.replace("./index.html")});$("#profileButton").addEventListener("click",()=>toast(lang==="sw"?"Mipangilio ya akaunti itaongezwa kwenye Zaidi.":"Account settings are available under More."));
 init();
