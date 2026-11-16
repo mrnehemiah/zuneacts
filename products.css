@@ -2,3 +2,31 @@
 .field-hint{display:block;font-size:10px;font-weight:400;color:#89978f;margin-top:6px}.image-preview{display:flex;flex-wrap:wrap;gap:8px;margin:-4px 0 14px}.image-preview img{width:66px;height:66px;object-fit:cover;border-radius:9px;border:1px solid #e0e9e3}.old-price{font-size:10px;color:#9aa59f;text-decoration:line-through;margin-top:3px}form select{display:block;width:100%;border:1px solid #dfe9e2;border-radius:9px;padding:12px;margin-top:7px;font:12px "DM Sans";outline:none;color:#18382a;background:#fff}form select:focus{border-color:#168568;box-shadow:0 0 0 3px #16856818}
 .bottom-nav{display:none}
 @media(max-width:700px){.content{padding-bottom:112px}.bottom-nav{position:fixed;display:flex;inset:auto 0 0;background:#073f32;padding:9px 4px calc(9px + env(safe-area-inset-bottom));justify-content:space-around;z-index:9;box-shadow:0 -5px 20px #102f2418}.bottom-nav a{display:flex;flex:1;min-width:0;flex-direction:column;align-items:center;gap:4px;color:#d6e6de;text-decoration:none;font-size:20px;padding:3px 0}.bottom-nav a small{font-size:9px}.bottom-nav a>span{display:grid;place-items:center;width:43px;height:30px}.bottom-nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.bottom-nav a.active{color:#f3d68e}.bottom-nav a.active>span{background:#ffffff18;border-radius:12px}}
+
+/* Animated Tanzania flag edge for product cards */
+.product-card{
+  border:2px solid transparent;
+  background:
+    linear-gradient(#fff,#fff) padding-box,
+    linear-gradient(135deg,
+      #1eb53a 0%,#1eb53a 22%,
+      #fcd116 22%,#fcd116 27%,
+      #111 27%,#111 70%,
+      #fcd116 70%,#fcd116 75%,
+      #00a3dd 75%,#00a3dd 100%) border-box;
+  background-size:auto,260% 260%;
+  background-position:0 0,0% 50%;
+  animation:tanzaniaFlagFlow 7s ease-in-out infinite;
+}
+.product-card:hover{
+  background-position:0 0,100% 50%;
+  box-shadow:0 12px 28px #153d2918;
+}
+@keyframes tanzaniaFlagFlow{
+  0%{background-position:0 0,0% 50%}
+  50%{background-position:0 0,100% 50%}
+  100%{background-position:0 0,0% 50%}
+}
+@media(prefers-reduced-motion:reduce){
+  .product-card{animation:none}
+}
