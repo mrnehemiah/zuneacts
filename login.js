@@ -104,15 +104,22 @@ async function requestCode(mode) {
   message.textContent = "";
   const trigger = mode === "reset" ? document.querySelector("#forgotBtn") : document.querySelector("#firstSetupBtn");
   trigger.disabled = true;
+
+  // Fungua panel mara moja ili mtumiaji aone hatua inayoendelea.
+  // Hitilafu za API zionekane ndani ya panel, si kwenye form iliyofichwa.
+  showSetup(mode);
+  setupMessage.textContent = copy[lang].loading;
+  setupMessage.classList.remove("error-message");
+
   try {
     const result = await callAuth({ action: mode === "reset" ? "request-reset-otp" : "request-otp", store_name: storeName });
-    showSetup(mode);
     setupMessage.textContent = result.email_hint
       ? (lang === "sw" ? "OTP imetumwa kwa " : "Code sent to ") + result.email_hint
-      : result.message;
+      : (result.message || copy[lang].otpSent);
     setupMessage.classList.remove("error-message");
   } catch (error) {
-    message.textContent = error.message;
+    setupMessage.textContent = error.message || "Ombi la OTP halijafanikiwa. Rudi nyuma ujaribu tena.";
+    setupMessage.classList.add("error-message");
   } finally {
     trigger.disabled = false;
   }
