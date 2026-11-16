@@ -7,3 +7,6 @@
 
 /* ZUNE Admin reference icon treatment */
 .bottom-link .nav-icon{display:grid;place-items:center;width:42px;height:30px;color:#d9bd78}.bottom-link .nav-icon svg{display:block!important;width:27px;height:27px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.bottom-link.active .nav-icon{color:#f0d58f}.bottom-link.active{background:linear-gradient(135deg,#d9b66c20,#d9b66c08);box-shadow:inset 0 0 0 1px #d9b66c22}.bottom-link.active:before{display:none}
+
+/* Shared ZUNE Admin icon sprite */
+.zune-icon-sprite{position:absolute;width:0;height:0;overflow:hidden}.icon{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}.nav-link .icon{width:24px;height:24px;color:#e6c46a;stroke-width:1.9}.nav-link.active{background:#143026;color:#fff;box-shadow:inset 3px 0 0 #3ddc97}.bottom-link .icon{width:27px;height:27px;color:#9db3a8;stroke-width:1.9}.bottom-link.active .icon{color:#e6c46a}.bottom-link.active{background:#143026;color:#e6c46a;border-radius:14px}.stat-icon .icon,.store-banner-icon .icon,.quick-card .icon{color:var(--emerald)}
