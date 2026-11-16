@@ -16,8 +16,8 @@ const copy = {
   sw: {
     portal:"SELLER PORTAL", welcome:"KARIBU TENA", title:"Ingia kwenye duka lako",
     subtitle:"Tumia jina la duka na password yake kuendelea.", storeLabel:"Jina la duka",
-    passwordLabel:"Password ya duka", forgot:"Umesahau password?", note:"Password hii ni ya duka la ZUNE pekee; si password ya ZUNE Marketplace.",
-    login:"INGIA KWENYE DUKA", approval:"Ni wauzaji walioidhinishwa na Admin Mkuu pekee wanaoweza kuingia.",
+    passwordLabel:"Password ya duka", forgot:"Umesahau password?",
+    login:"INGIA KWENYE DUKA",
     footer:"Duka jipya? Omba kufungua duka kupitia ZUNE Marketplace.", help:"Unahitaji msaada?",
     passwordPlaceholder:"Ingiza password ya duka", missing:"Jaza jina la duka na password.",
     firstSetup:"Mara ya kwanza? Tengeneza password ya duka",
@@ -26,8 +26,8 @@ const copy = {
   en: {
     portal:"SELLER PORTAL", welcome:"WELCOME BACK", title:"Sign in to your store",
     subtitle:"Continue with your store name and its password.", storeLabel:"Store name",
-    passwordLabel:"Store password", forgot:"Forgot password?", note:"This password is only for your ZUNE store, not your ZUNE Marketplace account.",
-    login:"SIGN IN TO YOUR STORE", approval:"Only sellers approved by the Head Admin can sign in.",
+    passwordLabel:"Store password", forgot:"Forgot password?",
+    login:"SIGN IN TO YOUR STORE",
     footer:"New store? Apply through ZUNE Marketplace.", help:"Need help?",
     passwordPlaceholder:"Enter your store password", missing:"Enter your store name and password.",
     firstSetup:"First time here? Create your store password",
