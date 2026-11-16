@@ -21,47 +21,16 @@ const copy = {
     footer:"Duka jipya? Omba kufungua duka kupitia ZUNE Marketplace.", help:"Unahitaji msaada?",
     passwordPlaceholder:"Ingiza password ya duka", missing:"Jaza jina la duka na password.",
     firstSetup:"Mara ya kwanza? Tengeneza password ya duka",
-    otpSent:"OTP imetumwa kwenye email ya maombi ya duka.", invalidPassword:"Password lazima iwe na angalau herufi/namba 4.",
-    mismatch:"Password ulizoweka hazifanani.", otpMissing:"Weka OTP yenye tarakimu 8.",
-    setupTitle:"Thibitisha email ya maombi", setupDescription:"Tutakutumia OTP kwenye email uliyotumia kuomba duka.",
-    resetTitle:"Thibitisha umiliki wa duka", resetDescription:"Tutakutumia OTP kwenye email ya maombi ili kuweka password mpya.",
-    complete:"THIBITISHA NA HIFADHI", resetComplete:"BADILISHA PASSWORD", back:"Rudi kwenye login",
-    loading:"Tafadhali subiri...", loginError:"Jina la duka au password si sahihi."
-  },
-  en: {
-    portal:"SELLER PORTAL", welcome:"WELCOME BACK", title:"Sign in to your store",
-    subtitle:"Continue with your store name and its password.", storeLabel:"Store name",
-    passwordLabel:"Store password", forgot:"Forgot password?", note:"This password is only for your ZUNE store, not your ZUNE Marketplace account.",
-    login:"SIGN IN TO YOUR STORE", approval:"Only sellers approved by the Head Admin can sign in.",
-    footer:"New store? Apply through ZUNE Marketplace.", help:"Need help?",
-    passwordPlaceholder:"Enter your store password", missing:"Enter your store name and password.",
-    firstSetup:"First time here? Create your store password",
-    otpSent:"A verification code was sent to your application email.", invalidPassword:"Password must contain at least 4 characters.",
-    mismatch:"The passwords do not match.", otpMissing:"Enter the 8-digit email code.",
-    setupTitle:"Verify your application email", setupDescription:"We will send a code to the email used in your store application.",
-    resetTitle:"Verify store ownership", resetDescription:"We will send a code to your application email so you can set a new password.",
-    complete:"VERIFY AND SAVE", resetComplete:"CHANGE PASSWORD", back:"Back to sign in",
     loading:"Please wait...", loginError:"Store name or password is incorrect."
   }
 };
 
 let lang = "sw";
-let setupMode = "setup";
 const form = document.querySelector("#loginForm");
 const nameField = document.querySelector("#storeName");
 const passField = document.querySelector("#storePassword");
 const message = document.querySelector("#formMessage");
-const setupPanel = document.querySelector("#setupPanel");
-const setupMessage = document.querySelector("#setupMessage");
-const otpField = document.querySelector("#otpCode");
-// Keep the mobile OTP field explicitly configured for all eight numeric digits.
-otpField.maxLength = 8;
-otpField.addEventListener("input", () => {
-  const digits = otpField.value.replace(/\\D/g, "").slice(0, 8);
-  if (otpField.value !== digits) otpField.value = digits;
-});
 const loginButton = document.querySelector("#loginButton");
-const completeButton = document.querySelector("#completeSetupBtn");
 
 async function callAuth(payload) {
   const response = await fetch(AUTH_URL, {
@@ -83,66 +52,13 @@ function setLanguage(next) {
   });
   passField.placeholder = copy[lang].passwordPlaceholder;
   document.querySelectorAll(".lang-btn").forEach(b => b.classList.toggle("active", b.dataset.lang === next));
-  document.querySelector("#setupTitle").textContent = setupMode === "reset" ? copy[lang].resetTitle : copy[lang].setupTitle;
-  document.querySelector("#setupDescription").textContent = setupMode === "reset" ? copy[lang].resetDescription : copy[lang].setupDescription;
-  document.querySelector("#completeSetupText").textContent = setupMode === "reset" ? copy[lang].resetComplete : copy[lang].complete;
-  document.querySelector("#backToLoginBtn").textContent = copy[lang].back;
   try { localStorage.setItem("zune-seller-language", next); } catch {}
-}
-
-function showSetup(mode) {
-  setupMode = mode;
-  form.hidden = true;
-  setupPanel.hidden = false;
-  setupMessage.textContent = "";
-  document.querySelector("#otpCode").value = "";
-  document.querySelector("#newStorePassword").value = "";
-  document.querySelector("#confirmStorePassword").value = "";
-  setLanguage(lang);
-}
-
-async function requestCode(mode) {
-  const storeName = nameField.value.trim();
-  if (!storeName) {
-    message.textContent = copy[lang].missing;
-    nameField.focus();
-    return;
-  }
-  message.textContent = "";
-  const trigger = mode === "reset" ? document.querySelector("#forgotBtn") : document.querySelector("#firstSetupBtn");
-  trigger.disabled = true;
-
-  // Fungua panel mara moja ili mtumiaji aone hatua inayoendelea.
-  // Hitilafu za API zionekane ndani ya panel, si kwenye form iliyofichwa.
-  showSetup(mode);
-  setupMessage.textContent = copy[lang].loading;
-  setupMessage.classList.remove("error-message");
-
-  try {
-    const result = await callAuth({ action: mode === "reset" ? "request-reset-otp" : "request-otp", store_name: storeName });
-    setupMessage.textContent = result.email_hint
-      ? (lang === "sw" ? "OTP imetumwa kwa " : "Code sent to ") + result.email_hint
-      : (result.message || copy[lang].otpSent);
-    setupMessage.classList.remove("error-message");
-  } catch (error) {
-    setupMessage.textContent = error.message || "Ombi la OTP halijafanikiwa. Rudi nyuma ujaribu tena.";
-    setupMessage.classList.add("error-message");
-  } finally {
-    trigger.disabled = false;
-  }
 }
 
 document.querySelectorAll(".lang-btn").forEach(b => b.addEventListener("click", () => setLanguage(b.dataset.lang)));
 document.querySelector("#togglePassword").addEventListener("click", () => {
   passField.type = passField.type === "password" ? "text" : "password";
   document.querySelector("#togglePassword").setAttribute("aria-label", passField.type === "password" ? "Onyesha password" : "Ficha password");
-});
-document.querySelector("#forgotBtn").addEventListener("click", () => requestCode("reset"));
-document.querySelector("#firstSetupBtn").addEventListener("click", () => requestCode("setup"));
-document.querySelector("#backToLoginBtn").addEventListener("click", () => {
-  setupPanel.hidden = true;
-  form.hidden = false;
-  setupMessage.textContent = "";
 });
 
 form.addEventListener("submit", async event => {
@@ -169,46 +85,6 @@ form.addEventListener("submit", async event => {
   } finally {
     loginButton.disabled = false;
     loginButton.querySelector("span").textContent = copy[lang].login;
-  }
-});
-
-completeButton.addEventListener("click", async () => {
-  setupMessage.textContent = "";
-  const storeName = nameField.value.trim();
-  const otp = otpField.value.replace(/\\D/g, "").slice(0, 8);
-  const password = document.querySelector("#newStorePassword").value;
-  const confirm = document.querySelector("#confirmStorePassword").value;
-  if (!/^\d{8}$/.test(otp)) {
-    setupMessage.textContent = copy[lang].otpMissing;
-    return;
-  }
-  if (password.length < 4 || password.length > 128) {
-    setupMessage.textContent = copy[lang].invalidPassword;
-    return;
-  }
-  if (password !== confirm) {
-    setupMessage.textContent = copy[lang].mismatch;
-    return;
-  }
-  completeButton.disabled = true;
-  document.querySelector("#completeSetupText").textContent = copy[lang].loading;
-  try {
-    const result = await callAuth({
-      action: setupMode === "reset" ? "reset-password" : "complete-setup",
-      store_name: storeName, otp, password
-    });
-    const { error } = await supabase.auth.setSession({
-      access_token: result.session.access_token,
-      refresh_token: result.session.refresh_token
-    });
-    if (error) throw error;
-    window.location.assign("./dashboard.html");
-  } catch (error) {
-    setupMessage.textContent = error.message;
-    setupMessage.classList.add("error-message");
-  } finally {
-    completeButton.disabled = false;
-    document.querySelector("#completeSetupText").textContent = setupMode === "reset" ? copy[lang].resetComplete : copy[lang].complete;
   }
 });
 
