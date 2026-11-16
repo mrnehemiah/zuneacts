@@ -1,7 +1,6 @@
 const SUPABASE_URL = "https://rpkogiieegqgxqbzwxwo.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf";
 const LOGIN_FUNCTION = "zunemar-seller-login";
-
 const translations = {
   sw: {
     seller_portal:"SELLER PORTAL",brand_title:"Duka lako.<br>Biashara yako.<br><em>Udhibiti wako.</em>",
