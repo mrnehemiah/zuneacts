@@ -26,6 +26,8 @@ jobs:
           test -f store-entry.html
           test -f store-entry.css
           test -f store-entry.js
+          test -f dashboard.html
+          test -f dashboard.js
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
