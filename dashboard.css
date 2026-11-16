@@ -10,3 +10,6 @@
 
 /* Shared ZUNE Admin icon sprite */
 .zune-icon-sprite{position:absolute;width:0;height:0;overflow:hidden}.icon{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}.nav-link .icon{width:24px;height:24px;color:#e6c46a;stroke-width:1.9}.nav-link.active{background:#143026;color:#fff;box-shadow:inset 3px 0 0 #3ddc97}.bottom-link .icon{width:27px;height:27px;color:#9db3a8;stroke-width:1.9}.bottom-link.active .icon{color:#e6c46a}.bottom-link.active{background:#143026;color:#e6c46a;border-radius:14px}.stat-icon .icon,.store-banner-icon .icon,.quick-card .icon{color:var(--emerald)}
+
+/* ZUNE scalloped verified seal */
+.store-name-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.verified-seal{width:25px;height:25px;flex:0 0 25px;color:#1877d2;vertical-align:middle;filter:drop-shadow(0 1px 2px #001b1430)}.verified-seal[hidden]{display:none!important}
