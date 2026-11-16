@@ -1,0 +1,25 @@
+import{createClient}from"https://esm.sh/@supabase/supabase-js@2";
+const URL="https://rpkogiieegqgxqbzwxwo.supabase.co",KEY="sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf";
+const supabase=createClient(URL,KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+const $=s=>document.querySelector(s),params=new URLSearchParams(location.search),storeId=params.get("store");
+const money=n=>new Intl.NumberFormat("sw-TZ",{style:"currency",currency:"TZS",maximumFractionDigits:0}).format(Number(n)||0);
+const safePhone=v=>String(v||"").replace(/[^0-9]/g,"");
+function message(t){const e=$("#pageMessage");e.textContent=t;e.hidden=false;setTimeout(()=>e.hidden=true,2600)}
+function setStatus(s){const raw=String(s||"open").toLowerCase(),e=$("#storeStatus");if(raw.includes("vacation")){e.textContent="Duka liko likizo";e.className="status-pill vacation"}else if(["closed","imefungwa"].includes(raw)){e.textContent="Duka limefungwa";e.className="status-pill closed"}else{e.textContent="Duka limefunguliwa";e.className="status-pill"}}
+function productCard(p){const card=document.createElement("article");card.className="product-card";const img=document.createElement("img");img.className="product-image";img.loading="lazy";img.alt=p.title||"Bidhaa";img.src=p.image_url||(Array.isArray(p.image_urls)&&p.image_urls[0])||"";if(!img.src){img.removeAttribute("src");img.alt="Picha haipo"}const copy=document.createElement("div");copy.className="product-copy";const h=document.createElement("h3");h.textContent=p.title||"Bidhaa";const price=document.createElement("div");price.className="product-price";price.textContent=money(p.price);copy.append(h,price);card.append(img,copy);return card}
+async function init(){if(!storeId){$("#productsGrid").innerHTML='<div class="empty-state">Kiungo cha duka hakijakamilika. Fungua duka kupitia Seller Dashboard.</div>';return}
+const{data:store,error}=await supabase.from("stores").select("id,owner_id,store_name,description,category,phone,region,district,address,verification_status,is_active,logo_url,email,store_status,cover_image_url").eq("id",storeId).eq("is_active",true).maybeSingle();
+if(error||!store){$("#storeName").textContent="Duka halijapatikana";$("#productsGrid").innerHTML='<div class="empty-state">Duka hili halipatikani au halijawekwa wazi kwa wateja.</div>';return}
+const name=store.store_name||"Duka la ZUNE";document.title="ZUNE | "+name;$("#storeName").textContent=name;$("#storeDescription").textContent=store.description||"Karibu kwenye duka letu la ZUNE.";$("#aboutText").textContent=store.description||"Duka hili linapatikana kwenye ZUNE Marketplace.";$("#categoryText").textContent=store.category||"";$("#storeLocation").textContent=[store.district,store.region,"Tanzania"].filter(Boolean).join(" · ");$("#addressText").textContent=[store.address,store.district,store.region,"Tanzania"].filter(Boolean).join(", ");$("#emailText").textContent=store.email||"";
+setStatus(store.store_status);$("#verifiedSeal").hidden=String(store.verification_status||"").toLowerCase()!=="verified";
+if(store.logo_url){const img=document.createElement("img");img.src=store.logo_url;img.alt=name;$("#storeAvatar").replaceChildren(img)}
+if(store.cover_image_url)$("#storeCover").style.backgroundImage="url("+JSON.stringify(store.cover_image_url)+")";
+const phone=safePhone(store.phone);if(phone)$("#contactButton").href="https://wa.me/"+phone+"?text="+encodeURIComponent("Habari, nimekuona kupitia ZUNE. Naomba taarifa kuhusu bidhaa zenu.");else{$("#contactButton").href="https://mrnehemiah.github.io/Z-marketing-/";$("#contactButton").textContent="Tembelea ZUNE Marketplace"}
+const{data:products,error:productError}=await supabase.from("products").select("id,title,price,image_url,image_urls,description,published_at").eq("vendor_id",store.owner_id).eq("moderation_status","approved").is("removed_at",null).order("published_at",{ascending:false}).limit(40);
+if(productError){$("#productsGrid").innerHTML='<div class="empty-state">Imeshindikana kupakia bidhaa kwa sasa.</div>';return}
+$("#productCount").textContent=(products||[]).length+" bidhaa";const grid=$("#productsGrid");grid.replaceChildren();if(!products?.length){grid.innerHTML='<div class="empty-state">Bado hakuna bidhaa zilizochapishwa kwenye duka hili.</div>';return}products.forEach(p=>grid.append(productCard(p)));
+$("#productSearch").addEventListener("input",e=>{const q=e.target.value.trim().toLowerCase();[...grid.children].forEach((el,i)=>{el.hidden=!!q&&!String(products[i]?.title||"").toLowerCase().includes(q)})});
+}
+$("#searchToggle").addEventListener("click",()=>{$("#searchPanel").hidden=!$("#searchPanel").hidden;if(!$("#searchPanel").hidden)$("#productSearch").focus()});
+$("#shareButton").addEventListener("click",async()=>{try{if(navigator.share)await navigator.share({title:document.title,url:location.href});else{await navigator.clipboard.writeText(location.href);message("Kiungo cha duka kimenakiliwa.")}}catch(e){if(e.name!=="AbortError")message("Imeshindikana kushiriki kiungo.")}});
+init();
