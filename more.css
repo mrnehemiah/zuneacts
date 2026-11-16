@@ -13,3 +13,6 @@
 
 /* Final consistent SVG icon sizing for every More service and category */
 .group-icon .icon{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.service-icon svg,.list-icon svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.service-card b{font-size:0}.service-card b:after{content:"";display:block;width:10px;height:10px;border-top:1.7px solid currentColor;border-right:1.7px solid currentColor;transform:rotate(0deg)}
+
+/* Keep seller navigation visible and consistent on tablet-width screens */
+@media(max-width:900px){.more-sidebar{display:none!important}.more-main{margin:0!important}body{padding-bottom:88px}.bottom-nav{position:fixed!important;display:flex!important;inset:auto 0 0!important;z-index:50!important;justify-content:space-around;background:#073f32;padding:9px 4px calc(9px + env(safe-area-inset-bottom));box-shadow:0 -5px 20px #102f2418}.bottom-nav a{flex:1;min-width:0}}
