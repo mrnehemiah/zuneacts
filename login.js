@@ -92,7 +92,7 @@ form.addEventListener("submit",async event=>{
     else message.textContent=t("failed");
   }finally{
     button.disabled=false;
-    button.querySelector("span").textContent=t("login_button");
+  button.querySelector("span").textContent=t("login_button");
   }
 });
 setLanguage(language);
