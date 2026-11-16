@@ -53,6 +53,13 @@ const passField = document.querySelector("#storePassword");
 const message = document.querySelector("#formMessage");
 const setupPanel = document.querySelector("#setupPanel");
 const setupMessage = document.querySelector("#setupMessage");
+const otpField = document.querySelector("#otpCode");
+// Keep the mobile OTP field explicitly configured for all eight numeric digits.
+otpField.maxLength = 8;
+otpField.addEventListener("input", () => {
+  const digits = otpField.value.replace(/\\D/g, "").slice(0, 8);
+  if (otpField.value !== digits) otpField.value = digits;
+});
 const loginButton = document.querySelector("#loginButton");
 const completeButton = document.querySelector("#completeSetupBtn");
 
@@ -168,7 +175,7 @@ form.addEventListener("submit", async event => {
 completeButton.addEventListener("click", async () => {
   setupMessage.textContent = "";
   const storeName = nameField.value.trim();
-  const otp = document.querySelector("#otpCode").value.trim();
+  const otp = otpField.value.replace(/\\D/g, "").slice(0, 8);
   const password = document.querySelector("#newStorePassword").value;
   const confirm = document.querySelector("#confirmStorePassword").value;
   if (!/^\d{8}$/.test(otp)) {
