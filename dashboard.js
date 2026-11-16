@@ -31,5 +31,6 @@ async function init(){
  if(storeId){const {data:store,error}=await db.from("stores").select("store_name,verification_status,store_status").eq("id",storeId).maybeSingle();if(error)console.warn("Store details:",error);if(store){const name=store.store_name||"Duka lako la ZUNE";showError($("#storeName"),name);showError($("#sideStoreName"),name);const badge=$("#storeVerifiedBadge");if(badge)badge.hidden=String(store.verification_status||"").toLowerCase()!=="verified";const state=String(store.store_status||"open").toLowerCase();showError($("#storeStatus"),state==="vacation"?(lang==="sw"?"Duka liko likizo":"Store on vacation"):state==="closed"?(lang==="sw"?"Duka limefungwa":"Store is closed"):(lang==="sw"?"Duka limefunguliwa":"Store is open"));const profile=$("#profileButton");if(profile)profile.textContent=name.trim().charAt(0).toUpperCase()||"Z"}}
 }
 const logout=$("#logoutBtn");logout?.addEventListener("click",async()=>{await db.auth.signOut();location.replace("./index.html")});
-$("#profileButton")?.addEventListener("click",()=>location.href="./seller-settings.html");\n$("#notificationsButton")?.addEventListener("click",()=>location.href="./orders.html");
+$("#profileButton")?.addEventListener("click",()=>location.href="./seller-settings.html");
+$("#notificationsButton")?.addEventListener("click",()=>location.href="./orders.html");
 init().catch(e=>{console.error("Dashboard init:",e);showError($("#storeStatus"),lang==="sw"?"Hitilafu imezuia kupakia muhtasari":"An error prevented the overview from loading")});
