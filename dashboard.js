@@ -17,8 +17,8 @@ async function init(){
  const {data:{session},error:authError}=await db.auth.getSession();if(authError||!session){location.replace("./index.html");return}
  const today=$("#todayLabel");if(today)today.textContent=new Intl.DateTimeFormat(lang==="sw"?"sw-TZ":"en-TZ",{weekday:"short",day:"numeric",month:"short"}).format(new Date());
  const {data:ownerId,error:ownerError}=await db.rpc("zune_seller_owner_id");if(ownerError||!ownerId){console.error("Seller owner lookup:",ownerError);showError($("#productCount"),"—");showError($("#storeStatus"),lang==="sw"?"Imeshindikana kuthibitisha duka":"Could not verify store");return}
- const {data:productRows,error:productError}=await db.from("products").select("id", {count:"exact"}).eq("vendor_id",ownerId).is("removed_at",null).limit(2000);
- if(productError){console.error("Dashboard products:",productError);showError($("#productCount"),"—")}else showError($("#productCount"),fmt(productRows?.length??0));
+ const {data:productRows,error:productError,count:productCount}=await db.from("products").select("id", {count:"exact"}).eq("vendor_id",ownerId).is("removed_at",null).limit(2000);
+ if(productError){console.error("Dashboard products:",productError);showError($("#productCount"),"—")}else showError($("#productCount"),fmt(productCount??productRows?.length??0));
  const ids=(productRows||[]).map(p=>p.id);
  let orders=[];
  if(ids.length){const {data,error}=await db.from("orders").select("id,buyer_id,product_id,total_price,status,created_at,recipient_name").in("product_id",ids).order("created_at",{ascending:false}).limit(2000);if(error){console.error("Dashboard orders:",error);showError($("#newOrders"),"—");showError($("#todaySales"),"—");showError($("#customerCount"),"—")}else orders=data||[]}
@@ -31,5 +31,5 @@ async function init(){
  if(storeId){const {data:store,error}=await db.from("stores").select("store_name,verification_status,store_status").eq("id",storeId).maybeSingle();if(error)console.warn("Store details:",error);if(store){const name=store.store_name||"Duka lako la ZUNE";showError($("#storeName"),name);showError($("#sideStoreName"),name);const badge=$("#storeVerifiedBadge");if(badge)badge.hidden=String(store.verification_status||"").toLowerCase()!=="verified";const state=String(store.store_status||"open").toLowerCase();showError($("#storeStatus"),state==="vacation"?(lang==="sw"?"Duka liko likizo":"Store on vacation"):state==="closed"?(lang==="sw"?"Duka limefungwa":"Store is closed"):(lang==="sw"?"Duka limefunguliwa":"Store is open"));const profile=$("#profileButton");if(profile)profile.textContent=name.trim().charAt(0).toUpperCase()||"Z"}}
 }
 const logout=$("#logoutBtn");logout?.addEventListener("click",async()=>{await db.auth.signOut();location.replace("./index.html")});
-$("#profileButton")?.addEventListener("click",()=>location.href="./seller-settings.html");
+$("#profileButton")?.addEventListener("click",()=>location.href="./seller-settings.html");\n$("#notificationsButton")?.addEventListener("click",()=>location.href="./orders.html");
 init().catch(e=>{console.error("Dashboard init:",e);showError($("#storeStatus"),lang==="sw"?"Hitilafu imezuia kupakia muhtasari":"An error prevented the overview from loading")});
