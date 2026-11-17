@@ -18,12 +18,15 @@ if(storeError)console.warn("Store details:",storeError);const store=Array.isArra
 const name=store?.store_name||store?.name||"Duka lako la ZUNE";$("#storeName").textContent=name;$("#sideStoreName").textContent=name;$("#profileButton").textContent=name.trim().charAt(0).toUpperCase()||"Z";
 const verified=String(store?.verification_status||"").toLowerCase()==="verified";const badge=$("#storeVerifiedBadge");if(badge)badge.hidden=!verified;
 if(store?.store_status)$("#storeStatus").textContent=store.store_status;
-const{data:productRows,error:productError}=await db.from("products").select("id,stock_quantity,removed_at,seller_archived_at").eq("vendor_id",owner).limit(5000);
-if(productError)throw productError;const activeProducts=(productRows||[]).filter(p=>!p.removed_at&&!p.seller_archived_at);$("#productCount").textContent=fmt(activeProducts.length);
-const ids=(productRows||[]).map(p=>p.id);let orders=[];
-if(ids.length){const{data,error}=await db.from("orders").select("id,buyer_id,product_id,total_price,status,created_at,recipient_name").in("product_id",ids).order("created_at",{ascending:false}).limit(2000);if(error)throw error;orders=data||[]}
-window.__zuneOrders=orders;const today=new Date();today.setHours(0,0,0,0);const newOrders=orders.filter(o=>o.status==="pending");const sales=orders.filter(o=>o.status==="completed"&&new Date(o.created_at)>=today).reduce((s,o)=>s+Number(o.total_price||0),0);const customers=new Set(orders.map(o=>o.buyer_id).filter(Boolean));
-$("#newOrders").textContent=fmt(newOrders.length);$("#todaySales").textContent=money(sales);$("#customerCount").textContent=fmt(customers.size);renderChart(orders);renderActivity(orders)}
+const{data:overview,error:overviewError}=await db.rpc("zune_seller_dashboard_overview");
+if(overviewError)throw overviewError;
+const metrics=overview||{};
+$("#productCount").textContent=fmt(metrics.products||0);
+$("#newOrders").textContent=fmt(metrics.pending_orders||0);
+$("#todaySales").textContent=money(metrics.today_sales||0);
+$("#customerCount").textContent=fmt(metrics.customers||0);
+const orders=metrics.orders||[];
+window.__zuneOrders=orders;renderChart(orders);renderActivity(orders)}
 catch(error){console.error("Business overview:",error);toast(error.message||t("Imeshindikana kupakia muhtasari","Could not load business overview"))}}
 $("#logoutBtn").addEventListener("click",async()=>{await db.auth.signOut();location.replace("./index.html")});
 $("#profileButton").addEventListener("click",()=>location.href="seller-settings.html");
@@ -31,24 +34,15 @@ const bell=document.querySelector('[aria-label="Notifications"]');if(bell)bell.a
 init();
 async function refreshOverviewMetrics(){
   try{
-    const{data:owner,error:ownerError}=await db.rpc("zune_seller_owner_id");
-    if(ownerError||!owner)return;
-    const{data:productRows,error:productError}=await db.from("products").select("id,removed_at,seller_archived_at").eq("vendor_id",owner).limit(5000);
-    if(productError)throw productError;
-    const active=(productRows||[]).filter(p=>!p.removed_at&&!p.seller_archived_at);
-    $("#productCount").textContent=fmt(active.length);
-    const ids=(productRows||[]).map(p=>p.id);
-    let orders=[];
-    if(ids.length){
-      const{data,error}=await db.from("orders").select("id,buyer_id,product_id,total_price,status,created_at,recipient_name").in("product_id",ids).order("created_at",{ascending:false}).limit(2000);
-      if(error)throw error;
-      orders=data||[];
-    }
+    const{data:metrics,error}=await db.rpc("zune_seller_dashboard_overview");
+    if(error)throw error;
+    const m=metrics||{};
+    $("#productCount").textContent=fmt(m.products||0);
+    $("#newOrders").textContent=fmt(m.pending_orders||0);
+    $("#todaySales").textContent=money(m.today_sales||0);
+    $("#customerCount").textContent=fmt(m.customers||0);
+    const orders=m.orders||[];
     window.__zuneOrders=orders;
-    const today=new Date();today.setHours(0,0,0,0);
-    $("#newOrders").textContent=fmt(orders.filter(o=>o.status==="pending").length);
-    $("#todaySales").textContent=money(orders.filter(o=>o.status==="completed"&&new Date(o.created_at)>=today).reduce((sum,o)=>sum+Number(o.total_price||0),0));
-    $("#customerCount").textContent=fmt(new Set(orders.map(o=>o.buyer_id).filter(Boolean)).size);
     renderChart(orders);renderActivity(orders);
   }catch(error){console.warn("Live overview refresh:",error)}
 }
