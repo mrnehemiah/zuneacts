@@ -99,7 +99,7 @@ form.addEventListener("submit", async event => {
     if (storeError) throw new Error("Duka halijathibitishwa: " + storeError.message);
     if (ownerError || !owner) throw new Error("Akaunti ya duka haijaunganishwa na mmiliki: " + (ownerError?.message || "owner missing"));
     const store = Array.isArray(currentStore) ? currentStore[0] : currentStore;
-    const normalizeName = value => String(value || "").trim().replace(/\\s+/g, " ").toLowerCase();
+    const normalizeName = value => String(value || "").trim().replace(/\s+/g, " ").toLowerCase();
     if (!store?.store_name || normalizeName(store.store_name) !== normalizeName(storeName)) {
       await supabase.auth.signOut({ scope: "local" });
       throw new Error("Umeingia kwenye session ya duka tofauti. Hakiki jina la duka na ujaribu tena.");
