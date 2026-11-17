@@ -29,3 +29,32 @@ $("#logoutBtn").addEventListener("click",async()=>{await db.auth.signOut();locat
 $("#profileButton").addEventListener("click",()=>location.href="seller-settings.html");
 const bell=document.querySelector('[aria-label="Notifications"]');if(bell)bell.addEventListener("click",()=>location.href="orders.html");
 init();
+async function refreshOverviewMetrics(){
+  try{
+    const{data:owner,error:ownerError}=await db.rpc("zune_seller_owner_id");
+    if(ownerError||!owner)return;
+    const{data:productRows,error:productError}=await db.from("products").select("id,removed_at,seller_archived_at").eq("vendor_id",owner).limit(5000);
+    if(productError)throw productError;
+    const active=(productRows||[]).filter(p=>!p.removed_at&&!p.seller_archived_at);
+    $("#productCount").textContent=fmt(active.length);
+    const ids=(productRows||[]).map(p=>p.id);
+    let orders=[];
+    if(ids.length){
+      const{data,error}=await db.from("orders").select("id,buyer_id,product_id,total_price,status,created_at,recipient_name").in("product_id",ids).order("created_at",{ascending:false}).limit(2000);
+      if(error)throw error;
+      orders=data||[];
+    }
+    window.__zuneOrders=orders;
+    const today=new Date();today.setHours(0,0,0,0);
+    $("#newOrders").textContent=fmt(orders.filter(o=>o.status==="pending").length);
+    $("#todaySales").textContent=money(orders.filter(o=>o.status==="completed"&&new Date(o.created_at)>=today).reduce((sum,o)=>sum+Number(o.total_price||0),0));
+    $("#customerCount").textContent=fmt(new Set(orders.map(o=>o.buyer_id).filter(Boolean)).size);
+    renderChart(orders);renderActivity(orders);
+  }catch(error){console.warn("Live overview refresh:",error)}
+}
+const overviewChannel=db.channel("zune-seller-overview-live")
+  .on("postgres_changes",{event:"*",schema:"public",table:"products"},refreshOverviewMetrics)
+  .on("postgres_changes",{event:"*",schema:"public",table:"orders"},refreshOverviewMetrics)
+  .subscribe();
+setInterval(()=>{if(!document.hidden)refreshOverviewMetrics()},30000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)refreshOverviewMetrics()});
