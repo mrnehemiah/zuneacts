@@ -1,1 +1,81 @@
-<!doctype html><html lang="sw"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#073f32"><title>ZUNE | Customize Store</title><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="store-tools.css?v=1"></head><body><header class="top"><a class="brand" href="dashboard.html">ⓏⓊⓃⒺ</a><div class="top-actions"><div class="lang"><button data-lang="sw" class="active">SW</button><button data-lang="en">EN</button></div></div></header><main class="page"><a class="back" href="more.html" data-sw="← Rudi kwenye huduma zaidi" data-en="← Back to More services">← Rudi kwenye huduma zaidi</a><section class="hero"><p class="eyebrow">ZUNE SELLER WORKSPACE</p><h1 data-sw="Customize Store" data-en="Customize Store">Customize Store</h1><p data-sw="Badili rangi, fonti na mpangilio wa storefront. Ona mfano kabla ya kuhifadhi." data-en="Change storefront colors, font and layout. Preview before saving.">Badili rangi, fonti na mpangilio wa storefront. Ona mfano kabla ya kuhifadhi.</p></section><div id="message" class="message" role="status"></div><section class="panel"><h2 data-sw="Rangi za duka" data-en="Store colors">Rangi za duka</h2><div class="form-grid"><div class="field"><label for="forest" data-sw="Rangi kuu" data-en="Primary color">Rangi kuu</label><div class="swatches"><input id="forest" type="color" value="#0b3026"><span id="forestValue">#0B3026</span></div></div><div class="field"><label for="emerald" data-sw="Rangi ya vitufe" data-en="Button color">Rangi ya vitufe</label><div class="swatches"><input id="emerald" type="color" value="#168568"><span id="emeraldValue">#168568</span></div></div><div class="field"><label for="accent" data-sw="Rangi ya msisitizo" data-en="Accent color">Rangi ya msisitizo</label><div class="swatches"><input id="accent" type="color" value="#e4c783"><span id="accentValue">#E4C783</span></div></div><div class="field"><label for="font" data-sw="Fonti" data-en="Font">Fonti</label><select id="font"><option value="DM Sans">DM Sans</option><option value="Manrope">Manrope</option><option value="Arial">Arial</option></select></div><div class="field"><label for="layout" data-sw="Mpangilio wa bidhaa" data-en="Product layout">Mpangilio wa bidhaa</label><select id="layout"><option value="grid">Grid</option><option value="compact">Compact</option><option value="list">List</option></select></div><div class="field"><label for="template" data-sw="Muundo wa storefront" data-en="Storefront template">Muundo wa storefront</label><select id="template"><option value="classic">Classic</option><option value="modern">Modern</option><option value="minimal">Minimal</option></select></div></div></section><section class="panel"><h2 data-sw="Live preview" data-en="Live preview">Live preview</h2><div class="preview" id="preview"><div class="preview-head" id="previewHead">ZUNE STORE</div><div class="preview-body"><div class="preview-tile" id="previewTile"><small>STORE COLLECTION</small><strong id="previewName">Duka lako</strong></div><p class="hint" data-sw="Huu ni mfano wa rangi na mpangilio utakaoonekana kwenye duka." data-en="This preview shows the colors and layout that will appear on your storefront.">Huu ni mfano wa rangi na mpangilio utakaoonekana kwenye duka.</p></div></div><div class="actions"><button class="btn secondary" type="button" id="previewLive" data-sw="Fungua storefront preview" data-en="Open storefront preview">Fungua storefront preview</button><button class="btn" type="button" id="saveTheme" data-sw="Hifadhi muonekano" data-en="Save appearance">Hifadhi muonekano</button></div></section></main><nav class="bottom-nav"><a href="dashboard.html"><svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10"/></svg><small>Home</small></a><a href="products.html"><svg viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg><small>Bidhaa</small></a><a href="orders.html"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4ZM3 6h18"/></svg><small>Oda</small></a><a href="analytics.html"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M8 16v-5m5 5V5m5 11V9"/></svg><small>Analytics</small></a><a href="more.html"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg><small>More</small></a></nav><script type="module" src="store-customize.js?v=diagnostic-2"></script></body></html>
+<!doctype html>
+<html lang="sw">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#073f32"><title>ZUNE | Live Store Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="store-tools.css?v=live-preview-premium-5">
+<style>
+.preview-workspace{display:grid;grid-template-columns:minmax(260px,.82fr) minmax(0,1.18fr);gap:18px;align-items:start}
+.control-panel{display:grid;gap:16px}.control-panel .panel{margin:0}.field input,.field select{min-height:46px}
+.template-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.template-option{border:1px solid #dce7e0;background:#fff;border-radius:13px;padding:9px;text-align:left;cursor:pointer;color:#24372d}
+.template-option[aria-pressed="true"]{border:2px solid #087653;background:#eff8f2;padding:8px;box-shadow:0 0 0 3px #08765312}
+.template-thumb{height:64px;border-radius:8px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;font:800 12px Manrope;letter-spacing:1px}
+.template-option strong{font-size:12px;display:block}.template-option small{font-size:10px;color:#718079}
+.color-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.color-field{display:grid;gap:7px;font-size:11px;font-weight:700;color:#52665b}.color-field input{width:100%;height:42px;border:1px solid #dce7e0;border-radius:9px;padding:4px;background:#fff}
+.segmented{display:flex;gap:7px;flex-wrap:wrap}.segmented button{border:1px solid #dce7e0;background:#fff;border-radius:10px;padding:10px 13px;font-size:12px;font-weight:700;cursor:pointer}.segmented button.active{background:#eaf5ee;border-color:#168568;color:#07513f}
+.preview-shell{position:sticky;top:16px;background:#e9efeb;border:1px solid #dce7e0;border-radius:20px;padding:13px}
+.preview-topline{display:flex;align-items:center;justify-content:space-between;margin:0 2px 10px;font-size:11px;font-weight:800;color:#51675b}
+.preview-device{overflow:hidden;border-radius:14px;background:#fff;box-shadow:0 12px 30px #173c2a15;min-height:490px}
+.preview-store{--pforest:#0b3026;--pemerald:#168568;--paccent:#e4c783;background:#fff;color:#1c2a22;font-family:"DM Sans",sans-serif;min-height:490px}
+.preview-store[data-template="modern"] .preview-cover{border-radius:0 0 25px 25px}
+.preview-store[data-template="minimal"] .preview-cover{border-radius:0}
+.preview-store[data-mode="dark"]{background:#14231c;color:#edf5ef}
+.preview-store[data-mode="dark"] .preview-products,.preview-store[data-mode="dark"] .preview-about{background:#1b2d24;color:#edf5ef}
+.preview-cover{background:var(--pforest);color:#fff;padding:20px 17px 25px;min-height:142px}
+.preview-brand{display:flex;justify-content:space-between;align-items:center;font:800 15px Manrope;letter-spacing:2px}
+.preview-cover h2{font:800 22px Manrope;margin:22px 0 5px;overflow-wrap:anywhere}
+.preview-cover p{font-size:11px;line-height:1.5;margin:0;color:#e2eee7;max-width:95%}
+.preview-store[data-template="minimal"] .preview-cover h2{font-size:19px}
+.preview-store[data-template="modern"] .preview-cover{padding:23px 18px 29px}
+.preview-store[data-template="minimal"] .preview-cover{padding:18px}
+.preview-badges{display:flex;gap:6px;margin-top:12px}.preview-badges span{font-size:9px;background:#ffffff20;border:1px solid #ffffff40;border-radius:30px;padding:5px 8px}
+.preview-products{padding:16px;background:#fff}.preview-products h3{font:800 14px Manrope;margin:0 0 12px}
+.preview-product-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.preview-product{border:1px solid #e6ece7;border-radius:12px;overflow:hidden;background:#fff;color:#24352b}
+.preview-product-art{height:92px;background:linear-gradient(135deg,#e4eee7,#c9ded1);display:grid;place-items:center;color:#527663;font-size:25px}
+.preview-product div:last-child{padding:9px}.preview-product strong{font-size:10px;display:block}.preview-product small{font-size:10px;color:var(--pemerald);font-weight:800}
+.preview-store[data-layout="list"] .preview-product-grid{grid-template-columns:1fr}
+.preview-store[data-layout="list"] .preview-product{display:grid;grid-template-columns:95px 1fr}
+.preview-store[data-layout="list"] .preview-product-art{height:100%;min-height:75px}
+.preview-store[data-layout="compact"] .preview-product-grid{gap:6px}
+.preview-store[data-layout="compact"] .preview-product-art{height:70px}
+.preview-about{background:#f4f7f4;padding:13px 16px;font-size:10px;line-height:1.6;color:#617168}
+.preview-actions{display:flex;gap:8px;margin-top:13px}.preview-actions button{flex:1;min-height:46px;border:0;border-radius:11px;background:#087653;color:#fff;font-weight:800;cursor:pointer}.preview-actions button.secondary{background:#edf3ef;color:#234537}
+.save-status{min-height:20px;font-size:12px;color:#176b49;margin-top:9px}
+@media(max-width:760px){.preview-workspace{grid-template-columns:1fr}.preview-shell{position:static;grid-row:1}.control-panel{grid-row:2}.preview-device{min-height:430px}.preview-store{min-height:430px}}
+</style></head>
+<body>
+<header class="top"><a class="brand" href="dashboard.html">ⓏⓊⓃⒺ</a><div class="top-actions"><div class="lang"><button data-lang="sw" class="active">SW</button><button data-lang="en">EN</button></div></div></header>
+<main class="page">
+<a class="back" href="more.html">← Rudi kwenye More</a>
+<section class="hero"><p class="eyebrow">ZUNE SELLER WORKSPACE</p><h1>Live Store Preview</h1><p>Chagua template, rangi, fonti na mpangilio. Mabadiliko yanaonekana papo hapo kabla hujahifadhi.</p></section>
+<div id="message" class="message" role="status"></div>
+<div class="preview-workspace">
+<section class="control-panel">
+<div class="panel"><h2>1. Chagua template</h2><div class="template-options">
+<button class="template-option" type="button" data-template="classic" aria-pressed="true"><span class="template-thumb" style="background:#0b3026;color:#fff">ZUNE</span><strong>Classic</strong><small>Premium & balanced</small></button>
+<button class="template-option" type="button" data-template="modern" aria-pressed="false"><span class="template-thumb" style="background:#dceafa;color:#234b72">ZUNE</span><strong>Modern</strong><small>Fresh & bold</small></button>
+<button class="template-option" type="button" data-template="minimal" aria-pressed="false"><span class="template-thumb" style="background:#f0f1ef;color:#39443d">ZUNE</span><strong>Minimal</strong><small>Clean & simple</small></button>
+</div></div>
+<div class="panel"><h2>2. Rangi za duka</h2><div class="color-row">
+<label class="color-field">Rangi kuu<input id="forest" type="color" value="#0b3026"></label>
+<label class="color-field">Vitufe<input id="emerald" type="color" value="#168568"></label>
+<label class="color-field">Msisitizo<input id="accent" type="color" value="#e4c783"></label>
+</div><div class="field" style="margin-top:14px"><label for="font">Fonti</label><select id="font"><option value="DM Sans">DM Sans</option><option value="Manrope">Manrope</option><option value="Arial">Arial</option></select></div></div>
+<div class="panel"><h2>3. Mpangilio wa bidhaa</h2><div class="segmented" id="layoutChoices"><button type="button" data-layout="grid" class="active">Grid</button><button type="button" data-layout="compact">Compact</button><button type="button" data-layout="list">List</button></div></div>
+<div class="panel"><h2>4. Mwonekano wa preview</h2><p class="hint">Preview inatumia taarifa za duka lako zilizopo. Mabadiliko ya hapa hayataonekana kwa wateja mpaka uhifadhi.</p><div class="preview-actions"><button type="button" class="secondary" id="resetPreview">Rejesha awali</button><button type="button" id="saveTheme">Hifadhi muonekano</button></div><p class="save-status" id="saveStatus" role="status"></p></div>
+</section>
+<section class="preview-shell" aria-label="Live store preview">
+<div class="preview-topline"><span>LIVE PREVIEW</span><span id="previewTemplateLabel">CLASSIC</span></div>
+<div class="preview-device"><div class="preview-store" id="previewStore" data-template="classic" data-mode="light" data-layout="grid">
+<div class="preview-cover" id="previewCover"><div class="preview-brand"><span>ⓏⓊⓃⒺ</span><span>⌕　♡　🛒</span></div><h2 id="previewName">Duka lako</h2><p id="previewDescription">Karibu kwenye duka letu la ZUNE.</p><div class="preview-badges"><span>✓ Verified Store</span><span>✦ ZUNE Marketplace</span></div></div>
+<div class="preview-products"><h3>Bidhaa za duka</h3><div class="preview-product-grid"><article class="preview-product"><div class="preview-product-art">▧</div><div><strong>Bidhaa ya mfano</strong><small>TSh —</small></div></article><article class="preview-product"><div class="preview-product-art">▧</div><div><strong>Bidhaa ya mfano</strong><small>TSh —</small></div></article></div></div>
+<div class="preview-about" id="previewAbout">Duka lako kwenye ZUNE Marketplace.</div>
+</div></div></section>
+</div>
+</main>
+<nav class="bottom-nav"><a href="dashboard.html"><svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10"/></svg><small>Home</small></a><a href="products.html"><svg viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg><small>Bidhaa</small></a><a href="orders.html"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4ZM3 6h18"/></svg><small>Oda</small></a><a href="analytics.html"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M8 16v-5m5 5V5m5 11V9"/></svg><small>Analytics</small></a><a href="more.html"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg><small>More</small></a></nav>
+<script type="module" src="store-customize.js?v=live-preview-premium-5"></script>
+</body></html>
