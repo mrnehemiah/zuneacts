@@ -84,11 +84,26 @@ form.addEventListener("submit", async event => {
   loginButton.querySelector("span").textContent = copy[lang].loading;
   try {
     const result = await callAuth({ action: "login", store_name: storeName, password });
-    const { error } = await supabase.auth.setSession({
+    // Clear any previous seller session so a different store cannot reuse stale identity.
+    await supabase.auth.signOut({ scope: "local" });
+    const { data: sessionData, error } = await supabase.auth.setSession({
       access_token: result.session.access_token,
       refresh_token: result.session.refresh_token
     });
     if (error) throw error;
+    if (!sessionData.session) throw new Error("Seller session haikuundwa. Jaribu tena.");
+    const [{ data: currentStore, error: storeError }, { data: owner, error: ownerError }] = await Promise.all([
+      supabase.rpc("zune_seller_portal_current_store"),
+      supabase.rpc("zune_seller_owner_id")
+    ]);
+    if (storeError) throw new Error("Duka halijathibitishwa: " + storeError.message);
+    if (ownerError || !owner) throw new Error("Akaunti ya duka haijaunganishwa na mmiliki: " + (ownerError?.message || "owner missing"));
+    const store = Array.isArray(currentStore) ? currentStore[0] : currentStore;
+    const normalizeName = value => String(value || "").trim().replace(/\\s+/g, " ").toLowerCase();
+    if (!store?.store_name || normalizeName(store.store_name) !== normalizeName(storeName)) {
+      await supabase.auth.signOut({ scope: "local" });
+      throw new Error("Umeingia kwenye session ya duka tofauti. Hakiki jina la duka na ujaribu tena.");
+    }
     window.location.assign("./dashboard.html");
   } catch (error) {
     message.textContent = error.message || copy[lang].loginError;
