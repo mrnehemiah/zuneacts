@@ -21,7 +21,7 @@ async function init(){
   function paint(){
    const p=$("#previewStore");p.dataset.template=state.template;p.dataset.layout=state.layout;p.dataset.mode=state.mode;
    p.style.setProperty("--pforest",state.forest);p.style.setProperty("--pemerald",state.emerald);p.style.setProperty("--paccent",state.accent);p.style.fontFamily=state.font+",sans-serif";
-   $("#previewCover").style.background=state.forest;
+   $("#previewCover").style.backgroundColor=state.forest;
    $("#previewProducts").style.background=state.mode==="dark"?"#1b2d24":"#fff";
    $("#previewAbout").style.background=state.mode==="dark"?"#22372b":"#f4f7f4";
    $("#previewTemplateLabel").textContent=state.template.toUpperCase()+" · "+state.mode.toUpperCase();
@@ -38,6 +38,6 @@ async function init(){
   $("#resetPreview").addEventListener("click",()=>{state.template=PRESETS[store.storefront_template]?store.storefront_template:"classic";state.forest=colors.forest||"#0b3026";state.emerald=colors.emerald||"#168568";state.accent=colors.accent||"#e4c783";state.font=cfg.fontFamily||"DM Sans";state.layout=cfg.layout||"grid";state.mode=cfg.mode||"light";paint();$("#saveStatus").textContent=tr("Preview imerejeshwa kwenye muonekano uliohifadhiwa.","Preview reset to the saved appearance.")});
   $("#saveTheme").addEventListener("click",async()=>{const b=$("#saveTheme");b.disabled=true;$("#saveStatus").textContent=tr("Inahifadhi muonekano...","Saving appearance...");try{const theme_config={...cfg,colors:{...colors,forest:state.forest,emerald:state.emerald,accent:state.accent},fontFamily:state.font,layout:state.layout,mode:state.mode};await c.saveStore({theme_config,storefront_template:state.template});Object.assign(store,{theme_config,storefront_template:state.template});$("#saveStatus").textContent=tr("Muonekano umehifadhiwa. Wateja wataona mabadiliko haya kwenye duka lako.","Appearance saved. Customers will see these changes on your storefront.");c.message("Muonekano wa duka umehifadhiwa.","Store appearance saved successfully.",true)}catch(err){console.error(err);$("#saveStatus").textContent=err?.message||tr("Imeshindikana kuhifadhi. Hakikisha ruhusa za duka zipo.","Save failed. Check store permissions.");c.message("Imeshindikana kuhifadhi muonekano.","Could not save appearance.")}finally{b.disabled=false}});
   paint();
- }catch(e){console.error(e);const m=$("#message");if(m){m.textContent=tr("Imeshindikana kufungua Live Preview: ","Could not load Live Preview: ")+(e?.message||"Hitilafu");m.classList.add("show")}}
+ }catch(e){console.error(e);const m=$("#message");if(m){m.textContent=tr("Live Preview haijafunguka: ","Live Preview could not load: ")+(e?.message||"Hitilafu isiyojulikana");m.classList.add("show");m.style.display="block";m.style.background="#fff0ed";m.style.color="#a13c32"}const b=$("#saveTheme");if(b)b.disabled=true;const status=$("#saveStatus");if(status)status.textContent=tr("Angalia ujumbe hapo juu ili kurekebisha tatizo.","See the message above to resolve the issue.");}
 }
 init();
