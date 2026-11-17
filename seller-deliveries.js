@@ -2,7 +2,7 @@ import{createClient}from"https://esm.sh/@supabase/supabase-js@2";
 const URL="https://rpkogiieegqgxqbzwxwo.supabase.co",KEY="sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf";
 const db=createClient(URL,KEY,{auth:{storageKey:"zune-seller-portal-auth",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
 const $=s=>document.querySelector(s),esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-let drivers=[],deliveries=[];
+let drivers=[],deliveries=[],activeFilter="all";
 const labels={pending:"Inasubiri",assigned:"Dereva amechaguliwa",ready_for_pickup:"Muuzaji amekabidhi mzigo",picked_up:"Dereva amepokea mzigo",in_transit:"Mzigo uko njiani",delivered:"Dereva amefikisha",completed:"Mnunuzi amethibitisha kupokea",cancelled:"Imeghairiwa",disputed:"Ina uchunguzi"};
 function toast(message,error=false){const el=$("#deliveryToast");el.className=error?"delivery-error":"";el.textContent=message;setTimeout(()=>{el.textContent="";el.className=""},4500)}
 function money(v,c="TSh"){return c+" "+Number(v||0).toLocaleString("en-TZ")}
@@ -11,8 +11,11 @@ function render(){
  $("#countTransit").textContent=deliveries.filter(d=>["picked_up","in_transit","ready_for_pickup"].includes(d.delivery_status)).length;
  $("#countDone").textContent=deliveries.filter(d=>d.delivery_status==="completed").length;
  const root=$("#deliveryList");
- if(!deliveries.length){root.innerHTML='<div class="delivery-empty">Hakuna delivery zilizorekodiwa kwa oda za duka lako bado.</div>';return}
- root.innerHTML=deliveries.map(d=>{
+ const q=($("#deliverySearch")?.value||"").trim().toLowerCase();
+ const rows=deliveries.filter(d=>{const driverName=drivers.find(x=>x.driver_id===d.assigned_driver_id)?.full_name||"";const statusMatch=activeFilter==="all"||(activeFilter==="in_transit"?["picked_up","in_transit","ready_for_pickup"].includes(d.delivery_status):d.delivery_status===activeFilter);const hay=[d.delivery_id,d.recipient_name,d.recipient_phone,d.delivery_address,d.region,driverName].join(" ").toLowerCase();return statusMatch&&(!q||hay.includes(q))});
+ const counter=$("#deliveryFilters");if(counter)counter.dataset.count=rows.length;
+ if(!rows.length){root.innerHTML='<div class="delivery-empty">Hakuna delivery zilizorekodiwa kwa oda za duka lako bado.</div>';return}
+ root.innerHTML=rows.map(d=>{
  const driver=drivers.find(x=>x.driver_id===d.assigned_driver_id);
  const canAssign=["pending","assigned"].includes(d.delivery_status)&&!d.seller_handover_confirmed_at;
  const canHandover=d.delivery_status==="assigned"&&!d.seller_handover_confirmed_at;
@@ -32,7 +35,8 @@ async function load(){
 async function init(){
  const{data:{session},error}=await db.auth.getSession();if(error||!session){location.replace("./index.html");return}
  $("#avatar").textContent=(session.user.email||"Z").charAt(0).toUpperCase();
- document.querySelectorAll(".lang-btn").forEach(btn=>btn.addEventListener("click",()=>{localStorage.setItem("zune-seller-language",btn.dataset.lang);document.documentElement.lang=btn.dataset.lang;toast(btn.dataset.lang==="en"?"English selected; delivery labels will be translated in the next language pass.":"Lugha ya Kiswahili imechaguliwa.")}));
+ $("#deliverySearch")?.addEventListener("input",render);
+ document.querySelectorAll("#deliveryFilters [data-filter]").forEach(btn=>btn.addEventListener("click",()=>{activeFilter=btn.dataset.filter;document.querySelectorAll("#deliveryFilters [data-filter]").forEach(x=>x.classList.toggle("active",x===btn));render()}));
  $("#refreshDelivery").addEventListener("click",()=>load().catch(e=>toast(e.message,true)));
  await load();
 }
