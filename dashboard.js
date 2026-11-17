@@ -13,7 +13,7 @@ function renderChart(rows){const host=$("#chartBars");if(!host)return;const now=
 function renderActivity(rows){const host=$(".activity-empty");if(!host)return;const latest=rows.slice().sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,5);if(!latest.length){host.innerHTML='<span>◷</span><strong>'+t("Hakuna shughuli mpya","No recent activity")+'</strong><p>'+t("Oda mpya zitaonekana hapa.","New orders will appear here.")+'</p>';return}host.style.display="block";host.innerHTML=latest.map(o=>'<div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #edf1ed"><div style="min-width:0"><strong style="display:block;font-size:13px">'+(o.recipient_name||t("Mteja","Customer")).replace(/[&<>]/g,"")+'</strong><small style="color:#718079">#'+String(o.id).slice(0,8).toUpperCase()+' · '+t("Oda","Order")+'</small></div><div style="text-align:right;white-space:nowrap"><strong style="font-size:12px">'+money(o.total_price)+'</strong><small style="display:block;color:#718079">'+new Intl.DateTimeFormat(lang==="sw"?"sw-TZ":"en-TZ",{day:"numeric",month:"short"}).format(new Date(o.created_at))+'</small></div></div>').join("")}
 async function init(){try{const{data:{session},error:authError}=await db.auth.getSession();if(authError||!session){location.replace("./index.html");return}
 const[{data:owner,error:ownerError},{data:storeData,error:storeError}]=await Promise.all([db.rpc("zune_seller_owner_id"),db.rpc("zune_seller_portal_current_store")]);
-if(ownerError||!owner){console.error("Seller owner lookup:",ownerError);$("#productCount").textContent="—";$("#storeStatus").textContent=t("Imeshindikana kuthibitisha duka","Could not verify seller store");return}
+if(ownerError||!owner){console.error("Seller owner lookup:",ownerError);$("#productCount").textContent="—";$("#storeStatus").textContent=t("Imeshindikana kuthibitisha duka","Could not verify seller store");return} await setupSellerNotifications(owner);
 if(storeError)console.warn("Store details:",storeError);const store=Array.isArray(storeData)?storeData[0]:storeData;
 const name=store?.store_name||store?.name||"Duka lako la ZUNE";$("#storeName").textContent=name;$("#sideStoreName").textContent=name;$("#profileButton").textContent=name.trim().charAt(0).toUpperCase()||"Z";
 const verified=String(store?.verification_status||"").toLowerCase()==="verified";const badge=$("#storeVerifiedBadge");if(badge)badge.hidden=!verified;
@@ -30,7 +30,18 @@ window.__zuneOrders=orders;renderChart(orders);renderActivity(orders)}
 catch(error){console.error("Business overview:",error);toast(error.message||t("Imeshindikana kupakia muhtasari","Could not load business overview"))}}
 $("#logoutBtn").addEventListener("click",async()=>{await db.auth.signOut();location.replace("./index.html")});
 $("#profileButton").addEventListener("click",()=>location.href="seller-settings.html");
-const bell=document.querySelector('[aria-label="Notifications"]');if(bell)bell.addEventListener("click",()=>location.href="orders.html");
+const bell=document.querySelector('#notificationsButton');
+if(bell)bell.addEventListener("click",()=>location.href="notifications.html");
+async function refreshSellerNotificationBadge(ownerId){
+ try{const{count,error}=await db.from("notifications").select("id",{count:"exact",head:true}).eq("user_id",ownerId).eq("is_read",false);if(error)throw error;
+ let badge=document.getElementById("sellerNotificationCount");if(!badge){badge=document.createElement("span");badge.id="sellerNotificationCount";bell?.appendChild(badge);}
+ badge.textContent=count>99?"99+":String(count||0);badge.hidden=!count;
+ if(bell){bell.style.position="relative";badge.style.cssText="position:absolute;right:-4px;top:-4px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:#e34b45;color:#fff;font:700 10px/17px sans-serif;text-align:center;";}
+ }catch(error){console.warn("Seller notification badge:",error.message)}
+}
+let sellerNotificationChannel=null;
+async function setupSellerNotifications(ownerId){await refreshSellerNotificationBadge(ownerId);if(sellerNotificationChannel)db.removeChannel(sellerNotificationChannel);sellerNotificationChannel=db.channel("zune-seller-notifications-badge").on("postgres_changes",{event:"*",schema:"public",table:"notifications",filter:"user_id=eq."+ownerId},()=>refreshSellerNotificationBadge(ownerId)).subscribe();}
+
 init();
 async function refreshOverviewMetrics(){
   try{
