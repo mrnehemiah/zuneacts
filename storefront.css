@@ -7,3 +7,27 @@
 body[data-template="modern"] .store-card,body[data-template="modern"] .product-card{border-radius:22px}body[data-template="minimal"] .store-card,body[data-template="minimal"] .product-card{border-radius:7px;box-shadow:none}
 
 .info-grid .info-card:last-child{min-width:0}
+
+/* Ten complete seller storefront template identities */
+body[data-template="luxury"] .store-card,body[data-template="luxury"] .product-card{border-radius:4px;box-shadow:0 14px 34px #201b1918;border-color:#d9c9a8}
+body[data-template="luxury"] .cover{min-height:210px}
+body[data-template="bold"] .store-card,body[data-template="bold"] .product-card{border-radius:5px;border:2px solid var(--emerald)}
+body[data-template="bold"] .cover{min-height:205px}
+body[data-template="nature"] .store-card,body[data-template="nature"] .product-card{border-radius:20px;border-color:#cbdcc7}
+body[data-template="nature"] .cover{border-radius:0 0 34px 34px}
+body[data-template="pastel"] .store-card,body[data-template="pastel"] .product-card{border-radius:22px;border-color:#ead7e1;box-shadow:0 10px 28px #79546c12}
+body[data-template="pastel"] .cover{border-radius:0 0 28px 28px}
+body[data-template="editorial"] .store-card,body[data-template="editorial"] .product-card{border-radius:2px;box-shadow:none;border-color:#d8d0c4}
+body[data-template="editorial"] .cover{min-height:230px}
+body[data-template="tech"] .store-card,body[data-template="tech"] .product-card{border-radius:10px;border-color:#b8d8d7;box-shadow:0 8px 24px #111d3518}
+body[data-template="tech"] .cover{min-height:190px;background-image:linear-gradient(135deg,#111d35,#174d60)!important}
+body[data-template="marketplace"] .store-card{border-radius:18px}
+body[data-template="marketplace"] .product-card{border-radius:12px;box-shadow:0 5px 16px #153c2b10}
+body[data-template="marketplace"] .cover{min-height:145px}
+body[data-mode="dark"]{background:#101a15;color:#eaf2ec}
+body[data-mode="dark"] .store-card,body[data-mode="dark"] .product-card,body[data-mode="dark"] .info-card{background:#1b2a22;border-color:#30463a;color:#eaf2ec}
+body[data-mode="dark"] .store-title-row h1,body[data-mode="dark"] .section-head h2,body[data-mode="dark"] .info-card h2,body[data-mode="dark"] .product-copy h3{color:#eaf2ec}
+body[data-mode="dark"] .store-description,body[data-mode="dark"] .info-card p{color:#bdcfc3}
+body[data-mode="dark"] .product-image{background:#26382e}
+body[data-mode="dark"] .product-open{background:#294638;color:#eaf2ec}
+body[data-mode="dark"] .empty-state,body[data-mode="dark"] .reviews-empty{background:#1b2a22;border-color:#40594a;color:#bdcfc3}
