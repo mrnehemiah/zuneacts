@@ -44,10 +44,15 @@ async function load(){
   const x=packages.find(v=>v.id===pkg.value),select=$("#placement");select.replaceChildren();
   (x?.placements?.length?x.placements:["home"]).forEach(v=>select.add(new Option(v.replaceAll("_"," "),v)));
   $("#packageHint").textContent=x?(x.description||("Bei "+money(x.price_tzs)+" · "+x.duration_days+" siku · Commission "+Number(x.commission_rate||0)+"%")):"Chagua package";
-  const auction=["auction","hybrid"].includes($("#pricingModel").value);
+  const mode=$("#pricingModel").value,auction=["auction","hybrid"].includes(mode),hybrid=mode==="hybrid";
   $("#billingMode").value=auction?"wallet":"campaign";
-  ["#bidType","#bidAmount","#dailyBudget"].forEach(id=>$(id).closest(".ads-field").classList.toggle("ads-hidden",!auction));
-  $("#bidAmount").required=auction;$("#dailyBudget").required=auction;
+  $("#singleBidTypeField").classList.toggle("ads-hidden",!auction||hybrid);
+  $("#singleBidAmountField").classList.toggle("ads-hidden",!auction||hybrid);
+  $("#hybridCpcField").classList.toggle("ads-hidden",!hybrid);
+  $("#hybridCpmField").classList.toggle("ads-hidden",!hybrid);
+  $("#dailyBudget").closest(".ads-field").classList.toggle("ads-hidden",!auction);
+  $("#bidAmount").required=mode==="auction";$("#dailyBudget").required=auction;
+  $("#hybridCpcBid").required=false;$("#hybridCpmBid").required=false;
  }
  pkg.addEventListener("change",updatePlacements);$("#pricingModel").addEventListener("change",updatePlacements);updatePlacements();
  renderRows("campaigns",campaigns,"Bado hujatengeneza kampeni.",x=>`<strong>${esc(x.title)}</strong><span class="ads-pill">${esc(statusLabel(x.status))}</span><small>${money(x.budget_tzs)} · ${esc(x.placement)} · ${esc(x.pricing_model||"fixed")} · ${new Date(x.created_at).toLocaleDateString("sw-TZ")}</small>${x.review_reason?`<small>Sababu ya Admin: ${esc(x.review_reason)}</small>`:""}`);
@@ -67,9 +72,14 @@ async function init(){
     const pricing=$("#pricingModel").value,auction=["auction","hybrid"].includes(pricing);
     const payload={seller_id:ctx.store.owner_id,store_id:ctx.storeId,product_id:$("#product").value||null,package_id:pkg.id,campaign_type:pkg.campaign_type,placement:$("#placement").value,title:$("#title").value.trim(),creative_url:$("#creative").value.trim()||null,budget_tzs:Number(pkg.price_tzs),starts_at:start,ends_at:end,status:"pending_review",pricing_model:pricing,billing_mode:$("#billingMode").value,attribution_window_days:7};
     const {data,error}=await ctx.supabase.from("ad_campaigns").insert(payload).select("id").single();if(error)throw error;
-    if(auction){
+    if(pricing==="auction"){
      const bid=await ctx.supabase.rpc("zune_seller_place_ad_bid",{p_campaign_id:data.id,p_bid_type:$("#bidType").value,p_bid_amount_tzs:Number($("#bidAmount").value),p_daily_budget_tzs:Number($("#dailyBudget").value),p_seller_note:"Submitted from Seller Ads Dashboard"});
      if(bid.error)throw bid.error;
+    }else if(pricing==="hybrid"){
+     const cpc=Number($("#hybridCpcBid").value||0),cpm=Number($("#hybridCpmBid").value||0),daily=Number($("#dailyBudget").value);
+     if(cpc<=0&&cpm<=0)throw new Error("Weka angalau CPC bid au CPM bid.");
+     if(cpc>0){const bid=await ctx.supabase.rpc("zune_seller_place_ad_bid",{p_campaign_id:data.id,p_bid_type:"cpc",p_bid_amount_tzs:cpc,p_daily_budget_tzs:daily,p_seller_note:"Hybrid CPC bid"});if(bid.error)throw bid.error;}
+     if(cpm>0){const bid=await ctx.supabase.rpc("zune_seller_place_ad_bid",{p_campaign_id:data.id,p_bid_type:"cpm",p_bid_amount_tzs:cpm,p_daily_budget_tzs:daily,p_seller_note:"Hybrid CPM bid"});if(bid.error)throw bid.error;}
     }
     message("Kampeni imetumwa kwa Admin Mkuu kwa ukaguzi.","Campaign submitted to Admin Mkuu for review.",true);
     e.target.reset();await load();
