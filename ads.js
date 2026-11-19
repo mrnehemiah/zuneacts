@@ -13,16 +13,20 @@ function renderRows(hostId, rows, empty, render){
 }
 async function load(){
  const owner=ctx.store.owner_id;
- const [pkgRes,productRes,campaignRes,walletRes,txRes,bidRes,eventRes]=await Promise.all([
+ const [pkgRes,productRes,campaignRes,walletRes,txRes,bidRes]=await Promise.all([
   ctx.supabase.from("ad_packages").select("id,name,description,campaign_type,duration_days,placements,price_tzs,pricing_model,cpc_floor_tzs,cpm_floor_tzs,commission_rate").eq("is_active",true).order("price_tzs"),
   ctx.supabase.from("products").select("id,title").eq("vendor_id",owner).is("removed_at",null).is("seller_archived_at",null).order("created_at",{ascending:false}),
   ctx.supabase.from("ad_campaigns").select("id,title,status,budget_tzs,spent_tzs,created_at,review_reason,placement,pricing_model,billing_mode,product_id").eq("seller_id",owner).order("created_at",{ascending:false}).limit(50),
   ctx.supabase.from("ads_wallets").select("available_tzs,pending_tzs,reserved_tzs").eq("seller_id",owner).maybeSingle(),
   ctx.supabase.from("ads_wallet_transactions").select("id,transaction_type,amount_tzs,status,reason,created_at").eq("seller_id",owner).order("created_at",{ascending:false}).limit(20),
-  ctx.supabase.from("ad_auction_bids").select("id,campaign_id,bid_type,bid_amount_tzs,daily_budget_tzs,status,admin_reason,created_at").eq("seller_id",owner).order("created_at",{ascending:false}).limit(30),
-  ctx.supabase.from("ad_events").select("campaign_id,event_type,cost_tzs,is_billable").in("campaign_id",(campaignRes.data||[]).map(x=>x.id).filter(Boolean))
+  ctx.supabase.from("ad_auction_bids").select("id,campaign_id,bid_type,bid_amount_tzs,daily_budget_tzs,status,admin_reason,created_at").eq("seller_id",owner).order("created_at",{ascending:false}).limit(30)
  ]);
- for(const r of [pkgRes,productRes,campaignRes,walletRes,txRes,bidRes,eventRes]) if(r.error) throw r.error;
+ for(const r of [pkgRes,productRes,campaignRes,walletRes,txRes,bidRes]) if(r.error) throw r.error;
+ const campaignIds=(campaignRes.data||[]).map(x=>x.id).filter(Boolean);
+ const eventRes=campaignIds.length
+  ? await ctx.supabase.from("ad_events").select("campaign_id,event_type,cost_tzs,is_billable").in("campaign_id",campaignIds)
+  : {data:[],error:null};
+ if(eventRes.error)throw eventRes.error;
  packages=pkgRes.data||[];campaigns=campaignRes.data||[];
  const wallet=walletRes.data||{};
  $("#adsAvailable").textContent=money(wallet.available_tzs);
