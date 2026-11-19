@@ -20,7 +20,7 @@ async function load(){
   ctx.supabase.from("ads_wallets").select("available_tzs,pending_tzs,reserved_tzs").eq("seller_id",owner).maybeSingle(),
   ctx.supabase.from("ads_wallet_transactions").select("id,transaction_type,amount_tzs,status,reason,created_at").eq("seller_id",owner).order("created_at",{ascending:false}).limit(20),
   ctx.supabase.from("ad_auction_bids").select("id,campaign_id,bid_type,bid_amount_tzs,daily_budget_tzs,status,admin_reason,created_at").eq("seller_id",owner).order("created_at",{ascending:false}).limit(30),
-  ctx.supabase.from("ad_events").select("campaign_id,event_type").in("campaign_id",(campaignRes.data||[]).map(x=>x.id).filter(Boolean))
+  ctx.supabase.from("ad_events").select("campaign_id,event_type,cost_tzs,is_billable").in("campaign_id",(campaignRes.data||[]).map(x=>x.id).filter(Boolean))
  ]);
  for(const r of [pkgRes,productRes,campaignRes,walletRes,txRes,bidRes,eventRes]) if(r.error) throw r.error;
  packages=pkgRes.data||[];campaigns=campaignRes.data||[];
@@ -30,6 +30,7 @@ async function load(){
  $("#adsCampaignCount").textContent=String(campaigns.length);
  const events=eventRes.data||[];
  $("#adsEngagement").textContent=events.filter(x=>x.event_type==="click").length+" / "+events.filter(x=>x.event_type==="impression").length;
+ $("#adsSpend").textContent=money(events.filter(x=>x.is_billable).reduce((n,x)=>n+Number(x.cost_tzs||0),0));
  const pkg=$("#package");pkg.replaceChildren();
  if(!packages.length){pkg.add(new Option("Hakuna package inayopatikana",""));$("#submitAd").disabled=true;}
  else packages.forEach(x=>pkg.add(new Option(x.name+" · "+money(x.price_tzs)+" · "+x.duration_days+" siku",x.id)));
@@ -40,7 +41,9 @@ async function load(){
   (x?.placements?.length?x.placements:["home"]).forEach(v=>select.add(new Option(v.replaceAll("_"," "),v)));
   $("#packageHint").textContent=x?(x.description||("Bei "+money(x.price_tzs)+" · "+x.duration_days+" siku · Commission "+Number(x.commission_rate||0)+"%")):"Chagua package";
   const auction=["auction","hybrid"].includes($("#pricingModel").value);
+  $("#billingMode").value=auction?"wallet":"campaign";
   ["#bidType","#bidAmount","#dailyBudget"].forEach(id=>$(id).closest(".ads-field").classList.toggle("ads-hidden",!auction));
+  $("#bidAmount").required=auction;$("#dailyBudget").required=auction;
  }
  pkg.addEventListener("change",updatePlacements);$("#pricingModel").addEventListener("change",updatePlacements);updatePlacements();
  renderRows("campaigns",campaigns,"Bado hujatengeneza kampeni.",x=>`<strong>${esc(x.title)}</strong><span class="ads-pill">${esc(statusLabel(x.status))}</span><small>${money(x.budget_tzs)} · ${esc(x.placement)} · ${esc(x.pricing_model||"fixed")} · ${new Date(x.created_at).toLocaleDateString("sw-TZ")}</small>${x.review_reason?`<small>Sababu ya Admin: ${esc(x.review_reason)}</small>`:""}`);
