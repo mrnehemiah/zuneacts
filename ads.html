@@ -21,8 +21,10 @@
  <div class="ads-field"><label for="placement">Mahali pa kuonekana</label><select id="placement" required></select></div>
  <div class="ads-field"><label for="pricingModel">Mfumo wa bei</label><select id="pricingModel"><option value="fixed">Fixed package</option><option value="auction">Auction</option><option value="hybrid">Hybrid CPC + CPM</option></select></div>
  <div class="ads-field"><label for="billingMode">Njia ya malipo</label><select id="billingMode"><option value="campaign">Campaign payment (flat fee)</option><option value="wallet">CPC / CPM from Ads Wallet</option></select></div>
- <div class="ads-field"><label for="bidType">Aina ya zabuni</label><select id="bidType"><option value="cpc">CPC — kwa click</option><option value="cpm">CPM — views 1,000</option></select></div>
- <div class="ads-field"><label for="bidAmount">Zabuni (TSh)</label><input id="bidAmount" type="number" min="1" step="1" placeholder="Weka kiasi"></div>
+ <div class="ads-field" id="singleBidTypeField"><label for="bidType">Aina ya zabuni</label><select id="bidType"><option value="cpc">CPC — kwa click</option><option value="cpm">CPM — views 1,000</option></select></div>
+ <div class="ads-field" id="singleBidAmountField"><label for="bidAmount">Zabuni (TSh)</label><input id="bidAmount" type="number" min="1" step="1" placeholder="Weka kiasi"></div>
+ <div class="ads-field" id="hybridCpcField"><label for="hybridCpcBid">Hybrid CPC bid (TSh / click)</label><input id="hybridCpcBid" type="number" min="0" step="1" placeholder="Weka CPC au acha 0"></div>
+ <div class="ads-field" id="hybridCpmField"><label for="hybridCpmBid">Hybrid CPM bid (TSh / 1,000 views)</label><input id="hybridCpmBid" type="number" min="0" step="1" placeholder="Weka CPM au acha 0"></div>
  <div class="ads-field"><label for="dailyBudget">Bajeti ya siku (TSh)</label><input id="dailyBudget" type="number" min="1" step="1" placeholder="Weka bajeti"></div>
  <div class="ads-field"><label for="startsAt">Tarehe ya kuanza</label><input id="startsAt" type="datetime-local"></div>
  <div class="ads-field"><label for="endsAt">Tarehe ya kumaliza</label><input id="endsAt" type="datetime-local"></div>
