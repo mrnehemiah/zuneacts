@@ -35,6 +35,7 @@ async function load(){
  const events=eventRes.data||[];
  $("#adsEngagement").textContent=events.filter(x=>x.event_type==="click").length+" / "+events.filter(x=>x.event_type==="impression").length;
  $("#adsSpend").textContent=money(events.filter(x=>x.is_billable).reduce((n,x)=>n+Number(x.cost_tzs||0),0));
+ $("#adsConversions").textContent=String(events.filter(x=>x.event_type==="attributed_order").length);
  const pkg=$("#package");pkg.replaceChildren();
  if(!packages.length){pkg.add(new Option("Hakuna package inayopatikana",""));$("#submitAd").disabled=true;}
  else packages.forEach(x=>pkg.add(new Option(x.name+" · "+money(x.price_tzs)+" · "+x.duration_days+" siku",x.id)));
