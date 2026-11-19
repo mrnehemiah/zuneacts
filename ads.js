@@ -50,8 +50,9 @@ async function load(){
   $("#singleBidAmountField").classList.toggle("ads-hidden",!auction||hybrid);
   $("#hybridCpcField").classList.toggle("ads-hidden",!hybrid);
   $("#hybridCpmField").classList.toggle("ads-hidden",!hybrid);
+  $("#totalBudgetField").classList.toggle("ads-hidden",!auction);
   $("#dailyBudget").closest(".ads-field").classList.toggle("ads-hidden",!auction);
-  $("#bidAmount").required=mode==="auction";$("#dailyBudget").required=auction;
+  $("#bidAmount").required=mode==="auction";$("#dailyBudget").required=auction;$("#totalBudget").required=auction;
   $("#hybridCpcBid").required=false;$("#hybridCpmBid").required=false;
  }
  pkg.addEventListener("change",updatePlacements);$("#pricingModel").addEventListener("change",updatePlacements);updatePlacements();
@@ -70,10 +71,14 @@ async function init(){
     const end=$("#endsAt").value?new Date($("#endsAt").value).toISOString():new Date(Date.now()+pkg.duration_days*86400000).toISOString();
     if(new Date(end)<=new Date(start))throw new Error("Tarehe ya mwisho lazima iwe baada ya tarehe ya kuanza.");
     const pricing=$("#pricingModel").value,auction=["auction","hybrid"].includes(pricing);
-    const payload={seller_id:ctx.store.owner_id,store_id:ctx.storeId,product_id:$("#product").value||null,package_id:pkg.id,campaign_type:pkg.campaign_type,placement:$("#placement").value,title:$("#title").value.trim(),creative_url:$("#creative").value.trim()||null,budget_tzs:Number(pkg.price_tzs),starts_at:start,ends_at:end,status:"pending_review",pricing_model:pricing,billing_mode:$("#billingMode").value,attribution_window_days:7};
+    const totalBudget=auction?Number($("#totalBudget").value):Number(pkg.price_tzs);
+    const dailyBudget=auction?Number($("#dailyBudget").value):null;
+    if(totalBudget<=0||totalBudget<(Number(pkg.price_tzs)||0))throw new Error("Bajeti yote lazima iwe angalau kiwango cha chini cha package.");
+    if(auction&&(dailyBudget<=0||dailyBudget>totalBudget))throw new Error("Bajeti ya siku lazima iwe chanya na isizidi bajeti yote.");
+    const payload={seller_id:ctx.store.owner_id,store_id:ctx.storeId,product_id:$("#product").value||null,package_id:pkg.id,campaign_type:pkg.campaign_type,placement:$("#placement").value,title:$("#title").value.trim(),creative_url:$("#creative").value.trim()||null,budget_tzs:totalBudget,starts_at:start,ends_at:end,status:"pending_review",pricing_model:pricing,billing_mode:$("#billingMode").value,attribution_window_days:7};
     const {data,error}=await ctx.supabase.from("ad_campaigns").insert(payload).select("id").single();if(error)throw error;
     if(pricing==="auction"){
-     const bid=await ctx.supabase.rpc("zune_seller_place_ad_bid",{p_campaign_id:data.id,p_bid_type:$("#bidType").value,p_bid_amount_tzs:Number($("#bidAmount").value),p_daily_budget_tzs:Number($("#dailyBudget").value),p_seller_note:"Submitted from Seller Ads Dashboard"});
+     const bid=await ctx.supabase.rpc("zune_seller_place_ad_bid",{p_campaign_id:data.id,p_bid_type:$("#bidType").value,p_bid_amount_tzs:Number($("#bidAmount").value),p_daily_budget_tzs:dailyBudget,p_seller_note:"Submitted from Seller Ads Dashboard"});
      if(bid.error)throw bid.error;
     }else if(pricing==="hybrid"){
      const cpc=Number($("#hybridCpcBid").value||0),cpm=Number($("#hybridCpmBid").value||0),daily=Number($("#dailyBudget").value);
