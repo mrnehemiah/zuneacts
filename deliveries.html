@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="sw">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#073f32"><title>Delivery | ZUNE Seller Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./dashboard.css"><link rel="stylesheet" href="./deliveries.css">
+</head>
+<body>
+<header class="delivery-top"><a class="delivery-brand" href="./dashboard.html">ⓏⓊⓃⒺ <small>SELLER WORKSPACE</small></a><div class="delivery-actions"><button class="lang-btn active" data-lang="sw" type="button">SW</button><button class="lang-btn" data-lang="en" type="button">EN</button><button id="refreshDeliveries" class="delivery-refresh" type="button">↻ <span data-t="refresh">Onyesha upya</span></button><button id="logoutBtn" class="delivery-logout" type="button" data-t="logout">Toka</button></div></header>
+<main class="delivery-shell">
+<a class="delivery-back" href="./dashboard.html">← <span data-t="back">Rudi Dashboard</span></a>
+<section class="delivery-heading"><div><span class="delivery-kicker">ZUNE LOGISTICS</span><h1 data-t="title">Usafirishaji wa Oda</h1><p data-t="subtitle">Chagua dereva, thibitisha makabidhiano na fuatilia safari za oda za duka lako.</p></div><div class="delivery-mark">🚚</div></section>
+<div id="deliveryNotice" class="delivery-notice" role="status" hidden></div>
+<section class="delivery-metrics">
+<article><small data-t="all">Delivery zote</small><strong id="metricAll">—</strong></article>
+<article><small data-t="waiting">Zinasubiri dereva</small><strong id="metricWaiting">—</strong></article>
+<article><small data-t="moving">Ziko njiani</small><strong id="metricMoving">—</strong></article>
+<article><small data-t="done">Zimekamilika</small><strong id="metricDone">—</strong></article>
+</section>
+<section class="delivery-list-head"><div><h2 data-t="orders">Oda za kusafirisha</h2><p data-t="scope">Unaona oda za duka lako pekee.</p></div><span id="lastUpdated">—</span></section>
+<section id="deliveryList" class="delivery-list" aria-live="polite"><div class="delivery-empty">Inapakia taarifa za delivery...</div></section>
+<footer class="delivery-footer">ZUNE ACTS · Seller Delivery Center</footer>
+</main>
+<script type="module" src="./deliveries.js?v=1"></script>
+</body></html>
