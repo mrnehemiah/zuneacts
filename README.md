@@ -13,6 +13,7 @@ Standalone, mobile-first seller portal for ZUNE Marketplace. Built with vanilla 
 ## Seller workspace
 - `dashboard.html/css/js`: Premium Emerald + Ivory Business Overview, desktop sidebar and mobile bottom navigation, bilingual controls, store identity lookup, quick links and animated Tanzania-colour card borders.
 - `more.html/css/js`: dedicated More page with grouped business, growth, finance, account and support tools.
+- `deliveries.html/css/js`: seller-scoped delivery queue, approved driver assignment, seller handover confirmation, customer and driver map links, and 20-second visible-page refresh using the existing Supabase delivery RPCs.
 - `workspace.html/css/js`: authenticated landing shell for individual modules. Modules that are not yet connected to their live data/actions are clearly marked as being prepared; no sample sales figures are presented as real data.
 - Dashboard statistics remain blank until the actual seller-scoped data queries are connected and verified.
 - Existing stores, products, orders and accounts are not recreated or reassigned.
