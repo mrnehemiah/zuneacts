@@ -172,3 +172,11 @@ footer{padding:34px 4px 0!important;font-size:11px!important}
 
 /* Keep verified-store seal visible above template/3D overrides */
 #verifiedSeal.verified-seal:not([hidden]){display:inline-block!important;visibility:visible!important;opacity:1!important;width:27px!important;height:27px!important;flex:0 0 27px!important;color:#1877d2!important;vertical-align:middle!important}
+
+/* Verified badge: blue scalloped rosette over the store profile photo */
+.store-avatar{position:relative;overflow:visible!important;isolation:isolate}
+.store-avatar>img,.store-avatar>span:not(.verified-seal){border-radius:18px;overflow:hidden}
+.store-avatar>img{display:block}
+.store-avatar .verified-seal{position:absolute;z-index:5;right:-9px;bottom:-8px;width:43px!important;height:43px!important;display:block!important;flex:0 0 43px!important;color:#1685df!important;filter:drop-shadow(0 3px 5px #062c4b45)}
+.store-avatar .verified-seal[hidden]{display:none!important}
+@media(max-width:480px){.store-avatar .verified-seal{width:39px!important;height:39px!important;right:-7px;bottom:-7px}}
