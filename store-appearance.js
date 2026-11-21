@@ -2,6 +2,7 @@ import{boot,$,tr}from"./store-tools-core.js";
 async function init(){
  try{
   const c=await boot(),s=c.store;
+  const storefrontLink=$("#viewStorefront");if(storefrontLink&&s.id){const publicUrl=new URL("/zuneacts/storefront.html",location.origin);publicUrl.searchParams.set("store",s.id);storefrontLink.href=publicUrl.toString();}
   $("#name").value=s.store_name||"";$("#category").value=s.category||"";$("#phone").value=s.phone||"";$("#email").value=s.email||"";$("#website").value=s.website||"";$("#description").value=s.description||"";
   const placeholder="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="300"><rect width="100%" height="100%" fill="#edf3ef"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#82948a" font-family="Arial" font-size="24">ZUNE STORE</text></svg>');
   $("#logoPreview").src=s.logo_url||placeholder;$("#coverPreview").src=s.cover_image_url||placeholder;
