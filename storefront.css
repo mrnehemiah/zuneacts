@@ -169,3 +169,6 @@ footer{padding:34px 4px 0!important;font-size:11px!important}
 .store-social-proof>span:not(.follower-icon){font-weight:800}
 .store-social-proof .social-proof-note{padding-left:9px;border-left:1px solid #cddfd3;color:#78887e;font-size:10px;font-weight:600}
 @media(max-width:480px){.store-social-proof{margin:2px 2px 15px;padding:8px 11px;gap:7px}.store-social-proof .social-proof-note{font-size:9px}}
+
+/* Keep verified-store seal visible above template/3D overrides */
+#verifiedSeal.verified-seal:not([hidden]){display:inline-block!important;visibility:visible!important;opacity:1!important;width:27px!important;height:27px!important;flex:0 0 27px!important;color:#1877d2!important;vertical-align:middle!important}
