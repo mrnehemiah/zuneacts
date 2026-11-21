@@ -1,0 +1,23 @@
+/* ZUNEACTS Premium Soft 3D System — shared across every portal page */
+:root{--z3-forest:#073f32;--z3-emerald:#12815d;--z3-mint:#e8f3ec;--z3-paper:#f2f6f3;--z3-line:#e2ebe5;--z3-shadow:8px 8px 20px rgba(20,55,39,.09),-6px -6px 18px rgba(255,255,255,.92);--z3-shadow-soft:4px 4px 12px rgba(20,55,39,.075),-3px -3px 10px rgba(255,255,255,.9);--z3-inset:inset 3px 3px 8px rgba(20,55,39,.08),inset -3px -3px 8px rgba(255,255,255,.9)}
+html{scroll-behavior:smooth}body{background:var(--z3-paper)}
+.panel,.stat-card,.stat,.stats article,.report-stat,.report-card,.card,.product-card,.quick-card,.review-card,.info-card,.store-card,.upload-card,.radio-card,.preview,.table-wrap,.message-card,.notification-card,.status-card,.order-card,.delivery-card,.wallet-card,.analytics-card,.coupon-card,.customer-card,.modal,.dialog,.settings-card,.section-card,.workspace-card,.chart-card{border:1px solid rgba(218,232,222,.95)!important;border-radius:17px!important;box-shadow:var(--z3-shadow)!important;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+.panel:hover,.stat-card:hover,.stat:hover,.stats article:hover,.report-stat:hover,.product-card:hover,.quick-card:hover,.review-card:hover,.info-card:hover,.order-card:hover,.delivery-card:hover,.wallet-card:hover,.analytics-card:hover{transform:translateY(-2px);box-shadow:10px 12px 25px rgba(20,55,39,.12),-5px -5px 15px rgba(255,255,255,.95)!important;border-color:#c7dfd0!important}
+button,.btn,.primary,.secondary,.submit-button,.primary-action,.secondary-action,.store-action,.product-open,.action-button,.filter,.icon-button,.avatar,.lang-btn{transition:transform .16s ease,box-shadow .16s ease,filter .16s ease}
+button:not(:disabled):active,.btn:not(:disabled):active,.primary:not(:disabled):active,.submit-button:not(:disabled):active,.primary-action:not(:disabled):active,.secondary-action:not(:disabled):active,.product-open:not(:disabled):active{transform:translateY(2px) scale(.985);box-shadow:inset 3px 3px 7px rgba(0,0,0,.16)!important}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(18,129,93,.22);outline-offset:2px}
+input,select,textarea,.field,.search,.toolbar,.filters,.form-control{border-radius:11px}
+input,select,textarea{box-shadow:inset 2px 2px 5px rgba(20,55,39,.055),inset -2px -2px 5px rgba(255,255,255,.8)}
+input:focus,select:focus,textarea:focus{box-shadow:var(--z3-inset),0 0 0 3px rgba(18,129,93,.12)!important}
+.topbar,.top,.header,.workspace-header{box-shadow:0 5px 18px rgba(14,55,39,.055)}
+.sidebar,.side-nav,.bottom-nav{box-shadow:5px 0 22px rgba(0,28,18,.16)}
+.nav-link,.bottom-nav a,.side-store,.brand-mark,.store-icon{transition:transform .18s ease,background .18s ease,box-shadow .18s ease}
+.nav-link:hover,.nav-link.active{box-shadow:inset 2px 2px 6px rgba(0,0,0,.11),inset -2px -2px 6px rgba(255,255,255,.06)}
+.icon-button,.avatar,.icon-btn,.store-icon,.stat-icon{filter:drop-shadow(0 3px 3px rgba(0,35,22,.12))}
+.store-banner,.hero-banner,.welcome-banner,.login-card,.entry-content,.cover{box-shadow:0 16px 35px rgba(4,55,38,.18),inset 0 1px 0 rgba(255,255,255,.18)}
+.submit-button,.btn.primary,.primary,.primary-action,.btn:not(.secondary){box-shadow:0 5px 0 rgba(0,35,23,.18),0 9px 17px rgba(0,70,45,.13)}
+.submit-button:active,.btn.primary:active,.primary:active,.primary-action:active{box-shadow:0 2px 0 rgba(0,35,23,.18)!important}
+.chart-empty,.activity-empty,.empty-state,.loading-state,.empty-note{border-radius:15px}
+table thead th{box-shadow:inset 0 -1px 0 rgba(12,75,48,.08)}hr{border:0;border-top:1px solid var(--z3-line)}
+@media(max-width:700px){.panel,.stat-card,.stat,.stats article,.report-stat,.product-card,.quick-card,.review-card,.info-card,.order-card,.delivery-card,.wallet-card,.analytics-card{border-radius:14px!important;box-shadow:5px 5px 13px rgba(20,55,39,.08),-3px -3px 10px rgba(255,255,255,.9)!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
