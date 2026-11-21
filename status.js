@@ -25,26 +25,27 @@ async function load(){
  if(error){toast(error.message);return;}
  if(!data?.length){$("#list").innerHTML='<p class="hint">Bado hujaweka status hai.</p>';return;}
  const ids=data.map(x=>x.id);
- const [viewsRes,likesRes,commentsRes]=await Promise.all([
+ const [viewsRes,likesRes,commentsRes,peopleRes]=await Promise.all([
   db.from("zune_store_status_views").select("status_id,viewer_id,viewed_at").in("status_id",ids),
   db.from("zune_status_likes").select("status_id,user_id,created_at").in("status_id",ids),
-  db.from("zune_status_comments").select("id,status_id,user_id,comment,created_at").in("status_id",ids).order("created_at",{ascending:false}).limit(300)
+  db.from("zune_status_comments").select("id,status_id,user_id,comment,created_at").in("status_id",ids).order("created_at",{ascending:false}).limit(300),
+  db.rpc("zune_seller_status_engagement_people",{p_status_ids:ids})
  ]);
  const views=viewsRes.data||[],likes=likesRes.data||[],comments=commentsRes.data||[];
  if(viewsRes.error)console.error("Status viewers query failed:",viewsRes.error);
  if(likesRes.error)console.warn("Status likes:",likesRes.error.message);
  if(commentsRes.error)console.warn("Status comments:",commentsRes.error.message);
- const userIds=[...new Set([...likes.map(x=>x.user_id),...comments.map(x=>x.user_id),...views.map(x=>x.viewer_id)].filter(Boolean))];
- let profiles={},profileError=null;
- if(userIds.length){const p=await db.from("public_profiles").select("id,full_name,zune_id").in("id",userIds);if(!p.error)(p.data||[]).forEach(x=>profiles[String(x.id)]=x.full_name||x.zune_id||"Mteja ZUNE");else{profileError=p.error;console.error("Public profile names query failed:",p.error);}}
+ let profiles={},profileError=peopleRes.error||null;
+ if(!peopleRes.error)(peopleRes.data||[]).forEach(x=>profiles[String(x.user_id)]=x.display_name||"Mtumiaji wa ZUNE");
+ else console.error("Seller engagement names RPC failed:",peopleRes.error);
  $("#list").innerHTML=data.map(st=>{
   const stViews=views.filter(v=>v.status_id===st.id),stLikes=likes.filter(v=>v.status_id===st.id),stComments=comments.filter(v=>v.status_id===st.id);
   const expiry=new Date(st.expires_at).toLocaleString("sw-TZ");
   const thumb=st.media_type==="image"?'<img class="thumb" src="'+esc(st.media_url)+'" alt="">':st.media_type==="video"?'<video class="thumb" src="'+esc(st.media_url)+'" muted playsinline></video>':'<div class="thumb text-thumb">Aa</div>';
-  const commentMarkup=stComments.length?stComments.map(c=>'<div class="seller-comment"><strong>'+esc(profiles[String(c.user_id)]||"Mteja ZUNE")+'</strong><p>'+esc(c.comment)+'</p><small>'+new Date(c.created_at).toLocaleString("sw-TZ")+'</small></div>').join(""):'<p class="hint">Bado hakuna maoni kwenye status hii.</p>';
-  const likedBy=stLikes.slice(0,30).map(x=>`<span class="viewer-chip">${esc(profiles[String(x.user_id)]||"Mteja ZUNE")}</span>`).join("");
+  const commentMarkup=stComments.length?stComments.map(c=>'<div class="seller-comment"><strong>'+esc(profiles[String(c.user_id)]||"Mtumiaji wa ZUNE")+'</strong><p>'+esc(c.comment)+'</p><small>'+new Date(c.created_at).toLocaleString("sw-TZ")+'</small></div>').join(""):'<p class="hint">Bado hakuna maoni kwenye status hii.</p>';
+  const likedBy=stLikes.slice(0,30).map(x=>`<span class="viewer-chip">${esc(profiles[String(x.user_id)]||"Mtumiaji wa ZUNE")}</span>`).join("");
   const uniqueViewers=[...new Map(stViews.map(v=>[String(v.viewer_id),v])).values()].sort((a,b)=>new Date(b.viewed_at)-new Date(a.viewed_at));
-  const viewers=uniqueViewers.slice(0,100).map(x=>'<span class="viewer-chip">'+esc(profiles[String(x.viewer_id)]||"Mtazamaji")+'</span>').join("");
+  const viewers=uniqueViewers.slice(0,100).map(x=>'<span class="viewer-chip">'+esc(profiles[String(x.viewer_id)]||"Mtumiaji wa ZUNE")+'</span>').join("");
   const viewerNotice=viewsRes.error?'<span class="hint">Imeshindikana kupakia watazamaji: '+esc(viewsRes.error.message)+'</span>':profileError?'<span class="hint">Majina hayajapakiwa: '+esc(profileError.message)+'</span>':"";
   return '<article class="seller-status-card" data-status-card="'+esc(st.id)+'"><div class="item">'+thumb+'<div><strong>'+esc(st.caption||(st.media_type==="text"?"Status ya maandishi":st.media_type==="video"?"Status ya video":"Status ya picha"))+'</strong><small>Inaisha '+esc(expiry)+'</small></div><button class="delete" data-delete="'+esc(st.id)+'">Futa</button></div><div class="engagement-stats"><div><b>👁 '+stViews.length+'</b><small>Watazamaji</small></div><div><b>❤️ '+stLikes.length+'</b><small>Likes</small></div><div><b>💬 '+stComments.length+'</b><small>Maoni</small></div></div><details class="engagement-details"><summary>Ona waliolike, watazamaji na maoni</summary><h3>Waliolike</h3><div class="viewer-list">'+(likedBy||'<span class="hint">Bado hakuna Like.</span>')+'</div><h3>Watazamaji</h3><div class="viewer-list">'+(viewers||'<span class="hint">Hakuna watazamaji bado.</span>')+viewerNotice+'</div><h3>Maoni ya wateja</h3><div class="seller-comments">'+commentMarkup+'</div></details></article>';
  }).join("");
