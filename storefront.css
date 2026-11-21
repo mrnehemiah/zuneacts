@@ -66,3 +66,97 @@ body[data-mode="dark"] .empty-state,body[data-mode="dark"] .reviews-empty{backgr
 .product-card-actions .product-open{margin-top:0}
 .product-save{width:100%;min-height:34px;border:1px solid #d8e7dd;border-radius:8px;background:#fff;color:#087653;font-size:10px;font-weight:800;cursor:pointer}
 .product-save:disabled{opacity:.55;cursor:wait}
+
+
+/* ZUNE Storefront — Modern customer-facing redesign */
+:root{--forest:#073f32;--forest2:#0b5943;--emerald:#13835f;--mint:#eaf4ee;--ink:#172820;--muted:#718078;--line:#e5ece7;--paper:#f5f8f6}
+body{background:#f5f8f6!important;color:#172820}
+.topbar{height:72px!important;background:linear-gradient(110deg,#062f25,#0b5943)!important;padding-inline:max(20px,calc((100vw - 1160px)/2))!important;box-shadow:0 8px 24px #052e241c!important}
+.brand{font-size:20px!important;letter-spacing:2.4px!important}
+.brand-mark{width:40px!important;height:40px!important;border:1px solid #b8d9c6!important;background:#ffffff0d!important;color:#f1d47b!important}
+.icon-btn{width:44px!important;height:44px!important;background:#ffffff12!important;border:1px solid #ffffff32!important;backdrop-filter:blur(8px);font-size:23px!important}
+.page{max-width:1120px!important;padding:30px 24px 60px!important}
+.store-card{background:#fff!important;border:1px solid #e3ece6!important;border-radius:26px!important;padding:0 30px 28px!important;overflow:hidden!important;box-shadow:0 18px 50px #123d2b12,0 3px 10px #123d2b08!important}
+.flag-edge:before{display:none!important}
+.cover{height:250px!important;margin:0 -30px!important;padding:22px 30px!important;background-color:#0b5943!important;background-size:cover!important;background-position:center 42%!important;border-radius:0!important;isolation:isolate}
+.cover:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#052f25a8,transparent 75%),linear-gradient(0deg,#052f2570,transparent 55%)}
+.cover-shade{background:linear-gradient(0deg,#052f2570,transparent 60%)!important}
+.cover-label{font-size:10px!important;letter-spacing:2.8px!important;color:#ffffffd9!important;background:#062f2570;padding:8px 12px;border:1px solid #ffffff38;border-radius:30px;backdrop-filter:blur(8px)}
+.identity{align-items:center!important;gap:18px!important;margin-top:-48px!important;padding:0 4px!important;z-index:3}
+.store-avatar{width:112px!important;height:112px!important;flex:0 0 112px!important;border:5px solid #fff!important;border-radius:25px!important;background:#eaf4ee!important;box-shadow:0 12px 30px #0b302632!important}
+.identity-main{padding:48px 0 0!important}
+.store-title-row h1{font-size:clamp(23px,3vw,32px)!important;letter-spacing:-.7px;color:#073f32!important}
+.store-location{font-size:13px!important;margin:6px 0 9px!important}
+.status-pill{padding:8px 13px!important;font-size:11px!important;border:1px solid #dceee2}
+.store-description{font-size:15px!important;line-height:1.75!important;color:#5f7067!important;max-width:780px!important;margin:22px 4px!important}
+.identity-actions{gap:11px!important;padding:0 4px}
+.primary-action,.secondary-action{min-height:46px!important;padding:12px 18px!important;border-radius:13px!important;font-size:12px!important;font-weight:800!important}
+.primary-action{background:linear-gradient(135deg,#087653,#0b5943)!important;border:1px solid #087653!important;box-shadow:0 5px 0 #064b37,0 10px 22px #08765324!important;color:#fff!important}
+.secondary-action{background:#fff!important;color:#145b43!important;border:1px solid #d7e5dc!important;box-shadow:0 4px 12px #123d2b0a!important}
+.primary-action:active,.secondary-action:active{transform:translateY(2px)!important;box-shadow:inset 0 2px 6px #062f2525!important}
+.stories-section,.products-section,.reviews-section{margin-top:42px!important}
+.section-head{align-items:center!important;margin-bottom:19px!important}
+.eyebrow{font-size:10px!important;letter-spacing:2px!important;color:#16815e!important}
+.section-head h2,.info-card h2{font-size:clamp(21px,3vw,26px)!important;letter-spacing:-.55px!important;color:#103f30!important;margin-top:7px!important}
+.count-pill{background:#e7f3eb!important;color:#24664c!important;padding:9px 14px!important;font-size:11px!important;border:1px solid #d9eade}
+.store-stories{gap:16px!important;padding:5px 2px 14px!important}
+.store-story{flex-basis:100px!important;width:100px!important}
+.store-story-ring{width:84px!important;height:84px!important;padding:3px!important;background:linear-gradient(145deg,#e5bd58,#168568 55%,#0b3026)!important;box-shadow:0 5px 15px #123d2b18}
+.store-story-thumb{border:3px solid #fff!important}
+.store-story-name{font-size:11px!important;color:#34473d!important;margin-top:9px!important}
+.store-product-tools{gap:10px!important;margin-bottom:18px!important}
+.store-product-tools input,.store-product-tools select{min-height:48px!important;border:1px solid #e0e9e3!important;border-radius:13px!important;background:#fff!important;box-shadow:0 4px 14px #123d2b08!important;padding:12px 14px!important;font-size:12px!important}
+.products-grid{gap:17px!important}
+.product-card{background:#fff!important;border:1px solid #e6ede8!important;border-radius:19px!important;overflow:hidden;box-shadow:0 8px 24px #123d2b0c!important;transition:transform .22s,box-shadow .22s!important}
+.product-card:hover{transform:translateY(-4px)!important;box-shadow:0 15px 32px #123d2b16!important}
+.product-image{background:#f0f4f1!important}
+.product-copy{padding:14px!important}
+.product-copy h3{font-size:13px!important;line-height:1.5!important;color:#24382e!important}
+.product-price{font-size:15px!important;color:#087653!important}
+.product-open{min-height:39px!important;border-radius:11px!important;background:#eaf4ee!important;color:#0b5943!important;font-size:11px!important}
+.product-save{min-height:38px!important;border-radius:11px!important;background:#fff!important;border-color:#dce9e0!important;font-size:11px!important}
+.reviews-grid{gap:14px!important}
+.review-card,.info-card,.store-location-card{background:#fff!important;border:1px solid #e5ece7!important;border-radius:19px!important;box-shadow:0 8px 24px #123d2b09!important}
+.review-card{padding:18px!important}
+.review-card p,.info-card p{font-size:13px!important;line-height:1.75!important;color:#63736a!important}
+.info-grid{gap:15px!important;margin-top:34px!important}
+.info-card{padding:23px!important}
+.store-location-card{padding:23px!important;margin-top:20px!important}
+footer{padding:34px 4px 0!important;font-size:11px!important}
+.product-dialog,.story-dialog{border-radius:24px!important}
+.page-message{border-radius:14px!important;box-shadow:0 12px 35px #001c1540!important}
+@media(max-width:800px){
+ .page{padding:19px 15px 42px!important}
+ .topbar{height:66px!important;padding-inline:17px!important}
+ .cover{height:205px!important;margin:0 -16px!important;padding:17px 18px!important}
+ .store-card{padding:0 16px 20px!important;border-radius:22px!important}
+ .identity{gap:13px!important;margin-top:-42px!important;padding:0 2px!important}
+ .store-avatar{width:88px!important;height:88px!important;flex-basis:88px!important;border-radius:21px!important}
+ .identity-main{padding-top:43px!important}
+ .store-title-row h1{font-size:21px!important}
+ .store-location{font-size:11px!important}
+ .store-description{font-size:13px!important;margin:19px 2px!important}
+ .identity-actions{display:grid!important;grid-template-columns:1fr 1fr!important;padding:0 2px!important}
+ .identity-actions .primary-action{grid-column:1/-1}
+ .identity-actions a,.identity-actions button{width:100%;min-width:0}
+ .stories-section,.products-section,.reviews-section{margin-top:34px!important}
+ .products-grid{gap:12px!important}
+ .product-copy{padding:11px!important}
+ .product-copy h3{font-size:12px!important}
+ .product-price{font-size:13px!important}
+ .section-head h2{font-size:21px!important}
+ .store-product-tools{grid-template-columns:1fr 1fr!important}
+ .store-product-tools input{grid-column:1/-1}
+ .info-grid{grid-template-columns:1fr!important}
+}
+@media(max-width:390px){
+ .cover{height:180px!important}
+ .store-avatar{width:76px!important;height:76px!important;flex-basis:76px!important}
+ .identity{margin-top:-36px!important}
+ .identity-main{padding-top:38px!important}
+ .store-title-row h1{font-size:18px!important}
+ .status-pill{font-size:9px!important;padding:6px 9px!important}
+ .identity-actions{gap:8px!important}
+ .primary-action,.secondary-action{font-size:10px!important;padding:10px 9px!important}
+}
+@media(prefers-reduced-motion:reduce){.product-card,.store-story-ring,.primary-action,.secondary-action{transition:none!important}}
