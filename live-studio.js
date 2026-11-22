@@ -47,10 +47,14 @@ async function loadYouTubeStatus(){
   const result=await response.json().catch(()=>({}));
   if(!response.ok)throw new Error(result.error||"Hali ya YouTube haikuweza kusomwa.");
   if(result.connected){
-   message.textContent="Imeunganishwa: "+(result.channel_title||"YouTube channel")+". Unaweza kuendelea na hatua za maandalizi ya Live.";
+   message.textContent="Imeunganishwa: "+(result.channel_title||"YouTube channel")+".";
    button.textContent="✓ YouTube imeunganishwa";button.disabled=true;button.dataset.connected="true";
+   $("#startLive").disabled=false;$("#scheduleLive").disabled=false;
+   $("#showStreamKey").disabled=false;$("#refreshLiveStatus").disabled=false;
+   await loadLiveHistory();
   }else{
    message.textContent="Bado hujaunganisha YouTube channel.";button.textContent="▶ Unganisha YouTube";button.disabled=false;delete button.dataset.connected;
+   $("#startLive").disabled=true;$("#scheduleLive").disabled=true;$("#showStreamKey").disabled=true;$("#refreshLiveStatus").disabled=true;
   }
  }catch(error){message.textContent=error.message||"Hali ya muunganisho haijapatikana.";}
 }
@@ -73,6 +77,85 @@ async function connectYouTube(){
   button.disabled=false;
  }
 }
+
+let currentBroadcast=null;
+async function liveApi(payload){
+ const response=await fetch(URL+"/functions/v1/youtube-live",{method:"POST",headers:{"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+sellerSession.access_token},body:JSON.stringify(payload)});
+ const result=await response.json().catch(()=>({}));
+ if(!response.ok)throw new Error(result.error||"Ombi la YouTube Live halikukamilika.");
+ return result;
+}
+function selectedProductIds(){return Array.from($("#products").selectedOptions).map(o=>o.value).filter(Boolean);}
+function showRtmp(config){
+ $("#rtmpAddress").textContent=config.ingestion_address||"";
+ $("#rtmpKey").textContent=config.stream_key||"";
+ $("#streamConfig").hidden=false;
+}
+async function createLive(scheduled){
+ const title=$("#liveTitle").value.trim(),description=$("#liveDescription").value.trim();
+ if(!title){$("#liveEventStatus").textContent="Andika kichwa cha matangazo kwanza.";$("#liveTitle").focus();return;}
+ const time=$("#liveScheduleTime").value;
+ if(scheduled&&!time){$("#liveEventStatus").textContent="Chagua tarehe na muda wa Live iliyopangwa.";return;}
+ const scheduledStart=time?new Date(time).toISOString():undefined;
+ $("#startLive").disabled=true;$("#scheduleLive").disabled=true;
+ $("#liveEventStatus").textContent="Inaandaa broadcast na RTMP stream kwenye YouTube…";
+ try{
+  const result=await liveApi({action:"create",title,description,privacy_status:$("#livePrivacy").value,scheduled_start_time:scheduledStart,product_ids:selectedProductIds(),resolution:"720p",frame_rate:"30fps"});
+  currentBroadcast=result.broadcast;
+  showRtmp(result.rtmp);
+  $("#liveEventStatus").textContent="Tukio limetengenezwa YouTube. Weka Server URL na Stream key kwenye RTMP encoder. Kisha anza kutuma video.";
+  $("#startLive").textContent="▶ Anza Kutangaza";
+  $("#showStreamKey").disabled=false;$("#stopLive").disabled=false;
+  await loadLiveHistory();
+ }catch(error){$("#liveEventStatus").textContent=error.message||"Imeshindikana kuunda Live.";}
+ finally{$("#startLive").disabled=false;$("#scheduleLive").disabled=false;}
+}
+async function loadLiveHistory(){
+ try{
+  const result=await liveApi({action:"list"});
+  const history=$("#liveHistory");history.replaceChildren();
+  const open=(result.broadcasts||[]).find(x=>!["complete","cancelled"].includes(x.broadcast_status));
+  if(open)currentBroadcast=open;
+  (result.broadcasts||[]).slice(0,8).forEach(item=>{
+   const p=document.createElement("p");
+   p.textContent=item.title+" · "+item.broadcast_status+" · "+new Date(item.scheduled_start_time).toLocaleString("sw-TZ");
+   history.append(p);
+  });
+  if(!currentBroadcast)$("#stopLive").disabled=true;
+ }catch(error){$("#liveEventStatus").textContent=error.message;}
+}
+async function revealStreamConfig(){
+ if(!currentBroadcast?.id){$("#liveEventStatus").textContent="Tengeneza au chagua tukio la Live kwanza.";return;}
+ try{const result=await liveApi({action:"stream_config",broadcast_id:currentBroadcast.id});showRtmp(result.rtmp);}
+ catch(error){$("#liveEventStatus").textContent=error.message;}
+}
+async function startBroadcast(){
+ if(!currentBroadcast){await createLive(false);return;}
+ $("#liveEventStatus").textContent="Inathibitisha kama YouTube inapokea video kutoka RTMP encoder…";
+ try{
+  const result=await liveApi({action:"start",broadcast_id:currentBroadcast.id});
+  $("#liveEventStatus").textContent=result.message+" Fungua link ya YouTube kuthibitisha video.";
+  $("#stopLive").disabled=false;
+ }catch(error){$("#liveEventStatus").textContent=error.message;}
+}
+async function refreshBroadcast(){
+ if(!currentBroadcast){await loadLiveHistory();return;}
+ try{const result=await liveApi({action:"status",broadcast_id:currentBroadcast.id});currentBroadcast={...currentBroadcast,...result.broadcast};$("#liveEventStatus").textContent="Hali ya Live: "+(result.broadcast?.broadcast_status||"haijulikani");await loadLiveHistory();}
+ catch(error){$("#liveEventStatus").textContent=error.message;}
+}
+async function stopBroadcast(){
+ if(!currentBroadcast?.id)return;
+ if(!confirm("Una uhakika unataka kumaliza matangazo haya?"))return;
+ try{const result=await liveApi({action:"stop",broadcast_id:currentBroadcast.id});$("#liveEventStatus").textContent=result.message;$("#stopLive").disabled=true;currentBroadcast=null;await loadLiveHistory();}
+ catch(error){$("#liveEventStatus").textContent=error.message;}
+}
+$("#startLive").addEventListener("click",startBroadcast);
+$("#scheduleLive").addEventListener("click",()=>createLive(true));
+$("#showStreamKey").addEventListener("click",revealStreamConfig);
+$("#refreshLiveStatus").addEventListener("click",refreshBroadcast);
+$("#stopLive").addEventListener("click",stopBroadcast);
+$("#hideStreamKey").addEventListener("click",()=>{$("#rtmpKey").textContent="••••••••••••••••";$("#streamConfig").hidden=true;});
+
 $("#connectYouTube").addEventListener("click",connectYouTube);
 enableCamera.addEventListener("click",startPreview);
 toggleMic.addEventListener("click",()=>{if(!stream)return;muted=!muted;stream.getAudioTracks().forEach(t=>t.enabled=!muted);toggleMic.textContent=muted?"🎙 Washa sauti":"🎙 Zima sauti";});
