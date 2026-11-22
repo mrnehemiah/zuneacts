@@ -116,8 +116,11 @@ async function loadLiveHistory(){
   const history=$("#liveHistory");history.replaceChildren();
   const open=(result.broadcasts||[]).find(x=>!["complete","cancelled"].includes(x.broadcast_status));
   if(open)currentBroadcast=open;
+  const isActive=open&&["live","testing"].includes(open.broadcast_status);
   $("#stopLive").disabled=!open;
-  $("#stopLive").textContent=open&&["live","testing"].includes(open.broadcast_status)?"Maliza Live":"Futa Live iliyopangwa";
+  $("#stopLive").textContent=isActive?"Maliza Live":"Futa Live iliyopangwa";
+  $("#startLive").disabled=!!isActive;
+  $("#startLive").textContent=isActive?"● Live inaendelea":"▶ Anza Kutangaza";
   (result.broadcasts||[]).slice(0,8).forEach(item=>{
    const p=document.createElement("p");
    p.textContent=item.title+" · "+item.broadcast_status+" · "+new Date(item.scheduled_start_time).toLocaleString("sw-TZ");
