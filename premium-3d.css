@@ -479,3 +479,4 @@ body img{max-width:100%}
  body :is(.card,.stat-card,.metric-card,.kpi-card,.panel,.widget,.section-card,.settings-card,.info-card,.summary-card,.product-card,.order-card,.service-card,.list-card,.form-card,.table-wrap,.chart-card,[class*="stat-card"],[class*="metric-card"],[class*="kpi-card"]){border-radius:14px!important;box-shadow:5px 6px 13px rgba(7,55,36,.10),-3px -3px 8px #fff!important}
 }
 @media(prefers-reduced-motion:reduce){body *,body *:before,body *:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+\n/* Visible keyboard focus across Seller Workspace */\n:where(a,button,input,select,textarea,[tabindex]):focus-visible{outline:3px solid #f0b84b!important;outline-offset:3px!important;border-radius:8px}\n@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}}\n
