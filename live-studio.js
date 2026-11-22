@@ -49,12 +49,12 @@ async function loadYouTubeStatus(){
   if(result.connected){
    message.textContent="Imeunganishwa: "+(result.channel_title||"YouTube channel")+".";
    button.textContent="✓ YouTube imeunganishwa";button.disabled=true;button.dataset.connected="true";
-   $("#startLive").disabled=false;$("#scheduleLive").disabled=false;
-   $("#showStreamKey").disabled=false;$("#refreshLiveStatus").disabled=false;
+   $("#scheduleLive").disabled=false;$("#createLiveNow").disabled=false;
+   $("#refreshLiveStatus").disabled=false;
    await loadLiveHistory();
   }else{
    message.textContent="Bado hujaunganisha YouTube channel.";button.textContent="▶ Unganisha YouTube";button.disabled=false;delete button.dataset.connected;
-   $("#startLive").disabled=true;$("#scheduleLive").disabled=true;$("#showStreamKey").disabled=true;$("#refreshLiveStatus").disabled=true;
+   $("#startLive").disabled=true;$("#scheduleLive").disabled=true;$("#createLiveNow").disabled=true;$("#showStreamKey").disabled=true;$("#refreshLiveStatus").disabled=true;
   }
  }catch(error){message.textContent=error.message||"Hali ya muunganisho haijapatikana.";}
 }
@@ -86,43 +86,51 @@ async function liveApi(payload){
  return result;
 }
 function selectedProductIds(){return Array.from($("#products").selectedOptions).map(o=>o.value).filter(Boolean);}
+function setLiveStatus(message,state="info",scroll=false){
+ const node=$("#liveEventStatus");node.textContent=message;node.dataset.state=state;
+ if(scroll)node.scrollIntoView({behavior:"smooth",block:"center"});
+}
 function showRtmp(config){
- $("#rtmpAddress").textContent=config.ingestion_address||"";
- $("#rtmpKey").textContent=config.stream_key||"";
+ if(!config?.ingestion_address||!config?.stream_key)throw new Error("Tukio limetengenezwa lakini RTMP haikurudishwa kikamilifu. Bonyeza Refresh hali kisha ujaribu Onyesha RTMP setup.");
+ $("#rtmpAddress").textContent=config.ingestion_address;
+ $("#rtmpKey").textContent=config.stream_key;
  $("#streamConfig").hidden=false;
+ $("#streamConfig").scrollIntoView({behavior:"smooth",block:"center"});
 }
 async function createLive(scheduled){
  const title=$("#liveTitle").value.trim(),description=$("#liveDescription").value.trim();
- if(!title){$("#liveEventStatus").textContent="Andika kichwa cha matangazo kwanza.";$("#liveTitle").focus();return;}
+ if(!title){setLiveStatus("Andika kichwa cha matangazo kwanza.","warning",true);$("#liveTitle").focus();return;}
  const time=$("#liveScheduleTime").value;
- if(scheduled&&!time){$("#liveEventStatus").textContent="Chagua tarehe na muda wa Live iliyopangwa.";return;}
+ if(scheduled&&!time){setLiveStatus("Chagua tarehe na muda wa Live iliyopangwa.","warning",true);$("#liveScheduleTime").focus();return;}
  const scheduledStart=time?new Date(time).toISOString():undefined;
- $("#startLive").disabled=true;$("#scheduleLive").disabled=true;
- $("#liveEventStatus").textContent="Inaandaa broadcast na RTMP stream kwenye YouTube…";
+ const createButton=$("#createLiveNow"),scheduleButton=$("#scheduleLive");
+ createButton.disabled=true;scheduleButton.disabled=true;$("#startLive").disabled=true;$("#showStreamKey").disabled=true;
+ setLiveStatus("Inatengeneza tukio la YouTube na RTMP stream… tafadhali subiri.","loading",true);
  try{
   const result=await liveApi({action:"create",title,description,privacy_status:$("#livePrivacy").value,scheduled_start_time:scheduledStart,product_ids:selectedProductIds(),resolution:"720p",frame_rate:"30fps"});
-  currentBroadcast=result.broadcast;
-  showRtmp(result.rtmp);
-  $("#liveEventStatus").textContent="Tukio limetengenezwa YouTube. Weka Server URL na Stream key kwenye RTMP encoder. Kisha anza kutuma video.";
-  $("#startLive").textContent="▶ Anza Kutangaza";
-  $("#showStreamKey").disabled=false;$("#stopLive").disabled=false;
+  if(!result.broadcast?.id)throw new Error("YouTube haikurudisha kitambulisho cha tukio. Angalia historia ya Live kabla ya kujaribu tena.");
+  currentBroadcast=result.broadcast;showRtmp(result.rtmp);
+  $("#startLive").textContent="▶ Anza Kutangaza";$("#showStreamKey").disabled=false;$("#stopLive").disabled=false;
   await loadLiveHistory();
- }catch(error){$("#liveEventStatus").textContent=error.message||"Imeshindikana kuunda Live.";}
- finally{$("#startLive").disabled=false;$("#scheduleLive").disabled=false;}
+  setLiveStatus("Imefanikiwa! Tukio limetengenezwa. Nakili Server URL na Stream key kwenye RTMP encoder (Larix au OBS), anza kutuma video, kisha bonyeza “Anza Kutangaza”.","success",true);
+ }catch(error){setLiveStatus(error.message||"Imeshindikana kuunda Live. Angalia muunganisho wa YouTube.","error",true);}
+ finally{createButton.disabled=false;scheduleButton.disabled=false;}
 }
 async function loadLiveHistory(){
  try{
   const result=await liveApi({action:"list"});
   const history=$("#liveHistory");history.replaceChildren();
   const broadcasts=result.broadcasts||[];
-  const open=broadcasts.find(x=>!["complete","cancelled"].includes(x.broadcast_status));
+  const preferredId=currentBroadcast?.id;
+  const open=(preferredId&&broadcasts.find(x=>x.id===preferredId&&!["complete","cancelled"].includes(x.broadcast_status)))||broadcasts.find(x=>!["complete","cancelled"].includes(x.broadcast_status));
   currentBroadcast=open||null;
   const isActive=!!open&&["live","testing"].includes(open.broadcast_status);
   setChatControlsEnabled(!!isActive);
   $("#stopLive").disabled=!open;
   $("#stopLive").textContent=isActive?"Maliza Live":"Futa Live iliyopangwa";
-  $("#startLive").disabled=!!isActive;
+  $("#startLive").disabled=!open||isActive;
   $("#startLive").textContent=isActive?"● Live inaendelea":"▶ Anza Kutangaza";
+  $("#showStreamKey").disabled=!open;
   (result.broadcasts||[]).slice(0,8).forEach(item=>{
    const p=document.createElement("p");
    p.textContent=item.title+" · "+item.broadcast_status+" · "+new Date(item.scheduled_start_time).toLocaleString("sw-TZ");
@@ -132,18 +140,17 @@ async function loadLiveHistory(){
  }catch(error){$("#liveEventStatus").textContent=error.message;}
 }
 async function revealStreamConfig(){
- if(!currentBroadcast?.id){$("#liveEventStatus").textContent="Tengeneza au chagua tukio la Live kwanza.";return;}
- try{const result=await liveApi({action:"stream_config",broadcast_id:currentBroadcast.id});showRtmp(result.rtmp);}
- catch(error){$("#liveEventStatus").textContent=error.message;}
+ if(!currentBroadcast?.id){setLiveStatus("Tengeneza Live kwanza ili kupata RTMP setup.","warning",true);return;}
+ $("#showStreamKey").disabled=true;setLiveStatus("Inachukua taarifa za RTMP kutoka YouTube…","loading",true);
+ try{const result=await liveApi({action:"stream_config",broadcast_id:currentBroadcast.id});showRtmp(result.rtmp);setLiveStatus("RTMP setup iko tayari. Nakili Server URL na Stream key kwenye encoder yako.","success",true);}
+ catch(error){setLiveStatus(error.message||"RTMP setup haikupatikana.","error",true);}
+ finally{$("#showStreamKey").disabled=false;}
 }
 async function startBroadcast(){
- if(!currentBroadcast){await createLive(false);return;}
- $("#liveEventStatus").textContent="Inathibitisha kama YouTube inapokea video kutoka RTMP encoder…";
- try{
-  const result=await liveApi({action:"start",broadcast_id:currentBroadcast.id});
-  $("#liveEventStatus").textContent=result.message+" Fungua link ya YouTube kuthibitisha video.";
-  $("#stopLive").disabled=false;
- }catch(error){$("#liveEventStatus").textContent=error.message;}
+ if(!currentBroadcast){setLiveStatus("Bado hakuna tukio la Live. Jaza kichwa cha matangazo kisha bonyeza “Tengeneza Live sasa”.","warning",true);$("#liveTitle").focus();return;}
+ setLiveStatus("Inathibitisha kama YouTube inapokea video kutoka RTMP encoder…","loading",true);$("#startLive").disabled=true;
+ try{const result=await liveApi({action:"start",broadcast_id:currentBroadcast.id});setLiveStatus((result.message||"YouTube imepokea ombi la kuanza matangazo.")+" Fungua YouTube kuthibitisha video.","success",true);$("#stopLive").disabled=false;}
+ catch(error){setLiveStatus(error.message||"Matangazo hayajaanza. Hakikisha RTMP encoder inatuma video.","error",true);$("#startLive").disabled=false;}
 }
 async function refreshBroadcast(){
  if(!currentBroadcast){await loadLiveHistory();return;}
@@ -160,6 +167,7 @@ async function stopBroadcast(){
  }catch(error){$("#liveEventStatus").textContent=error.message;}
 }
 $("#startLive").addEventListener("click",startBroadcast);
+$("#createLiveNow").addEventListener("click",()=>createLive(false));
 $("#scheduleLive").addEventListener("click",()=>createLive(true));
 $("#showStreamKey").addEventListener("click",revealStreamConfig);
 $("#refreshLiveStatus").addEventListener("click",refreshBroadcast);
