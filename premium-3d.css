@@ -313,3 +313,68 @@ body:has(.product-grid) .toast{
  body:has(.product-grid) .product-card:hover{transform:translateY(-2px)!important}
  body:has(.product-grid) .bottom-nav a.active{transform:translateY(-2px)}
 }
+
+
+/* Full 3D styling — Seller Orders page */
+body:has(.summary-card) .topbar{background:linear-gradient(180deg,#fff,#f2f8f4)!important;box-shadow:0 7px 20px #0d392018!important}
+body:has(.summary-card) .summary-card,body:has(.summary-card) .orders-panel{
+ background:linear-gradient(145deg,#fff 0%,#f8fcf8 62%,#edf5ef 100%)!important;
+ border:1px solid #cfe4d6!important;border-radius:17px!important;
+ box-shadow:8px 10px 19px rgba(13,57,39,.13),-5px -5px 13px #fff,inset 0 1px 0 #fff!important;
+}
+body:has(.summary-card) .summary-card{padding:18px;transition:transform .22s,box-shadow .22s}
+body:has(.summary-card) .summary-card:hover{transform:translateY(-4px) rotateX(2deg);box-shadow:12px 15px 24px #0d39202b,-4px -4px 12px #fff!important}
+body:has(.summary-card) .summary-card strong{text-shadow:0 2px 0 #fff,0 4px 9px #073f3218}
+body:has(.summary-card) .toolbar{background:linear-gradient(145deg,#fff,#f0f7f2)!important;border:1px solid #dce9df!important;border-radius:14px;box-shadow:5px 6px 13px #0d392014,-3px -3px 9px #fff!important}
+body:has(.summary-card) .tab{border-radius:10px;transition:all .18s}
+body:has(.summary-card) .tab.active{background:linear-gradient(145deg,#fafffb,#dceee2)!important;box-shadow:3px 4px 8px #0d392022,inset 1px 1px 0 #fff!important}
+body:has(.summary-card) .search{background:linear-gradient(145deg,#f0f6f1,#fff);border:1px solid #e0ebe3;box-shadow:inset 3px 3px 6px #0d392014,inset -2px -2px 5px #fff}
+body:has(.summary-card) .order-card{background:linear-gradient(145deg,#fff,#f0f7f2)!important;border:1px solid #d5e6da!important;box-shadow:6px 7px 15px #0d392018,-3px -3px 8px #fff!important}
+body:has(.summary-card) .drawer{background:linear-gradient(145deg,#fff,#f4f9f5)!important;box-shadow:-16px 0 38px #001b1330!important}
+body:has(.summary-card) .drawer-head{border-bottom:1px solid #dfebe2}
+body:has(.summary-card) .refresh,body:has(.summary-card) .drawer-actions button{box-shadow:0 4px 0 #03432f,0 8px 14px #00523625,inset 1px 1px 0 #ffffff40}
+body:has(.summary-card) .bottom-nav{background:linear-gradient(180deg,#0b5943,#06392d)!important;box-shadow:0 -8px 22px #001e143d!important}
+body:has(.summary-card) .bottom-nav a.active{background:linear-gradient(145deg,#1c654d,#0c4434)!important;border-radius:12px;box-shadow:4px 5px 9px #0004,inset 1px 1px 2px #ffffff20!important}
+
+/* Full 3D styling — Seller Analytics page */
+body:has(#topProducts) .top{background:linear-gradient(180deg,#fff,#f2f8f4)!important;box-shadow:0 7px 20px #0d392018!important}
+body:has(#topProducts) .metrics article,body:has(#topProducts) .panel{
+ position:relative;overflow:hidden;background:linear-gradient(145deg,#fff 0%,#f8fcf8 62%,#edf5ef 100%)!important;
+ border:1px solid #cfe4d6!important;border-radius:17px!important;
+ box-shadow:8px 10px 19px rgba(13,57,39,.13),-5px -5px 13px #fff,inset 0 1px 0 #fff!important;
+ transition:transform .22s,box-shadow .22s;
+}
+body:has(#topProducts) .metrics article:after,body:has(#topProducts) .panel:after{content:"";position:absolute;inset:0 0 auto;height:38%;background:linear-gradient(155deg,#ffffffa8,transparent);pointer-events:none}
+body:has(#topProducts) .metrics article>* ,body:has(#topProducts) .panel>*{position:relative;z-index:1}
+body:has(#topProducts) .metrics article:hover,body:has(#topProducts) .panel:hover{transform:translateY(-4px) rotateX(1deg);box-shadow:12px 15px 24px #0d39202b,-4px -4px 12px #fff!important}
+body:has(#topProducts) .metrics strong{text-shadow:0 2px 0 #fff,0 4px 9px #073f3218}
+body:has(#topProducts) #period,body:has(#topProducts) .chip{background:linear-gradient(145deg,#fff,#eaf3ec)!important;border:1px solid #d7e7dc!important;box-shadow:3px 4px 8px #0d392018,-2px -2px 5px #fff!important}
+body:has(#topProducts) .chart{border-radius:14px;background:linear-gradient(180deg,#edf6ef,#fff);box-shadow:inset 4px 4px 10px #10452f17,inset -3px -3px 9px #fff;padding:12px}
+body:has(#topProducts) .legend i{box-shadow:0 3px 7px #08745140}
+body:has(#topProducts) .bottom{background:linear-gradient(180deg,#0b5943,#06392d)!important;box-shadow:0 -8px 22px #001e143d!important}
+body:has(#topProducts) .bottom a.active{background:linear-gradient(145deg,#1c654d,#0c4434)!important;border-radius:12px;box-shadow:4px 5px 9px #0004,inset 1px 1px 2px #ffffff20!important}
+
+/* Full 3D styling — Seller More / business tools page */
+body:has(.more-shell) .more-sidebar{background:linear-gradient(155deg,#0b5742,#073f32 52%,#032c23)!important;box-shadow:9px 0 26px #0023173d,inset -1px 0 #ffffff1a!important}
+body:has(.more-shell) .more-main{background:linear-gradient(145deg,#f4f8f5,#edf4ef)}
+body:has(.more-shell) .more-top{background:linear-gradient(180deg,#fff,#f2f8f4)!important;box-shadow:0 7px 20px #0d392018!important;border-bottom:1px solid #dce9df}
+body:has(.more-shell) .sidebar-note{background:linear-gradient(145deg,#17664e,#073b2d)!important;border:1px solid #ffffff24;border-radius:15px;box-shadow:inset 2px 2px 6px #001d1540,0 8px 16px #001d1530}
+body:has(.more-shell) .group-title .group-icon{background:linear-gradient(145deg,#fff,#e3f0e7)!important;box-shadow:5px 6px 12px #0d392022,-3px -3px 8px #fff,inset 1px 1px 0 #fff!important;border:1px solid #d5e6da}
+body:has(.more-shell) .service-card{
+ position:relative;overflow:hidden;background:linear-gradient(145deg,#fff 0%,#f8fcf8 62%,#edf5ef)!important;
+ border:1px solid #cfe4d6!important;border-radius:17px!important;
+ box-shadow:8px 10px 19px rgba(13,57,39,.13),-5px -5px 13px #fff,inset 0 1px 0 #fff!important;
+ transition:transform .22s,box-shadow .22s!important;
+}
+body:has(.more-shell) .service-card:after{content:"";position:absolute;inset:0 0 auto;height:42%;background:linear-gradient(155deg,#ffffffb8,transparent);pointer-events:none}
+body:has(.more-shell) .service-card>*{position:relative;z-index:1}
+body:has(.more-shell) .service-card:hover{transform:translateY(-5px) rotateX(2deg)!important;box-shadow:13px 16px 25px #0d39202e,-4px -4px 12px #fff!important;border-color:#b9d8c5!important}
+body:has(.more-shell) .service-icon{background:linear-gradient(145deg,#fff,#e1efe5)!important;border:1px solid #d6e7dc;box-shadow:5px 6px 11px #0d392022,-3px -3px 8px #fff,inset 1px 1px 0 #fff!important}
+body:has(.more-shell) .service-card>b{filter:drop-shadow(0 3px 3px #00352235)}
+body:has(.more-shell) .more-content .intro h1{text-shadow:0 2px 0 #fff,0 5px 14px #073f321a}
+body:has(.more-shell) .more-bottom,body:has(.more-shell) .bottom-nav{background:linear-gradient(180deg,#0b5943,#06392d)!important;box-shadow:0 -8px 22px #001e143d!important}
+body:has(.more-shell) .more-bottom a.active,body:has(.more-shell) .bottom-nav a.active{background:linear-gradient(145deg,#1c654d,#0c4434)!important;border-radius:12px;box-shadow:4px 5px 9px #0004,inset 1px 1px 2px #ffffff20!important}
+@media(max-width:700px){
+ body:has(.summary-card) .summary-card,body:has(.summary-card) .orders-panel,body:has(#topProducts) .metrics article,body:has(#topProducts) .panel,body:has(.more-shell) .service-card{border-radius:14px!important;box-shadow:5px 6px 13px #0d392018,-3px -3px 9px #fff!important}
+ body:has(.more-shell) .service-card:hover{transform:translateY(-2px)!important}
+}
