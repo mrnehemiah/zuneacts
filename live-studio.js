@@ -36,6 +36,24 @@ function renderSelectedProducts(){
  if(!selected.length){const empty=document.createElement("span");empty.className="empty-selection";empty.textContent="Bado hujachagua bidhaa.";preview.append(empty);return;}
  selected.forEach(p=>{const item=document.createElement("div");item.className="selected-product";const image=p.image_url||(Array.isArray(p.image_urls)?p.image_urls[0]:"");if(image){const img=document.createElement("img");img.src=image;img.alt="";img.loading="lazy";item.append(img);}const meta=document.createElement("span");meta.textContent=p.title||"Bidhaa";item.append(meta);preview.append(item);});
 }
+async function loadYouTubeStatus(){
+ const message=$("#youtubeConnectStatus"),button=$("#connectYouTube");
+ try{
+  const response=await fetch("https://rpkogiieegqgxqbzwxwo.supabase.co/functions/v1/youtube-oauth",{
+   method:"POST",
+   headers:{ "Content-Type":"application/json", "apikey":KEY, "Authorization":"Bearer "+sellerSession.access_token },
+   body:JSON.stringify({action:"status"})
+  });
+  const result=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(result.error||"Hali ya YouTube haikuweza kusomwa.");
+  if(result.connected){
+   message.textContent="Imeunganishwa: "+(result.channel_title||"YouTube channel")+". Unaweza kuendelea na hatua za maandalizi ya Live.";
+   button.textContent="✓ YouTube imeunganishwa";button.disabled=true;button.dataset.connected="true";
+  }else{
+   message.textContent="Bado hujaunganisha YouTube channel.";button.textContent="▶ Unganisha YouTube";button.disabled=false;delete button.dataset.connected;
+  }
+ }catch(error){message.textContent=error.message||"Hali ya muunganisho haijapatikana.";}
+}
 async function connectYouTube(){
  const button=$("#connectYouTube"),message=$("#youtubeConnectStatus");
  if(!sellerVerified||!sellerSession?.access_token){message.textContent="Ingia tena kwenye akaunti ya Seller kisha ujaribu.";return;}
@@ -61,5 +79,5 @@ toggleMic.addEventListener("click",()=>{if(!stream)return;muted=!muted;stream.ge
 switchCamera.addEventListener("click",async()=>{facingMode=facingMode==="user"?"environment":"user";await startPreview();});
 stopCamera.addEventListener("click",stopPreview);
 window.addEventListener("pagehide",()=>{if(stream)stream.getTracks().forEach(t=>t.stop());});
-async function init(){try{const{data:{session},error}=await db.auth.getSession();if(error||!session){location.replace("./index.html");return;}sellerSession=session;const{data:owner,error:ownerError}=await db.rpc("zune_seller_owner_id");if(ownerError||!owner)throw new Error("Imeshindikana kuthibitisha akaunti ya muuzaji.");sellerVerified=true;enableCamera.disabled=false;$("#connectYouTube").disabled=false;$("#youtubeConnectStatus").textContent="Akaunti ya Seller imethibitishwa. Unaweza kuunganisha YouTube.";await loadSellerProducts(owner);status.textContent="Akaunti imethibitishwa. Unaweza kuwasha kamera kwa preview; huduma ya kutangaza bado inaunganishwa.";status.dataset.state="warning";}catch(e){status.textContent=e.message||"Imeshindikana kuthibitisha huduma.";status.dataset.state="error";$("#youtubeConnectStatus").textContent="Muunganisho wa YouTube umefungwa hadi akaunti ya Seller ithibitishwe.";cameraStatus.textContent="Thibitisha akaunti ya muuzaji kabla ya kuwasha kamera.";}}
+async function init(){try{const{data:{session},error}=await db.auth.getSession();if(error||!session){location.replace("./index.html");return;}sellerSession=session;const{data:owner,error:ownerError}=await db.rpc("zune_seller_owner_id");if(ownerError||!owner)throw new Error("Imeshindikana kuthibitisha akaunti ya muuzaji.");sellerVerified=true;enableCamera.disabled=false;$("#connectYouTube").disabled=false;$("#youtubeConnectStatus").textContent="Akaunti ya Seller imethibitishwa. Inakagua YouTube…";await loadYouTubeStatus();await loadSellerProducts(owner);status.textContent="Akaunti imethibitishwa. Unaweza kuwasha kamera kwa preview; huduma ya kutangaza bado inaunganishwa.";status.dataset.state="warning";}catch(e){status.textContent=e.message||"Imeshindikana kuthibitisha huduma.";status.dataset.state="error";$("#youtubeConnectStatus").textContent="Muunganisho wa YouTube umefungwa hadi akaunti ya Seller ithibitishwe.";cameraStatus.textContent="Thibitisha akaunti ya muuzaji kabla ya kuwasha kamera.";}}
 init();
