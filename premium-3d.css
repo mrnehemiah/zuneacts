@@ -21,3 +21,44 @@ input:focus,select:focus,textarea:focus{box-shadow:var(--z3-inset),0 0 0 3px rgb
 table thead th{box-shadow:inset 0 -1px 0 rgba(12,75,48,.08)}hr{border:0;border-top:1px solid var(--z3-line)}
 @media(max-width:700px){.panel,.stat-card,.stat,.stats article,.report-stat,.product-card,.quick-card,.review-card,.info-card,.order-card,.delivery-card,.wallet-card,.analytics-card{border-radius:14px!important;box-shadow:5px 5px 13px rgba(20,55,39,.08),-3px -3px 10px rgba(255,255,255,.9)!important}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
+/* Dashboard-specific 3D overrides — intentionally loaded after dashboard.css */
+body:has(.welcome-row) .stat-card,
+body:has(.welcome-row) .panel,
+body:has(.welcome-row) .quick-card{
+  background:linear-gradient(145deg,#fff 0%,#f8fcf8 62%,#edf5ef 100%)!important;
+  border:1px solid rgba(207,228,214,.98)!important;
+  box-shadow:9px 11px 20px rgba(13,57,39,.15),-5px -5px 14px rgba(255,255,255,.98),inset 0 1px 0 #fff!important;
+}
+body:has(.welcome-row) .stat-card{transform:translateZ(0);min-height:150px}
+body:has(.welcome-row) .stat-card:hover,
+body:has(.welcome-row) .quick-card:hover,
+body:has(.welcome-row) .panel:hover{
+  transform:translateY(-5px) rotateX(2deg)!important;
+  box-shadow:13px 17px 28px rgba(13,57,39,.19),-5px -5px 14px #fff,inset 0 1px 0 #fff!important;
+}
+body:has(.welcome-row) .stat-icon,
+body:has(.welcome-row) .quick-card>span{
+  width:44px;height:44px;border-radius:14px;
+  background:linear-gradient(145deg,#fff,#e2f0e6)!important;
+  box-shadow:5px 6px 11px rgba(13,57,39,.16),-3px -3px 9px #fff,inset 1px 1px 0 #fff!important;
+}
+body:has(.welcome-row) .store-banner{
+  background:linear-gradient(125deg,#042d23 0%,#0a5b43 55%,#15906a 100%)!important;
+  border:1px solid rgba(255,255,255,.25)!important;
+  box-shadow:0 16px 0 -8px rgba(4,47,34,.2),0 23px 40px rgba(5,58,41,.28),inset 0 1px 0 rgba(255,255,255,.28)!important;
+}
+body:has(.welcome-row) .store-banner-icon{
+  background:linear-gradient(145deg,rgba(255,255,255,.25),rgba(255,255,255,.06))!important;
+  box-shadow:7px 8px 16px rgba(0,25,17,.28),inset 1px 1px 2px rgba(255,255,255,.3)!important;
+}
+body:has(.welcome-row) .chart-bars{
+  border-radius:16px;background:linear-gradient(180deg,#edf6ef,#fff)!important;
+  box-shadow:inset 4px 4px 10px rgba(16,69,47,.09),inset -3px -3px 9px #fff!important;
+}
+body:has(.welcome-row) .chart-bar-track{box-shadow:inset 3px 3px 7px rgba(16,69,47,.12),inset -2px -2px 5px #fff}
+body:has(.welcome-row) .chart-bar-track i{background:linear-gradient(180deg,#75dfb0,#15956a 55%,#064f39)!important;box-shadow:inset 1px 1px 0 rgba(255,255,255,.4),0 4px 8px rgba(7,100,71,.25)}
+@media(max-width:700px){
+ body:has(.welcome-row) .stat-card,body:has(.welcome-row) .panel,body:has(.welcome-row) .quick-card{box-shadow:5px 7px 14px rgba(13,57,39,.14),-3px -3px 9px #fff,inset 0 1px 0 #fff!important}
+ body:has(.welcome-row) .stat-icon,body:has(.welcome-row) .quick-card>span{width:38px;height:38px}
+}
