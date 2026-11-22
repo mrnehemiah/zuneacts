@@ -4,7 +4,7 @@ const db=createClient(URL,KEY,{auth:{storageKey:"zune-seller-portal-auth",persis
 const $=s=>document.querySelector(s);
 const status=$("#backendStatus"),cameraStatus=$("#cameraStatus"),video=$("#cameraPreview");
 const enableCamera=$("#enableCamera"),toggleMic=$("#toggleMic"),switchCamera=$("#switchCamera"),stopCamera=$("#stopCamera");
-let stream=null,muted=false,facingMode="user",sellerVerified=false,availableProducts=[];
+let stream=null,muted=false,facingMode="user",sellerVerified=false,availableProducts=[],sellerSession=null;
 function cameraControls(enabled){[enableCamera,toggleMic,switchCamera,stopCamera].forEach(b=>b.disabled=!enabled);}
 function stopPreview(){if(stream){stream.getTracks().forEach(track=>track.stop());stream=null;}video.srcObject=null;video.classList.remove("is-visible");$("#cameraPlaceholder").hidden=false;$("#previewState").textContent="PREVIEW HAJAANZA";cameraControls(sellerVerified);enableCamera.disabled=!sellerVerified;toggleMic.disabled=true;switchCamera.disabled=true;stopCamera.disabled=true;cameraStatus.textContent="Kamera imezimwa. Hakuna video inayotumwa kwa watazamaji.";}
 async function startPreview(){if(!sellerVerified)return;if(!navigator.mediaDevices?.getUserMedia){cameraStatus.textContent="Browser hii haitoi ruhusa ya kamera. Fungua ukurasa kupitia HTTPS na browser inayotumika.";return;}enableCamera.disabled=true;cameraStatus.textContent="Inaomba ruhusa ya kamera na kipaza sauti…";try{if(stream)stream.getTracks().forEach(t=>t.stop());stream=await navigator.mediaDevices.getUserMedia({audio:true,video:{facingMode:{ideal:facingMode},width:{ideal:1280},height:{ideal:720}}});video.srcObject=stream;await video.play();video.classList.add("is-visible");$("#cameraPlaceholder").hidden=true;$("#previewState").textContent="CAMERA PREVIEW";muted=false;toggleMic.textContent="🎙 Zima sauti";cameraControls(true);cameraStatus.textContent="Preview iko tayari kwenye kifaa hiki pekee. Bado hujaanza kutangaza kwa watazamaji."; }catch(e){cameraStatus.textContent=e.name==="NotAllowedError"?"Ruhusa ya kamera/mikrofoni imekataliwa. Ruhusu kwenye mipangilio ya browser kisha ujaribu tena.":e.name==="NotFoundError"?"Hakuna kamera au kipaza sauti kilichopatikana kwenye kifaa hiki.":"Imeshindikana kuwasha kamera: "+(e.message||"jaribu tena.");enableCamera.disabled=false;}}
@@ -36,10 +36,30 @@ function renderSelectedProducts(){
  if(!selected.length){const empty=document.createElement("span");empty.className="empty-selection";empty.textContent="Bado hujachagua bidhaa.";preview.append(empty);return;}
  selected.forEach(p=>{const item=document.createElement("div");item.className="selected-product";const image=p.image_url||(Array.isArray(p.image_urls)?p.image_urls[0]:"");if(image){const img=document.createElement("img");img.src=image;img.alt="";img.loading="lazy";item.append(img);}const meta=document.createElement("span");meta.textContent=p.title||"Bidhaa";item.append(meta);preview.append(item);});
 }
+async function connectYouTube(){
+ const button=$("#connectYouTube"),message=$("#youtubeConnectStatus");
+ if(!sellerVerified||!sellerSession?.access_token){message.textContent="Ingia tena kwenye akaunti ya Seller kisha ujaribu.";return;}
+ button.disabled=true;message.textContent="Inaandaa muunganisho salama wa Google…";
+ try{
+  const response=await fetch("https://rpkogiieegqgxqbzwxwo.supabase.co/functions/v1/youtube-oauth",{
+   method:"POST",
+   headers:{ "Content-Type":"application/json", "apikey":KEY, "Authorization":"Bearer "+sellerSession.access_token },
+   body:JSON.stringify({action:"start"})
+  });
+  const result=await response.json().catch(()=>({}));
+  if(!response.ok||!result.authorization_url)throw new Error(result.error||"Imeshindikana kuanzisha OAuth. Jaribu tena.");
+  message.textContent="Unaelekezwa Google ili uthibitishe channel yako…";
+  location.assign(result.authorization_url);
+ }catch(error){
+  message.textContent=error.message||"Hitilafu ya muunganisho imetokea.";
+  button.disabled=false;
+ }
+}
+$("#connectYouTube").addEventListener("click",connectYouTube);
 enableCamera.addEventListener("click",startPreview);
 toggleMic.addEventListener("click",()=>{if(!stream)return;muted=!muted;stream.getAudioTracks().forEach(t=>t.enabled=!muted);toggleMic.textContent=muted?"🎙 Washa sauti":"🎙 Zima sauti";});
 switchCamera.addEventListener("click",async()=>{facingMode=facingMode==="user"?"environment":"user";await startPreview();});
 stopCamera.addEventListener("click",stopPreview);
 window.addEventListener("pagehide",()=>{if(stream)stream.getTracks().forEach(t=>t.stop());});
-async function init(){try{const{data:{session},error}=await db.auth.getSession();if(error||!session){location.replace("./index.html");return;}const{data:owner,error:ownerError}=await db.rpc("zune_seller_owner_id");if(ownerError||!owner)throw new Error("Imeshindikana kuthibitisha akaunti ya muuzaji.");sellerVerified=true;enableCamera.disabled=false;await loadSellerProducts(owner);status.textContent="Akaunti imethibitishwa. Unaweza kuwasha kamera kwa preview; huduma ya kutangaza bado inaunganishwa.";status.dataset.state="warning";}catch(e){status.textContent=e.message||"Imeshindikana kuthibitisha huduma.";status.dataset.state="error";cameraStatus.textContent="Thibitisha akaunti ya muuzaji kabla ya kuwasha kamera.";}}
+async function init(){try{const{data:{session},error}=await db.auth.getSession();if(error||!session){location.replace("./index.html");return;}sellerSession=session;const{data:owner,error:ownerError}=await db.rpc("zune_seller_owner_id");if(ownerError||!owner)throw new Error("Imeshindikana kuthibitisha akaunti ya muuzaji.");sellerVerified=true;enableCamera.disabled=false;$("#connectYouTube").disabled=false;$("#youtubeConnectStatus").textContent="Akaunti ya Seller imethibitishwa. Unaweza kuunganisha YouTube.";await loadSellerProducts(owner);status.textContent="Akaunti imethibitishwa. Unaweza kuwasha kamera kwa preview; huduma ya kutangaza bado inaunganishwa.";status.dataset.state="warning";}catch(e){status.textContent=e.message||"Imeshindikana kuthibitisha huduma.";status.dataset.state="error";$("#youtubeConnectStatus").textContent="Muunganisho wa YouTube umefungwa hadi akaunti ya Seller ithibitishwe.";cameraStatus.textContent="Thibitisha akaunti ya muuzaji kabla ya kuwasha kamera.";}}
 init();
