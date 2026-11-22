@@ -27,3 +27,17 @@
 .youtube-connect-panel button:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
 .youtube-connect-panel small{display:block;color:#71877b;font-size:11px;line-height:1.5;margin-top:10px}
 .youtube-connect-panel .hint{margin:10px 0 0;min-height:18px}
+
+
+/* YouTube Live event controls */
+.live-event-panel{margin:18px 0;overflow:hidden}
+.live-event-panel .hero-actions{flex-wrap:wrap}
+.live-event-panel button{border:0;border-radius:11px;padding:11px 14px;background:#0a7554;color:#fff;font:800 12px "DM Sans";cursor:pointer}
+.live-event-panel button.secondary{background:#e6f0e9;color:#245541;border:1px solid #d3e3d8}
+.live-event-panel button:disabled{opacity:.45;cursor:not-allowed}
+.live-event-panel .hint{line-height:1.6}
+.stream-config{margin-top:14px;padding:16px;border:1px solid #cfe4d6;background:#f2f8f3;border-radius:14px;overflow-wrap:anywhere}
+.stream-config label{margin:12px 0}
+.stream-config code{display:block;padding:11px;border-radius:9px;background:#102d23;color:#e3f7e9;overflow-wrap:anywhere;font-size:12px;user-select:all}
+.live-history{margin-top:14px;border-top:1px solid #e2ece5;padding-top:10px}
+.live-history p{padding:9px 11px;margin:6px 0;border-radius:9px;background:#f1f7f2;color:#476957;font-size:12px}
