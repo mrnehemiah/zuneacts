@@ -378,3 +378,104 @@ body:has(.more-shell) .more-bottom a.active,body:has(.more-shell) .bottom-nav a.
  body:has(.summary-card) .summary-card,body:has(.summary-card) .orders-panel,body:has(#topProducts) .metrics article,body:has(#topProducts) .panel,body:has(.more-shell) .service-card{border-radius:14px!important;box-shadow:5px 6px 13px #0d392018,-3px -3px 9px #fff!important}
  body:has(.more-shell) .service-card:hover{transform:translateY(-2px)!important}
 }
+
+
+/* =========================================================
+   ZUNE SELLER PORTAL — GLOBAL 3D DESIGN SYSTEM
+   Applied consistently across every HTML route.
+   Presentation only: no application logic or data changes.
+   ========================================================= */
+:root{
+ --z3d-ink:#17382d;--z3d-green:#0b6549;--z3d-line:#d5e7dc;
+ --z3d-shadow:0 10px 22px rgba(7,55,36,.12),0 2px 5px rgba(7,55,36,.06);
+ --z3d-shadow-hover:0 16px 30px rgba(7,55,36,.18),0 4px 9px rgba(7,55,36,.08);
+}
+html{scroll-behavior:smooth}
+body{
+ background:radial-gradient(ellipse at 12% 0%,#ffffff 0%,transparent 42%),
+ linear-gradient(145deg,#f5f9f6 0%,#edf4ef 55%,#f8faf8 100%)!important;
+ color:var(--z3d-ink);
+}
+body :is(header,.topbar,.top,.navbar,.page-header,.header,.app-header){
+ background:linear-gradient(180deg,#fff 0%,#f2f8f4 100%)!important;
+ box-shadow:0 7px 20px rgba(7,55,36,.09)!important;
+ border-bottom:1px solid #dcebe1!important;
+}
+body :is(aside,.sidebar,.side-nav,.side-menu){
+ background:linear-gradient(155deg,#0c6047 0%,#084632 55%,#032f24 100%)!important;
+ box-shadow:8px 0 24px rgba(0,38,25,.22),inset -1px 0 rgba(255,255,255,.12)!important;
+}
+body :is(.card,.stat-card,.metric-card,.kpi-card,.panel,.widget,.section-card,.settings-card,.info-card,.summary-card,.product-card,.order-card,.service-card,.list-card,.form-card,.table-wrap,.chart-card,[class*="stat-card"],[class*="metric-card"],[class*="kpi-card"]){
+ background:linear-gradient(145deg,#fff 0%,#f9fcfa 58%,#edf5ef 100%)!important;
+ border:1px solid var(--z3d-line)!important;
+ border-radius:17px!important;
+ box-shadow:var(--z3d-shadow),inset 0 1px 0 rgba(255,255,255,.95)!important;
+ transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease!important;
+}
+body :is(.card,.stat-card,.metric-card,.kpi-card,.panel,.widget,.section-card,.settings-card,.info-card,.summary-card,.product-card,.order-card,.service-card,.list-card,.form-card,.chart-card,[class*="stat-card"],[class*="metric-card"],[class*="kpi-card"]):hover{
+ transform:translateY(-3px);
+ box-shadow:var(--z3d-shadow-hover),inset 0 1px 0 #fff!important;
+ border-color:#bdd9c8!important;
+}
+body :is(button,.btn,[role="button"],input[type="submit"],input[type="button"]){
+ transition:transform .18s ease,box-shadow .18s ease,filter .18s ease!important;
+}
+body :is(button,.btn,input[type="submit"],input[type="button"]):not(:disabled){
+ box-shadow:0 4px 0 rgba(3,68,46,.16),0 7px 13px rgba(3,68,46,.10),inset 0 1px 0 rgba(255,255,255,.28);
+}
+body :is(button,.btn,input[type="submit"],input[type="button"]):not(:disabled):hover{
+ transform:translateY(-2px);filter:saturate(1.06);
+ box-shadow:0 6px 0 rgba(3,68,46,.13),0 11px 18px rgba(3,68,46,.15),inset 0 1px 0 rgba(255,255,255,.3);
+}
+body :is(button,.btn,input[type="submit"],input[type="button"]):not(:disabled):active{
+ transform:translateY(1px);box-shadow:0 1px 0 rgba(3,68,46,.16),inset 0 2px 5px rgba(0,0,0,.08);
+}
+body :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),select,textarea){
+ background:linear-gradient(145deg,#f0f6f1,#fff)!important;
+ border:1px solid #d6e6dc!important;border-radius:11px!important;
+ box-shadow:inset 3px 3px 7px rgba(9,61,39,.07),inset -2px -2px 5px #fff!important;
+}
+body :is(input,select,textarea):focus{
+ outline:none!important;border-color:#70ad8a!important;
+ box-shadow:0 0 0 3px rgba(36,139,86,.13),inset 2px 2px 5px rgba(9,61,39,.05)!important;
+}
+body :is(.toolbar,.filter-bar,.filters,.search-bar,.action-bar,.tabs,.tab-list){
+ background:linear-gradient(145deg,#fff,#f0f7f2)!important;
+ border:1px solid #dce9df!important;border-radius:14px!important;
+ box-shadow:5px 6px 13px rgba(13,57,39,.08),-3px -3px 9px #fff!important;
+}
+body :is(table,.data-table){border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:13px}
+body :is(thead th,th){background:linear-gradient(180deg,#edf6ef,#e2efe6)!important}
+body :is(tbody tr){transition:background .16s ease}
+body :is(tbody tr:hover){background:#edf7f0!important}
+body :is(.badge,.status,.status-badge,.chip,.tag){
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 2px 5px rgba(7,55,36,.08);
+}
+body :is(.icon-box,.icon-tile,.service-icon,.stat-icon,.feature-icon){
+ background:linear-gradient(145deg,#fff,#e4f1e8)!important;
+ border:1px solid #d5e7dc!important;
+ box-shadow:5px 6px 12px rgba(13,57,39,.12),-3px -3px 8px #fff,inset 1px 1px 0 #fff!important;
+}
+body :is(.modal,.dialog,[role="dialog"],.drawer,.popup,.dropdown-menu){
+ background:linear-gradient(145deg,#fff,#f2f8f4)!important;
+ border:1px solid #d8e9de!important;border-radius:18px!important;
+ box-shadow:0 22px 55px rgba(0,31,20,.24),inset 0 1px 0 #fff!important;
+}
+body :is(.bottom-nav,.mobile-nav,.bottom-navigation){
+ background:linear-gradient(180deg,#0b6047,#063729)!important;
+ box-shadow:0 -8px 22px rgba(0,30,20,.23)!important;
+}
+body :is(.bottom-nav a.active,.mobile-nav a.active,.bottom-navigation a.active){
+ background:linear-gradient(145deg,#1c7053,#0b4936)!important;
+ border-radius:12px;box-shadow:4px 5px 9px #0004,inset 1px 1px 2px #ffffff20!important;
+}
+body :is(.empty-state,.empty,.placeholder){
+ background:linear-gradient(145deg,#fff,#f0f7f2)!important;
+ border:1px dashed #c7ddce!important;border-radius:16px!important;
+}
+body img{max-width:100%}
+@media(hover:none){body :is(.card,.stat-card,.metric-card,.panel,.service-card,.product-card,.order-card):hover{transform:none}}
+@media(max-width:700px){
+ body :is(.card,.stat-card,.metric-card,.kpi-card,.panel,.widget,.section-card,.settings-card,.info-card,.summary-card,.product-card,.order-card,.service-card,.list-card,.form-card,.table-wrap,.chart-card,[class*="stat-card"],[class*="metric-card"],[class*="kpi-card"]){border-radius:14px!important;box-shadow:5px 6px 13px rgba(7,55,36,.10),-3px -3px 8px #fff!important}
+}
+@media(prefers-reduced-motion:reduce){body *,body *:before,body *:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
