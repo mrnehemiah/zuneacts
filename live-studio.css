@@ -19,3 +19,11 @@
 .selected-product{display:flex;align-items:center;gap:8px;padding:6px 9px;border:1px solid #dce9df;background:#f5faf6;border-radius:10px;font-size:11px;font-weight:700;color:#244c3b}
 .selected-product img{width:34px;height:34px;object-fit:cover;border-radius:7px}
 .empty-selection{font-size:11px;color:#71877b;padding:8px 0}
+
+/* Secure YouTube OAuth connection panel */
+.youtube-connect-panel{margin:18px 0;position:relative;overflow:hidden;border:1px solid #cfe4d6;box-shadow:10px 12px 24px #174d3718,-4px -4px 12px #fff,inset 0 1px #fff}
+.youtube-connect-panel>p{color:#61796c;line-height:1.6;font-size:13px;max-width:760px}
+.youtube-connect-panel button{border:0;border-radius:12px;padding:13px 18px;background:linear-gradient(135deg,#087b59,#07513c);color:#fff;font:800 13px "DM Sans";box-shadow:0 5px 0 #043a2b35,0 10px 18px #0a4c3620;cursor:pointer}
+.youtube-connect-panel button:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+.youtube-connect-panel small{display:block;color:#71877b;font-size:11px;line-height:1.5;margin-top:10px}
+.youtube-connect-panel .hint{margin:10px 0 0;min-height:18px}
