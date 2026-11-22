@@ -117,6 +117,7 @@ async function loadLiveHistory(){
   const open=(result.broadcasts||[]).find(x=>!["complete","cancelled"].includes(x.broadcast_status));
   if(open)currentBroadcast=open;
   const isActive=open&&["live","testing"].includes(open.broadcast_status);
+  setChatControlsEnabled(!!isActive);
   $("#stopLive").disabled=!open;
   $("#stopLive").textContent=isActive?"Maliza Live":"Futa Live iliyopangwa";
   $("#startLive").disabled=!!isActive;
@@ -163,6 +164,94 @@ $("#showStreamKey").addEventListener("click",revealStreamConfig);
 $("#refreshLiveStatus").addEventListener("click",refreshBroadcast);
 $("#stopLive").addEventListener("click",stopBroadcast);
 $("#hideStreamKey").addEventListener("click",()=>{$("#rtmpKey").textContent="••••••••••••••••";$("#streamConfig").hidden=true;});
+function setChatControlsEnabled(enabled){
+  $("#refreshChat").disabled=!enabled;
+  $("#addChatModerator").disabled=!enabled;
+}
+function renderChatMessages(messages){
+ const root=$("#liveChatMessages");root.replaceChildren();
+ if(!messages.length){const p=document.createElement("p");p.className="empty-selection";p.textContent="Hakuna ujumbe wa kuonyesha kwa sasa.";root.append(p);return;}
+ messages.forEach(item=>{
+  const card=document.createElement("article");card.className="chat-message";
+  const head=document.createElement("div");head.className="chat-message-head";
+  const author=document.createElement("strong");author.textContent=item.author_name||"YouTube user";
+  const date=document.createElement("small");date.textContent=item.published_at?new Date(item.published_at).toLocaleTimeString("sw-TZ",{hour:"2-digit",minute:"2-digit"}):"";
+  head.append(author,date);
+  const body=document.createElement("p");body.textContent=item.message||"[Ujumbe usio wa maandishi]";
+  card.append(head,body);
+  if(item.author_channel_id){
+   const actions=document.createElement("div");actions.className="chat-message-actions";
+   [["chat_delete","Futa ujumbe"],["chat_timeout","Timeout dakika 5"],["chat_ban","Ban ya kudumu"]].forEach(([action,label])=>{
+    const button=document.createElement("button");button.type="button";button.textContent=label;button.dataset.chatAction=action;button.dataset.channelId=item.author_channel_id;button.dataset.messageId=item.id;actions.append(button);
+   });
+   card.append(actions);
+  }
+  root.append(card);
+ });
+}
+async function loadChatModeration(){
+ if(!currentBroadcast?.id){$("#chatModerationStatus").textContent="Tengeneza au chagua matangazo kwanza.";return;}
+ setChatControlsEnabled(false);$("#chatModerationStatus").textContent="Inapakia YouTube Live Chat na orodha ya moderators…";
+ try{
+  const [chat,mods,bans]=await Promise.all([
+   liveApi({action:"chat_list",broadcast_id:currentBroadcast.id}),
+   liveApi({action:"chat_mod_list",broadcast_id:currentBroadcast.id}),
+   liveApi({action:"chat_bans",broadcast_id:currentBroadcast.id})
+  ]);
+  renderChatMessages(chat.messages||[]);
+  const modRoot=$("#liveChatModerators");modRoot.replaceChildren();
+  (mods.moderators||[]).forEach(mod=>{
+   const row=document.createElement("div");row.className="chat-admin-row";
+   const name=document.createElement("span");name.textContent=mod.display_name||mod.channel_id;
+   const remove=document.createElement("button");remove.type="button";remove.textContent="Ondoa";remove.dataset.moderatorRemove=mod.id;
+   row.append(name,remove);modRoot.append(row);
+  });
+  if(!modRoot.children.length)modRoot.textContent="Hakuna moderators wa ziada.";
+  const banRoot=$("#liveChatBans");banRoot.replaceChildren();
+  (bans.bans||[]).forEach(ban=>{
+   const row=document.createElement("div");row.className="chat-admin-row";
+   const name=document.createElement("span");name.textContent=ban.channel_id+" · "+(ban.ban_type==="permanent"?"Permanent":"Temporary");
+   const remove=document.createElement("button");remove.type="button";remove.textContent="Ondoa zuio";remove.dataset.banRemove=ban.id;
+   row.append(name,remove);banRoot.append(row);
+  });
+  if(!banRoot.children.length)banRoot.textContent="Hakuna watumiaji waliozuiwa.";
+  $("#chatModerationStatus").textContent="Chat imepakiwa. "+(chat.messages||[]).length+" ujumbe umeonekana.";
+  setChatControlsEnabled(true);
+ }catch(error){$("#chatModerationStatus").textContent=error.message||"Imeshindikana kupakia chat moderation.";setChatControlsEnabled(true);}
+}
+async function runChatAction(action,payload={}){
+ if(!currentBroadcast?.id)return;
+ try{
+  $("#chatModerationStatus").textContent="Inatekeleza moderation…";
+  const result=await liveApi({action,broadcast_id:currentBroadcast.id,...payload});
+  $("#chatModerationStatus").textContent=result.message||"Moderation imekamilika.";
+  await loadChatModeration();
+ }catch(error){$("#chatModerationStatus").textContent=error.message||"Moderation haikukamilika.";}
+}
+$("#refreshChat").addEventListener("click",loadChatModeration);
+$("#addChatModerator").addEventListener("click",()=>{
+ const channelId=$("#moderatorChannelId").value.trim();
+ if(!channelId){$("#chatModerationStatus").textContent="Weka YouTube Channel ID ya moderator.";return;}
+ runChatAction("chat_mod_add",{channel_id:channelId}).then(()=>{$("#moderatorChannelId").value="";});
+});
+$("#liveChatMessages").addEventListener("click",event=>{
+ const button=event.target.closest("[data-chat-action]");if(!button)return;
+ const action=button.dataset.chatAction;
+ if(action==="chat_delete"){
+  if(confirm("Una uhakika unataka kufuta ujumbe huu kwenye YouTube?"))runChatAction(action,{message_id:button.dataset.messageId});
+ }else if(action==="chat_timeout"){
+  runChatAction(action,{channel_id:button.dataset.channelId,duration_seconds:300});
+ }else if(action==="chat_ban"){
+  if(confirm("Zuia channel hii kabisa kwenye Live Chat?"))runChatAction(action,{channel_id:button.dataset.channelId});
+ }
+});
+$("#liveChatModerators").addEventListener("click",event=>{
+ const button=event.target.closest("[data-moderator-remove]");if(button&&confirm("Ondoa moderator huyu?"))runChatAction("chat_mod_remove",{moderator_id:button.dataset.moderatorRemove});
+});
+$("#liveChatBans").addEventListener("click",event=>{
+ const button=event.target.closest("[data-ban-remove]");if(button&&confirm("Ondoa zuio hili?"))runChatAction("chat_unban",{ban_id:button.dataset.banRemove});
+});
+
 
 $("#connectYouTube").addEventListener("click",connectYouTube);
 enableCamera.addEventListener("click",startPreview);
