@@ -112,7 +112,7 @@ async function createLive(scheduled){
   currentBroadcast=result.broadcast;showRtmp(result.rtmp);
   $("#startLive").textContent="▶ Anza Kutangaza";$("#showStreamKey").disabled=false;$("#stopLive").disabled=false;
   await loadLiveHistory();
-  setLiveStatus("Imefanikiwa! Tukio limetengenezwa. Nakili Server URL na Stream key kwenye RTMP encoder (Larix au OBS), anza kutuma video, kisha bonyeza “Anza Kutangaza”.","success",true);
+  setLiveStatus("Imefanikiwa! Tukio limetengenezwa. Nakili Server URL na Stream key kwenye RTMP encoder (Larix au OBS), anza kutuma video, kisha bonyeza “Anza Kutangaza”.","success",true);$("#streamConfig").scrollIntoView({behavior:"smooth",block:"center"});
  }catch(error){setLiveStatus(error.message||"Imeshindikana kuunda Live. Angalia muunganisho wa YouTube.","error",true);}
  finally{createButton.disabled=false;scheduleButton.disabled=false;}
 }
@@ -142,7 +142,7 @@ async function loadLiveHistory(){
 async function revealStreamConfig(){
  if(!currentBroadcast?.id){setLiveStatus("Tengeneza Live kwanza ili kupata RTMP setup.","warning",true);return;}
  $("#showStreamKey").disabled=true;setLiveStatus("Inachukua taarifa za RTMP kutoka YouTube…","loading",true);
- try{const result=await liveApi({action:"stream_config",broadcast_id:currentBroadcast.id});showRtmp(result.rtmp);setLiveStatus("RTMP setup iko tayari. Nakili Server URL na Stream key kwenye encoder yako.","success",true);}
+ try{const result=await liveApi({action:"stream_config",broadcast_id:currentBroadcast.id});showRtmp(result.rtmp);setLiveStatus("RTMP setup iko tayari. Nakili Server URL na Stream key kwenye encoder yako.","success",true);$("#streamConfig").scrollIntoView({behavior:"smooth",block:"center"});}
  catch(error){setLiveStatus(error.message||"RTMP setup haikupatikana.","error",true);}
  finally{$("#showStreamKey").disabled=false;}
 }
