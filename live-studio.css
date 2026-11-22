@@ -13,3 +13,9 @@
 .camera-note{font-size:11px;line-height:1.5;color:#e1f4e9;margin:10px 2px 0}
 .camera-placeholder[hidden]{display:none}
 @media(max-width:480px){.camera-controls button{flex:1 1 calc(50% - 8px)}#cameraPreview{min-height:210px}}
+
+.selection-count{float:right;font-size:11px;color:#527466;font-weight:700}
+.selected-products{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;min-height:34px}
+.selected-product{display:flex;align-items:center;gap:8px;padding:6px 9px;border:1px solid #dce9df;background:#f5faf6;border-radius:10px;font-size:11px;font-weight:700;color:#244c3b}
+.selected-product img{width:34px;height:34px;object-fit:cover;border-radius:7px}
+.empty-selection{font-size:11px;color:#71877b;padding:8px 0}
