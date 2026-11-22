@@ -117,6 +117,7 @@ async function loadLiveHistory(){
   const open=(result.broadcasts||[]).find(x=>!["complete","cancelled"].includes(x.broadcast_status));
   if(open)currentBroadcast=open;
   const isActive=open&&["live","testing"].includes(open.broadcast_status);
+  setChatControlsEnabled(!!isActive);
   $("#stopLive").disabled=!open;
   $("#stopLive").textContent=isActive?"Maliza Live":"Futa Live iliyopangwa";
   $("#startLive").disabled=!!isActive;
