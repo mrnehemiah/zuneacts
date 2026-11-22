@@ -116,6 +116,8 @@ async function loadLiveHistory(){
   const history=$("#liveHistory");history.replaceChildren();
   const open=(result.broadcasts||[]).find(x=>!["complete","cancelled"].includes(x.broadcast_status));
   if(open)currentBroadcast=open;
+  $("#stopLive").disabled=!open;
+  $("#stopLive").textContent=open&&["live","testing"].includes(open.broadcast_status)?"Maliza Live":"Futa Live iliyopangwa";
   (result.broadcasts||[]).slice(0,8).forEach(item=>{
    const p=document.createElement("p");
    p.textContent=item.title+" · "+item.broadcast_status+" · "+new Date(item.scheduled_start_time).toLocaleString("sw-TZ");
@@ -145,9 +147,12 @@ async function refreshBroadcast(){
 }
 async function stopBroadcast(){
  if(!currentBroadcast?.id)return;
- if(!confirm("Una uhakika unataka kumaliza matangazo haya?"))return;
- try{const result=await liveApi({action:"stop",broadcast_id:currentBroadcast.id});$("#liveEventStatus").textContent=result.message;$("#stopLive").disabled=true;currentBroadcast=null;await loadLiveHistory();}
- catch(error){$("#liveEventStatus").textContent=error.message;}
+ const isLive=["live","testing"].includes(currentBroadcast.broadcast_status);
+ if(!confirm(isLive?"Una uhakika unataka kumaliza matangazo haya?":"Una uhakika unataka kufuta Live hii iliyopangwa?"))return;
+ try{
+  const result=await liveApi({action:isLive?"stop":"cancel",broadcast_id:currentBroadcast.id});
+  $("#liveEventStatus").textContent=result.message;$("#stopLive").disabled=true;currentBroadcast=null;await loadLiveHistory();
+ }catch(error){$("#liveEventStatus").textContent=error.message;}
 }
 $("#startLive").addEventListener("click",startBroadcast);
 $("#scheduleLive").addEventListener("click",()=>createLive(true));
