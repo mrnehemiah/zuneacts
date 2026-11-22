@@ -114,9 +114,10 @@ async function loadLiveHistory(){
  try{
   const result=await liveApi({action:"list"});
   const history=$("#liveHistory");history.replaceChildren();
-  const open=(result.broadcasts||[]).find(x=>!["complete","cancelled"].includes(x.broadcast_status));
-  if(open)currentBroadcast=open;
-  const isActive=open&&["live","testing"].includes(open.broadcast_status);
+  const broadcasts=result.broadcasts||[];
+  const open=broadcasts.find(x=>!["complete","cancelled"].includes(x.broadcast_status));
+  currentBroadcast=open||null;
+  const isActive=!!open&&["live","testing"].includes(open.broadcast_status);
   setChatControlsEnabled(!!isActive);
   $("#stopLive").disabled=!open;
   $("#stopLive").textContent=isActive?"Maliza Live":"Futa Live iliyopangwa";
@@ -164,9 +165,12 @@ $("#showStreamKey").addEventListener("click",revealStreamConfig);
 $("#refreshLiveStatus").addEventListener("click",refreshBroadcast);
 $("#stopLive").addEventListener("click",stopBroadcast);
 $("#hideStreamKey").addEventListener("click",()=>{$("#rtmpKey").textContent="••••••••••••••••";$("#streamConfig").hidden=true;});
+function chatModerationAvailable(){
+ return !!currentBroadcast?.id&&["live","testing"].includes(currentBroadcast.broadcast_status);
+}
 function setChatControlsEnabled(enabled){
-  $("#refreshChat").disabled=!enabled;
-  $("#addChatModerator").disabled=!enabled;
+ const panel=$("#chatModerationPanel");
+ panel.querySelectorAll("button, select").forEach(control=>{control.disabled=!enabled;});
 }
 function renderChatMessages(messages){
  const root=$("#liveChatMessages");root.replaceChildren();
@@ -181,7 +185,7 @@ function renderChatMessages(messages){
   card.append(head,body);
   if(item.author_channel_id){
    const actions=document.createElement("div");actions.className="chat-message-actions";
-   [["chat_delete","Futa ujumbe"],["chat_timeout","Timeout dakika 5"],["chat_ban","Ban ya kudumu"]].forEach(([action,label])=>{
+   [["chat_delete","Futa ujumbe"],["chat_timeout","Timeout"],["chat_ban","Ban ya kudumu"]].forEach(([action,label])=>{
     const button=document.createElement("button");button.type="button";button.textContent=label;button.dataset.chatAction=action;button.dataset.channelId=item.author_channel_id;button.dataset.messageId=item.id;actions.append(button);
    });
    card.append(actions);
@@ -190,7 +194,7 @@ function renderChatMessages(messages){
  });
 }
 async function loadChatModeration(){
- if(!currentBroadcast?.id){$("#chatModerationStatus").textContent="Tengeneza au chagua matangazo kwanza.";return;}
+ if(!chatModerationAvailable()){$("#chatModerationStatus").textContent="Moderation inapatikana tu matangazo yanapokuwa LIVE.";setChatControlsEnabled(false);return;}
  setChatControlsEnabled(false);$("#chatModerationStatus").textContent="Inapakia YouTube Live Chat na orodha ya moderators…";
  try{
   const [chat,mods,bans]=await Promise.all([
@@ -217,10 +221,10 @@ async function loadChatModeration(){
   if(!banRoot.children.length)banRoot.textContent="Hakuna watumiaji waliozuiwa.";
   $("#chatModerationStatus").textContent="Chat imepakiwa. "+(chat.messages||[]).length+" ujumbe umeonekana.";
   setChatControlsEnabled(true);
- }catch(error){$("#chatModerationStatus").textContent=error.message||"Imeshindikana kupakia chat moderation.";setChatControlsEnabled(true);}
+ }catch(error){$("#chatModerationStatus").textContent=error.message||"Imeshindikana kupakia chat moderation.";setChatControlsEnabled(chatModerationAvailable());}
 }
 async function runChatAction(action,payload={}){
- if(!currentBroadcast?.id)return;
+ if(!chatModerationAvailable()){$("#chatModerationStatus").textContent="Moderation inapatikana tu matangazo yanapokuwa LIVE.";return;}
  try{
   $("#chatModerationStatus").textContent="Inatekeleza moderation…";
   const result=await liveApi({action,broadcast_id:currentBroadcast.id,...payload});
@@ -240,7 +244,7 @@ $("#liveChatMessages").addEventListener("click",event=>{
  if(action==="chat_delete"){
   if(confirm("Una uhakika unataka kufuta ujumbe huu kwenye YouTube?"))runChatAction(action,{message_id:button.dataset.messageId});
  }else if(action==="chat_timeout"){
-  runChatAction(action,{channel_id:button.dataset.channelId,duration_seconds:300});
+  const duration=Number($("#chatTimeoutDuration").value)||300;runChatAction(action,{channel_id:button.dataset.channelId,duration_seconds:duration});
  }else if(action==="chat_ban"){
   if(confirm("Zuia channel hii kabisa kwenye Live Chat?"))runChatAction(action,{channel_id:button.dataset.channelId});
  }
@@ -259,5 +263,5 @@ toggleMic.addEventListener("click",()=>{if(!stream)return;muted=!muted;stream.ge
 switchCamera.addEventListener("click",async()=>{facingMode=facingMode==="user"?"environment":"user";await startPreview();});
 stopCamera.addEventListener("click",stopPreview);
 window.addEventListener("pagehide",()=>{if(stream)stream.getTracks().forEach(t=>t.stop());});
-async function init(){try{const{data:{session},error}=await db.auth.getSession();if(error||!session){location.replace("./index.html");return;}sellerSession=session;const{data:owner,error:ownerError}=await db.rpc("zune_seller_owner_id");if(ownerError||!owner)throw new Error("Imeshindikana kuthibitisha akaunti ya muuzaji.");sellerVerified=true;enableCamera.disabled=false;$("#connectYouTube").disabled=false;$("#youtubeConnectStatus").textContent="Akaunti ya Seller imethibitishwa. Inakagua YouTube…";await loadYouTubeStatus();await loadSellerProducts(owner);status.textContent="Akaunti imethibitishwa. Unaweza kuwasha kamera kwa preview; huduma ya kutangaza bado inaunganishwa.";status.dataset.state="warning";}catch(e){status.textContent=e.message||"Imeshindikana kuthibitisha huduma.";status.dataset.state="error";$("#youtubeConnectStatus").textContent="Muunganisho wa YouTube umefungwa hadi akaunti ya Seller ithibitishwe.";cameraStatus.textContent="Thibitisha akaunti ya muuzaji kabla ya kuwasha kamera.";}}
+async function init(){try{const{data:{session},error}=await db.auth.getSession();if(error||!session){location.replace("./index.html");return;}sellerSession=session;const{data:owner,error:ownerError}=await db.rpc("zune_seller_owner_id");if(ownerError||!owner)throw new Error("Imeshindikana kuthibitisha akaunti ya muuzaji.");sellerVerified=true;enableCamera.disabled=false;$("#connectYouTube").disabled=false;$("#youtubeConnectStatus").textContent="Akaunti ya Seller imethibitishwa. Inakagua YouTube…";await loadYouTubeStatus();await loadSellerProducts(owner);status.textContent="Akaunti imethibitishwa. YouTube Live imeunganishwa; kamera preview ni ya kifaa hiki pekee na broadcast hutumia RTMP encoder." ;status.dataset.state="warning";}catch(e){status.textContent=e.message||"Imeshindikana kuthibitisha huduma.";status.dataset.state="error";$("#youtubeConnectStatus").textContent="Muunganisho wa YouTube umefungwa hadi akaunti ya Seller ithibitishwe.";cameraStatus.textContent="Thibitisha akaunti ya muuzaji kabla ya kuwasha kamera.";}}
 init();
