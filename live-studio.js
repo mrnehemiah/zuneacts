@@ -138,7 +138,6 @@ async function createLive(scheduled){
  }catch(error){
   showLiveFeedback(error.message||"Imeshindikana kuunda Live. Jaribu tena.","error");
  }finally{
-  $("#live-event-panel");
   $(".live-event-panel").setAttribute("aria-busy","false");
   $("#startLive").disabled=false;$("#scheduleLive").disabled=false;
  }
@@ -183,12 +182,12 @@ async function startBroadcast(){
   $("#stopLive").disabled=false;
   await loadLiveHistory();
  }catch(error){showLiveFeedback(error.message,"error");}
- finally{$("#startLive").disabled=false;}
+ finally{$("#startLive").disabled=!!currentBroadcast&&["live","testing"].includes(currentBroadcast.broadcast_status);}
 }
 async function refreshBroadcast(){
  if(!currentBroadcast){await loadLiveHistory();return;}
  try{const result=await liveApi({action:"status",broadcast_id:currentBroadcast.id});currentBroadcast={...currentBroadcast,...result.broadcast};$("#liveEventStatus").textContent="Hali ya Live: "+(result.broadcast?.broadcast_status||"haijulikani");await loadLiveHistory();}
- catch(error){$("#liveEventStatus").textContent=error.message;}
+ catch(error){showLiveFeedback(error.message,"error");}
 }
 async function stopBroadcast(){
  if(!currentBroadcast?.id)return;
