@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-const URL="https://rpkogiieegqgxqbzwxwo.supabase.co", KEY="sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf", AUTH=URL+"/functions/v1/seller-portal-auth";
+const SUPABASE_URL="https://rpkogiieegqgxqbzwxwo.supabase.co", KEY="sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf", AUTH=SUPABASE_URL+"/functions/v1/seller-portal-auth";
 const params=new URLSearchParams(location.search), mode=params.get("mode")==="reset"?"reset":"setup";
 const btn=document.querySelector("#continueBtn"), field=document.querySelector("#storeName"), msg=document.querySelector("#message");
 const copy={sw:{title:"Tengeneza password ya duka",intro:"Andika jina la duka lililo kwenye maombi yako, kisha endelea.",continue:"ENDELEA",missing:"Andika jina la duka kwanza.",loading:"Tunathibitisha taarifa za duka...",error:"Hatukuweza kuendelea. Hakikisha jina la duka ni sahihi."},en:{title:mode==="reset"?"Reset store password":"Create your store password",intro:"Enter the store name used in your application, then continue.",continue:"CONTINUE",missing:"Enter your store name first.",loading:"Checking store details...",error:"We could not continue. Check the store name and try again."}};
