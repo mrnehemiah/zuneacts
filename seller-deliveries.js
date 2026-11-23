@@ -1,6 +1,6 @@
 import{createClient}from"https://esm.sh/@supabase/supabase-js@2";
-const URL="https://rpkogiieegqgxqbzwxwo.supabase.co",KEY="sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf";
-const db=createClient(URL,KEY,{auth:{storageKey:"zune-seller-portal-auth",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+const SUPABASE_URL="https://rpkogiieegqgxqbzwxwo.supabase.co",KEY="sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf";
+const db=createClient(SUPABASE_URL,KEY,{auth:{storageKey:"zune-seller-portal-auth",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
 const $=s=>document.querySelector(s),esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 let drivers=[],deliveries=[],trackingRows=[],activeFilter="all";
 const labels={pending:"Inasubiri",assigned:"Dereva amechaguliwa",ready_for_pickup:"Muuzaji amekabidhi mzigo",picked_up:"Dereva amepokea mzigo",in_transit:"Mzigo uko njiani",delivered:"Dereva amefikisha",completed:"Mnunuzi amethibitisha kupokea",cancelled:"Imeghairiwa",disputed:"Ina uchunguzi"};
