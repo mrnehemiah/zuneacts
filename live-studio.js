@@ -147,10 +147,17 @@ async function loadLiveHistory(){
   const result=await liveApi({action:"list"});
   const history=$("#liveHistory");history.replaceChildren();
   const broadcasts=result.broadcasts||[];
-  const open=broadcasts.find(x=>!["complete","cancelled"].includes(x.broadcast_status));
+  // Prefer the currently streaming broadcast over a newer scheduled one.
+  const open=broadcasts.find(x=>["live","testing"].includes(x.broadcast_status))
+    || broadcasts.find(x=>!["complete","cancelled"].includes(x.broadcast_status));
   currentBroadcast=open||null;
   const isActive=!!open&&["live","testing"].includes(open.broadcast_status);
-  setChatControlsEnabled(!!isActive);
+  const canModerate=chatModerationAvailable();
+  setChatControlsEnabled(canModerate);
+  if(canModerate) await loadChatModeration();
+  else $("#chatModerationStatus").textContent=isActive
+    ?"Moderation itafunguliwa YouTube itakapothibitisha LIVE (si wakati wa testing)."
+    :"Moderation itafunguliwa matangazo yanapoanza LIVE.";
   $("#stopLive").disabled=!open;
   $("#stopLive").textContent=isActive?"Maliza Live":"Futa Live iliyopangwa";
   $("#startLive").disabled=!!isActive;
@@ -205,11 +212,12 @@ $("#refreshLiveStatus").addEventListener("click",refreshBroadcast);
 $("#stopLive").addEventListener("click",stopBroadcast);
 $("#hideStreamKey").addEventListener("click",()=>{$("#rtmpKey").textContent="••••••••••••••••";$("#streamConfig").hidden=true;});
 function chatModerationAvailable(){
- return !!currentBroadcast?.id&&["live","testing"].includes(currentBroadcast.broadcast_status);
+ // YouTube Live Chat moderation endpoints require the broadcast lifecycle to be LIVE.
+ return !!currentBroadcast?.id&&currentBroadcast.broadcast_status==="live";
 }
 function setChatControlsEnabled(enabled){
  const panel=$("#chatModerationPanel");
- panel.querySelectorAll("button, select").forEach(control=>{control.disabled=!enabled;});
+ panel.querySelectorAll("button, select, input").forEach(control=>{control.disabled=!enabled;});
 }
 function renderChatMessages(messages){
  const root=$("#liveChatMessages");root.replaceChildren();
