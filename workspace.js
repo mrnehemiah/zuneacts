@@ -6,7 +6,8 @@ const key=new URLSearchParams(location.search).get("feature")||"products";
 async function init(){
  const{data:{session},error}=await supabase.auth.getSession();
  if(error||!session){location.replace("./index.html");return}
- if(key==="inventory"){location.replace("inventory.html");return;}\n if(key==="products"){location.replace("products.html");return;}
+ if(key==="inventory"){location.replace("inventory.html");return;}
+ if(key==="products"){location.replace("products.html");return;}
  if(key==="orders"){location.replace("orders.html");return;}
  if(key==="analytics"){location.replace("analytics.html");return;}
  if(key==="store"){location.replace("store-appearance.html");return;}
