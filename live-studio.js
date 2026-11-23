@@ -152,9 +152,12 @@ async function loadLiveHistory(){
     || broadcasts.find(x=>!["complete","cancelled"].includes(x.broadcast_status));
   currentBroadcast=open||null;
   const isActive=!!open&&["live","testing"].includes(open.broadcast_status);
-  setChatControlsEnabled(!!isActive);
-  if(isActive) await loadChatModeration();
-  else $("#chatModerationStatus").textContent="Moderation itafunguliwa matangazo yanapoanza LIVE.";
+  const canModerate=chatModerationAvailable();
+  setChatControlsEnabled(canModerate);
+  if(canModerate) await loadChatModeration();
+  else $("#chatModerationStatus").textContent=isActive
+    ?"Moderation itafunguliwa YouTube itakapothibitisha LIVE (si wakati wa testing)."
+    :"Moderation itafunguliwa matangazo yanapoanza LIVE.";
   $("#stopLive").disabled=!open;
   $("#stopLive").textContent=isActive?"Maliza Live":"Futa Live iliyopangwa";
   $("#startLive").disabled=!!isActive;
@@ -209,7 +212,8 @@ $("#refreshLiveStatus").addEventListener("click",refreshBroadcast);
 $("#stopLive").addEventListener("click",stopBroadcast);
 $("#hideStreamKey").addEventListener("click",()=>{$("#rtmpKey").textContent="••••••••••••••••";$("#streamConfig").hidden=true;});
 function chatModerationAvailable(){
- return !!currentBroadcast?.id&&["live","testing"].includes(currentBroadcast.broadcast_status);
+ // YouTube Live Chat moderation endpoints require the broadcast lifecycle to be LIVE.
+ return !!currentBroadcast?.id&&currentBroadcast.broadcast_status==="live";
 }
 function setChatControlsEnabled(enabled){
  const panel=$("#chatModerationPanel");
