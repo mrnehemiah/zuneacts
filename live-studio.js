@@ -79,10 +79,31 @@ async function connectYouTube(){
 }
 
 let currentBroadcast=null;
+function showLiveFeedback(message,state="info"){
+ const el=$("#liveEventStatus");
+ el.textContent=message||"Hakuna maelezo ya ziada yaliyorejeshwa na seva.";
+ el.dataset.state=state;
+ el.scrollIntoView({behavior:"smooth",block:"center"});
+}
+function setLiveBusy(busy,message){
+ const panel=$(".live-event-panel");
+ panel.setAttribute("aria-busy",String(busy));
+ $("#startLive").disabled=busy;
+ $("#scheduleLive").disabled=busy;
+ if(busy)showLiveFeedback(message,"loading");
+}
 async function liveApi(payload){
- const response=await fetch(URL+"/functions/v1/youtube-live",{method:"POST",headers:{"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+sellerSession.access_token},body:JSON.stringify(payload)});
+ let response;
+ try{
+  response=await fetch(URL+"/functions/v1/youtube-live",{method:"POST",headers:{"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+sellerSession.access_token},body:JSON.stringify(payload)});
+ }catch(error){
+  throw new Error("Imeshindikana kuwasiliana na seva ya Live. Kagua intaneti kisha ujaribu tena.");
+ }
  const result=await response.json().catch(()=>({}));
- if(!response.ok)throw new Error(result.error||"Ombi la YouTube Live halikukamilika.");
+ if(!response.ok){
+  const reason=result.error||result.message||"Seva haikukamilisha ombi.";
+  throw new Error("Hitilafu "+response.status+": "+reason);
+ }
  return result;
 }
 function selectedProductIds(){return Array.from($("#products").selectedOptions).map(o=>o.value).filter(Boolean);}
@@ -93,22 +114,34 @@ function showRtmp(config){
 }
 async function createLive(scheduled){
  const title=$("#liveTitle").value.trim(),description=$("#liveDescription").value.trim();
- if(!title){$("#liveEventStatus").textContent="Andika kichwa cha matangazo kwanza.";$("#liveTitle").focus();return;}
+ if(!title){
+  showLiveFeedback("HATUA INAHITAJIKA: Andika kichwa cha matangazo kwenye sehemu ya “Maandalizi ya matangazo”, kisha bonyeza tena.","warning");
+  $("#liveTitle").focus();
+  $("#liveTitle").scrollIntoView({behavior:"smooth",block:"center"});
+  return;
+ }
  const time=$("#liveScheduleTime").value;
- if(scheduled&&!time){$("#liveEventStatus").textContent="Chagua tarehe na muda wa Live iliyopangwa.";return;}
- const scheduledStart=time?new Date(time).toISOString():undefined;
- $("#startLive").disabled=true;$("#scheduleLive").disabled=true;
- $("#liveEventStatus").textContent="Inaandaa broadcast na RTMP stream kwenye YouTube…";
+ if(scheduled&&!time){showLiveFeedback("Chagua tarehe na muda wa Live iliyopangwa.","warning");$("#liveScheduleTime").focus();return;}
+ const parsedTime=time?new Date(time):null;
+ if(parsedTime&&Number.isNaN(parsedTime.getTime())){showLiveFeedback("Tarehe au muda uliochagua si sahihi. Chagua tena.","warning");return;}
+ const scheduledStart=parsedTime?parsedTime.toISOString():undefined;
+ setLiveBusy(true,"INATENGENEZA LIVE: Inaomba YouTube itengeneze broadcast na RTMP stream. Tafadhali subiri…");
  try{
   const result=await liveApi({action:"create",title,description,privacy_status:$("#livePrivacy").value,scheduled_start_time:scheduledStart,product_ids:selectedProductIds(),resolution:"720p",frame_rate:"30fps"});
+  if(!result.broadcast?.id||!result.rtmp?.ingestion_address||!result.rtmp?.stream_key)throw new Error("YouTube haikurudisha taarifa zote za broadcast/RTMP. Refresh hali au kagua muunganisho wa YouTube.");
   currentBroadcast=result.broadcast;
   showRtmp(result.rtmp);
-  $("#liveEventStatus").textContent="Tukio limetengenezwa YouTube. Weka Server URL na Stream key kwenye RTMP encoder. Kisha anza kutuma video.";
+  showLiveFeedback("IMEFANIKIWA: Tukio limetengenezwa YouTube. RTMP setup imefunguliwa hapa chini. Nakili Server URL na Stream key kwenda kwenye OBS au Larix, anza kutuma video, kisha bonyeza “Anza Kutangaza”.","success");
   $("#startLive").textContent="▶ Anza Kutangaza";
   $("#showStreamKey").disabled=false;$("#stopLive").disabled=false;
   await loadLiveHistory();
- }catch(error){$("#liveEventStatus").textContent=error.message||"Imeshindikana kuunda Live.";}
- finally{$("#startLive").disabled=false;$("#scheduleLive").disabled=false;}
+ }catch(error){
+  showLiveFeedback(error.message||"Imeshindikana kuunda Live. Jaribu tena.","error");
+ }finally{
+  $("#live-event-panel");
+  $(".live-event-panel").setAttribute("aria-busy","false");
+  $("#startLive").disabled=false;$("#scheduleLive").disabled=false;
+ }
 }
 async function loadLiveHistory(){
  try{
@@ -129,21 +162,28 @@ async function loadLiveHistory(){
    history.append(p);
   });
   if(!currentBroadcast)$("#stopLive").disabled=true;
- }catch(error){$("#liveEventStatus").textContent=error.message;}
+ }catch(error){showLiveFeedback(error.message,"error");}
 }
 async function revealStreamConfig(){
- if(!currentBroadcast?.id){$("#liveEventStatus").textContent="Tengeneza au chagua tukio la Live kwanza.";return;}
- try{const result=await liveApi({action:"stream_config",broadcast_id:currentBroadcast.id});showRtmp(result.rtmp);}
- catch(error){$("#liveEventStatus").textContent=error.message;}
+ if(!currentBroadcast?.id){showLiveFeedback("Tengeneza Live kwanza ili kupata RTMP setup.","warning");return;}
+ try{
+  showLiveFeedback("Inaomba taarifa za RTMP kutoka seva…","loading");
+  const result=await liveApi({action:"stream_config",broadcast_id:currentBroadcast.id});
+  if(!result.rtmp?.ingestion_address||!result.rtmp?.stream_key)throw new Error("Seva haikurudisha RTMP setup kamili.");
+  showRtmp(result.rtmp);showLiveFeedback("RTMP setup iko tayari. Usimshirikishe mtu mwingine Stream key yako.","success");
+ }catch(error){showLiveFeedback(error.message,"error");}
 }
 async function startBroadcast(){
  if(!currentBroadcast){await createLive(false);return;}
- $("#liveEventStatus").textContent="Inathibitisha kama YouTube inapokea video kutoka RTMP encoder…";
+ $("#startLive").disabled=true;
+ showLiveFeedback("INAKAGUA RTMP: Inathibitisha kama YouTube inapokea video kutoka encoder…","loading");
  try{
   const result=await liveApi({action:"start",broadcast_id:currentBroadcast.id});
-  $("#liveEventStatus").textContent=result.message+" Fungua link ya YouTube kuthibitisha video.";
+  showLiveFeedback((result.message||"Ombi la kuanza matangazo limetumwa.")+" Fungua YouTube kuthibitisha picha na sauti.","success");
   $("#stopLive").disabled=false;
- }catch(error){$("#liveEventStatus").textContent=error.message;}
+  await loadLiveHistory();
+ }catch(error){showLiveFeedback(error.message,"error");}
+ finally{$("#startLive").disabled=false;}
 }
 async function refreshBroadcast(){
  if(!currentBroadcast){await loadLiveHistory();return;}
@@ -156,8 +196,8 @@ async function stopBroadcast(){
  if(!confirm(isLive?"Una uhakika unataka kumaliza matangazo haya?":"Una uhakika unataka kufuta Live hii iliyopangwa?"))return;
  try{
   const result=await liveApi({action:isLive?"stop":"cancel",broadcast_id:currentBroadcast.id});
-  $("#liveEventStatus").textContent=result.message;$("#stopLive").disabled=true;currentBroadcast=null;await loadLiveHistory();
- }catch(error){$("#liveEventStatus").textContent=error.message;}
+  showLiveFeedback(result.message||"Ombi limekamilika.","success");$("#stopLive").disabled=true;currentBroadcast=null;await loadLiveHistory();
+ }catch(error){showLiveFeedback(error.message,"error");}
 }
 $("#startLive").addEventListener("click",startBroadcast);
 $("#scheduleLive").addEventListener("click",()=>createLive(true));
