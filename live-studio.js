@@ -95,7 +95,7 @@ function setLiveBusy(busy,message){
 async function liveApi(payload){
  let response;
  try{
-  response=await fetch(URL+"/functions/v1/youtube-live",{method:"POST",headers:{"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+sellerSession.access_token},body:JSON.stringify(payload)});
+  response=await fetch(SUPABASE_URL+"/functions/v1/youtube-live",{method:"POST",headers:{"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+sellerSession.access_token},body:JSON.stringify(payload)});
  }catch(error){
   throw new Error("Imeshindikana kuwasiliana na seva ya Live. Kagua intaneti kisha ujaribu tena.");
  }
