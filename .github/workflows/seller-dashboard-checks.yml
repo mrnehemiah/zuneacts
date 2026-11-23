@@ -1,0 +1,30 @@
+name: Seller Dashboard checks
+
+on:
+  push:
+    branches:
+      - seller-dashboard-integrated-upgrade
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check seller dashboard JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in analytics.js inventory.js customers.js seller-performance.js messages.js coupons.js deliveries.js live-studio.js store-tools-core.js more.js; do
+            if [[ -f "$file" ]]; then
+              echo "Checking $file"
+              node --input-type=module --check < "$file"
+            fi
+          done

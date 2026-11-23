@@ -1,6 +1,6 @@
 import{createClient}from"https://esm.sh/@supabase/supabase-js@2";
-const URL="https://rpkogiieegqgxqbzwxwo.supabase.co",KEY="sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf";
-const db=createClient(URL,KEY,{auth:{storageKey:"zune-seller-portal-auth",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+const SUPABASE_URL="https://rpkogiieegqgxqbzwxwo.supabase.co",KEY="sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf";
+const db=createClient(SUPABASE_URL,KEY,{auth:{storageKey:"zune-seller-portal-auth",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
 const $=s=>document.querySelector(s);let categories=[],selectedFiles=[],ownerId="",lang=localStorage.getItem("zune-seller-language")==="en"?"en":"sw";
 const money=n=>new Intl.NumberFormat("en-TZ",{maximumFractionDigits:0}).format(Number(n)||0);
 const toast=s=>{const el=$("#toast");el.textContent=s;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),3000)};

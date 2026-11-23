@@ -1,6 +1,6 @@
 import{createClient}from"https://esm.sh/@supabase/supabase-js@2";
-const URL="https://rpkogiieegqgxqbzwxwo.supabase.co",KEY="sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf";
-const db=createClient(URL,KEY,{auth:{storageKey:"zune-seller-portal-auth",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+const SUPABASE_URL="https://rpkogiieegqgxqbzwxwo.supabase.co",KEY="sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf";
+const db=createClient(SUPABASE_URL,KEY,{auth:{storageKey:"zune-seller-portal-auth",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
 const $=s=>document.querySelector(s);
 const status=$("#backendStatus"),cameraStatus=$("#cameraStatus"),video=$("#cameraPreview");
 const enableCamera=$("#enableCamera"),toggleMic=$("#toggleMic"),switchCamera=$("#switchCamera"),stopCamera=$("#stopCamera");
@@ -95,7 +95,7 @@ function setLiveBusy(busy,message){
 async function liveApi(payload){
  let response;
  try{
-  response=await fetch(URL+"/functions/v1/youtube-live",{method:"POST",headers:{"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+sellerSession.access_token},body:JSON.stringify(payload)});
+  response=await fetch(SUPABASE_URL+"/functions/v1/youtube-live",{method:"POST",headers:{"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+sellerSession.access_token},body:JSON.stringify(payload)});
  }catch(error){
   throw new Error("Imeshindikana kuwasiliana na seva ya Live. Kagua intaneti kisha ujaribu tena.");
  }

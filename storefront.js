@@ -1,6 +1,6 @@
 import{createClient}from"https://esm.sh/@supabase/supabase-js@2";
-const URL="https://rpkogiieegqgxqbzwxwo.supabase.co",KEY="sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf";
-const supabase=createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const SUPABASE_URL="https://rpkogiieegqgxqbzwxwo.supabase.co",KEY="sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf";
+const supabase=createClient(SUPABASE_URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const $=s=>document.querySelector(s),params=new URLSearchParams(location.search),storeId=params.get("store");
 const money=n=>new Intl.NumberFormat("sw-TZ",{style:"currency",currency:"TZS",maximumFractionDigits:0}).format(Number(n)||0);
 const safePhone=v=>String(v||"").replace(/[^0-9]/g,"");
