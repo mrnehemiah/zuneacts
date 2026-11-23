@@ -12,6 +12,16 @@ create index if not exists order_deliveries_estimated_delivery_at_idx
   on public.order_deliveries(estimated_delivery_at)
   where estimated_delivery_at is not null;
 
+alter table public.zune_delivery_events
+  drop constraint if exists zune_delivery_events_event_type_check;
+alter table public.zune_delivery_events
+  add constraint zune_delivery_events_event_type_check
+  check (event_type = any(array[
+    'driver_assigned','seller_handover_confirmed','driver_pickup_confirmed',
+    'in_transit','driver_marked_delivered','buyer_confirmed_received',
+    'location_updated','delivery_disputed','delivery_cancelled','eta_updated'
+  ]::text[]));
+
 create or replace function public.zune_delivery_driver_set_eta(
   p_delivery_id uuid,
   p_estimated_delivery_at timestamptz
