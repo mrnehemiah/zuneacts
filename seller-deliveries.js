@@ -2,7 +2,7 @@ import{createClient}from"https://esm.sh/@supabase/supabase-js@2";
 const SUPABASE_URL="https://rpkogiieegqgxqbzwxwo.supabase.co",KEY="sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf";
 const db=createClient(SUPABASE_URL,KEY,{auth:{storageKey:"zune-seller-portal-auth",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
 const $=s=>document.querySelector(s),esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-let drivers=[],deliveries=[],trackingRows=[],activeFilter="all";
+let drivers=[],deliveries=[],trackingRows=[],activeFilter="all",loading=false,hasLoaded=false,knownRejected=new Set();
 const labels={pending:"Inasubiri",assigned:"Dereva amechaguliwa",ready_for_pickup:"Muuzaji amekabidhi mzigo",picked_up:"Dereva amepokea mzigo",in_transit:"Mzigo uko njiani",delivered:"Dereva amefikisha",completed:"Mnunuzi amethibitisha kupokea",cancelled:"Imeghairiwa",disputed:"Ina uchunguzi"};
 function toast(message,error=false){const el=$("#deliveryToast");el.className=error?"delivery-error":"";el.textContent=message;setTimeout(()=>{el.textContent="";el.className=""},4500)}
 function money(v,c="TSh"){return c+" "+Number(v||0).toLocaleString("en-TZ")}
@@ -13,7 +13,7 @@ function render(){
  $("#countDone").textContent=deliveries.filter(d=>d.delivery_status==="completed").length;
  const root=$("#deliveryList");
  const q=($("#deliverySearch")?.value||"").trim().toLowerCase();
- const rows=deliveries.filter(d=>{const driverName=drivers.find(x=>x.driver_id===d.assigned_driver_id)?.full_name||"";const statusMatch=activeFilter==="all"||(activeFilter==="in_transit"?["picked_up","in_transit"].includes(d.delivery_status):activeFilter==="assigned"?["assigned","ready_for_pickup"].includes(d.delivery_status):d.delivery_status===activeFilter);const hay=[d.delivery_id,d.recipient_name,d.recipient_phone,d.delivery_address,d.region,driverName].join(" ").toLowerCase();return statusMatch&&(!q||hay.includes(q))});
+ const rows=deliveries.filter(d=>{const driverName=drivers.find(x=>x.driver_id===d.assigned_driver_id)?.full_name||"";const statusMatch=activeFilter==="all"||(activeFilter==="rejected"?d.driver_response_status==="rejected":activeFilter==="in_transit"?["picked_up","in_transit"].includes(d.delivery_status):activeFilter==="assigned"?["assigned","ready_for_pickup"].includes(d.delivery_status):d.delivery_status===activeFilter);const hay=[d.delivery_id,d.recipient_name,d.recipient_phone,d.delivery_address,d.region,driverName].join(" ").toLowerCase();return statusMatch&&(!q||hay.includes(q))});
  const counter=$("#deliveryFilters");if(counter)counter.dataset.count=rows.length;
  if(!rows.length){const filtered=deliveries.length>0;root.innerHTML=filtered?'<div class="delivery-empty">Hakuna oda zinazolingana na kichujio hiki. <button type="button" id="showAllDelivery" class="delivery-refresh">Onyesha zote</button></div>':'<div class="delivery-empty"><h3>Hakuna oda za delivery bado</h3><p>Oda itaonekana hapa baada ya mnunuzi kuchagua delivery wakati wa checkout na oda kuunganishwa na duka lako.</p><a href="orders.html" class="delivery-refresh" style="display:inline-block;text-decoration:none">Fungua oda za duka ↗</a></div>';$("#showAllDelivery")?.addEventListener("click",()=>{activeFilter="all";document.querySelectorAll("#deliveryFilters [data-filter]").forEach(x=>x.classList.toggle("active",x.dataset.filter==="all"));render()});return}
  root.innerHTML=rows.map(d=>{
@@ -24,7 +24,7 @@ function render(){
  const canHandover=d.delivery_status==="assigned"&&!d.seller_handover_confirmed_at&&d.driver_response_status==="accepted";
  const track=trackingRows.find(x=>x.delivery_id===d.delivery_id);const driverMap=track?.last_latitude!=null&&track?.last_longitude!=null?'<a target="_blank" rel="noopener" href="https://www.openstreetmap.org/?mlat='+track.last_latitude+'&mlon='+track.last_longitude+'#map=16/'+track.last_latitude+'/'+track.last_longitude+'">📍 Eneo la sasa la dereva ↗</a>':"";const destinationMap=d.latitude!=null&&d.longitude!=null?'<a target="_blank" rel="noopener" href="https://www.openstreetmap.org/?mlat='+d.latitude+'&mlon='+d.longitude+'#map=16/'+d.latitude+'/'+d.longitude+'">Anwani ya mnunuzi ↗</a>':"";const map=[driverMap,destinationMap].filter(Boolean).join("");
  const assign=canAssign?(drivers.length?'<div class="delivery-actions"><select class="delivery-select" data-driver-select="'+d.delivery_id+'"><option value="">Chagua dereva aliyeidhinishwa</option>'+drivers.map(x=>'<option value="'+x.driver_id+'" '+(x.driver_id===d.assigned_driver_id?'selected':'')+'>'+esc(x.full_name)+' · '+esc(x.vehicle_type||"")+' · '+esc(x.phone_number||"")+'</option>').join("")+'</select><button data-assign="'+d.delivery_id+'">Panga dereva</button></div>':'<p class="delivery-error">Hakuna dereva aliyeidhinishwa. Huwezi kupanga dereva mpaka awepo.</p>'):"";
- const responseMeta=d.assigned_driver_id?("<br>Majibu ya dereva: "+(d.driver_response_status==="accepted"?"Amekubali":d.driver_response_status==="rejected"?"Amekataa":responseExpired?"Muda umeisha":"Anasubiri jibu")+(responseDeadline&&d.driver_response_status==="pending"&&!responseExpired?" · Mwisho "+responseDeadline.toLocaleString("sw-TZ",{hour:"2-digit",minute:"2-digit"}):"")+(d.driver_rejection_reason?"<br>Sababu ya kukataa: "+esc(d.driver_rejection_reason):"")):"";
+ const responseMeta=d.assigned_driver_id?("<br><strong>Majibu ya dereva: "+(d.driver_response_status==="accepted"?"Amekubali":d.driver_response_status==="rejected"?"AMEKATAA OMBI":responseExpired?"Muda umeisha":"Anasubiri jibu")+"</strong>"+(responseDeadline&&d.driver_response_status==="pending"&&!responseExpired?" · Mwisho "+responseDeadline.toLocaleString("sw-TZ",{hour:"2-digit",minute:"2-digit"}):"")+(d.driver_rejection_reason?"<br>Sababu ya kukataa: "+esc(d.driver_rejection_reason):"")):"";
  const gpsMeta=track?.last_location_at?"<br>GPS ya dereva imesasishwa: "+new Date(track.last_location_at).toLocaleString("sw-TZ"):"<br>GPS ya dereva bado haijatumwa.";const etaMeta=d.estimated_delivery_at?"<br>Muda unaokadiriwa wa kufika: "+new Date(d.estimated_delivery_at).toLocaleString("sw-TZ",{dateStyle:"medium",timeStyle:"short"}):"";const handover=canHandover?'<div class="delivery-actions"><button data-handover="'+d.delivery_id+'">Thibitisha nimemkabidhi dereva mzigo</button></div>':"";
  return '<article class="delivery-card"><div class="delivery-card-top"><div><h3>Oda #'+d.delivery_id.slice(0,8).toUpperCase()+'</h3><div class="delivery-meta">'+esc(d.recipient_name||"Mnunuzi")+' · '+esc(d.recipient_phone||"")+'<br>'+esc([d.delivery_address,d.district,d.region].filter(Boolean).join(", ")||"Anwani haijawekwa")+'<br>Gharama ya delivery: '+money(d.delivery_fee,d.currency)+'</div></div><span class="delivery-status">'+esc(labels[d.delivery_status]||d.delivery_status)+'</span></div><div class="delivery-meta">Dereva: '+(driver?esc(driver.full_name)+" · "+esc(driver.phone_number||""):"Hajapangiwa")+(d.seller_handover_confirmed_at?"<br>Makabidhiano: "+new Date(d.seller_handover_confirmed_at).toLocaleString("sw-TZ"):"")+(d.driver_pickup_confirmed_at?"<br>Dereva amepokea: "+new Date(d.driver_pickup_confirmed_at).toLocaleString("sw-TZ"):"")+(d.driver_delivered_at?"<br>Dereva amefikisha: "+new Date(d.driver_delivered_at).toLocaleString("sw-TZ"):"")+(d.buyer_confirmed_at?"<br>Mnunuzi amepokea: "+new Date(d.buyer_confirmed_at).toLocaleString("sw-TZ"):"")+responseMeta+gpsMeta+etaMeta+'</div><div class="delivery-links">'+map+'</div>'+assign+handover+'</article>';
  }).join("");
@@ -32,9 +32,15 @@ function render(){
  root.querySelectorAll("[data-handover]").forEach(btn=>btn.addEventListener("click",async()=>{if(!confirm("Unathibitisha kuwa umemkabidhi dereva mzigo wa oda hii?"))return;btn.disabled=true;const{error}=await db.rpc("zune_delivery_seller_handover",{p_delivery_id:btn.dataset.handover,p_note:"Muuzaji amethibitisha kumkabidhi dereva mzigo."});btn.disabled=false;if(error){toast(error.message,true);return}toast("Makabidhiano yamethibitishwa.");await load()}));
 }
 async function load(){
+ if(loading)return;loading=true;
+ try{
  $("#deliveryList").innerHTML='<div class="delivery-empty">Inapakia delivery...</div>';
  const{data:driverRows,error:driverError}=await db.rpc("zune_delivery_active_drivers");if(driverError)throw driverError;drivers=driverRows||[];
  const{data:deliveryRows,error}=await db.rpc("zune_delivery_seller_queue");if(error)throw error;const{data:etaRows,error:etaError}=await db.rpc("zune_delivery_seller_eta");if(etaError)throw etaError;const etaById=new Map((etaRows||[]).map(x=>[x.delivery_id,x]));deliveries=(deliveryRows||[]).map(d=>({...d,...(etaById.get(d.delivery_id)||{})}));const{data:tracking,error:trackingError}=await db.rpc("zune_delivery_seller_tracking");if(trackingError)throw trackingError;trackingRows=tracking||[];render();
+ const rejectedNow=new Set(deliveries.filter(d=>d.driver_response_status==="rejected").map(d=>d.delivery_id));
+ if(hasLoaded){const newlyRejected=[...rejectedNow].filter(id=>!knownRejected.has(id));if(newlyRejected.length)toast("Dereva amekataa ombi la oda "+newlyRejected.map(id=>"#"+id.slice(0,8).toUpperCase()).join(", ")+". Chagua dereva mwingine.");}
+ knownRejected=rejectedNow;hasLoaded=true;
+ }finally{loading=false;}
 }
 async function init(){
  const{data:{session},error}=await db.auth.getSession();if(error||!session){location.replace("./index.html");return}
@@ -44,5 +50,8 @@ async function init(){
  $("#refreshDelivery").addEventListener("click",()=>load().catch(e=>toast(e.message,true)));
  document.querySelectorAll("[data-shortcut]").forEach(btn=>btn.addEventListener("click",()=>{activeFilter=btn.dataset.shortcut;document.querySelectorAll("#deliveryFilters [data-filter]").forEach(x=>x.classList.toggle("active",x.dataset.filter===activeFilter));render();document.querySelector(".delivery-panel")?.scrollIntoView({behavior:"smooth",block:"start"})}));
  await load();
+ window.setInterval(()=>{if(!document.hidden)load().catch(e=>toast(e.message,true))},15000);
+ document.addEventListener("visibilitychange",()=>{if(!document.hidden)load().catch(e=>toast(e.message,true))});
+ window.addEventListener("focus",()=>load().catch(e=>toast(e.message,true)));
 }
 init().catch(error=>{console.error(error);$("#deliveryList").innerHTML='<div class="delivery-error">'+esc(error.message)+'</div>'});
