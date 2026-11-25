@@ -87,7 +87,7 @@ async function init(){
   storeName=current?.store_name||current?.name||'Duka langu';
   $('#sellerBadge').textContent=profile?.is_verified===true?'Verified Seller':'Seller Account';
   if(!uploadPermission){$('#formMessage').textContent='Akaunti hii bado haina ruhusa ya kupakia Reels kulingana na RLS. Backend mapping ya Seller Portal inahitaji ukaguzi/idhini kabla ya kuendelea.';$('#publishBtn').disabled=true;}
-  await Promise.all([loadProducts(),loadSounds(),loadMyReels(),mountMonetizationApplication()]);
+  await Promise.all([loadProducts(),loadSounds(),loadMyReels(),mountMonetizationApplication(),mountReelChallenges()]);
 }
 
 async function mountMonetizationApplication(){
@@ -102,6 +102,36 @@ async function mountMonetizationApplication(){
   else status.textContent='Bado hujaomba';
   form.onsubmit=async e=>{e.preventDefault();button.disabled=true;try{const payload={creator_id:ownerId,status:'pending',application_note:note.value.trim()||null};const result=data?await db.from('zune_creator_monetization_applications').update(payload).eq('id',data.id):await db.from('zune_creator_monetization_applications').insert(payload);if(result.error)throw result.error;status.textContent='Ombi limetumwa — linasubiri ukaguzi wa Admin';form.hidden=true;toast('Ombi la Creator Monetization limetumwa.');}catch(err){toast(err.message||'Ombi halikutumwa.');button.disabled=false;}};
  }catch(err){status.textContent='Huduma haipatikani kwa sasa';console.warn('Creator monetization application:',err);}
+}
+
+
+async function mountReelChallenges(){
+ const anchor=$('#myReels')||$('#publishBtn')?.closest('form');if(!anchor)return;
+ let panel=$('#sellerReelChallenges');
+ if(!panel){panel=document.createElement('section');panel.id='sellerReelChallenges';panel.style.cssText='margin:18px 0;padding:16px;border:1px solid #ddd6fe;border-radius:16px;background:#faf9ff;color:#17152b';anchor.insertAdjacentElement('beforebegin',panel);}
+ panel.innerHTML='<strong>ZUNE Creator Challenges</strong><p style="font-size:12px;color:#64748b">Jiunge na challenge zinazoendelea kwa kuwasilisha Reel yako iliyochapishwa.</p><form id="sellerChallengeForm"><label style="display:block;font-size:12px;margin:8px 0">Challenge<select id="sellerChallengeSelect" required style="display:block;width:100%;padding:10px;border:1px solid #d8dce8;border-radius:10px;margin-top:5px"></select></label><label style="display:block;font-size:12px;margin:8px 0">Reel yako iliyochapishwa<select id="sellerChallengeReel" required style="display:block;width:100%;padding:10px;border:1px solid #d8dce8;border-radius:10px;margin-top:5px"></select></label><button type="submit" id="sellerChallengeSubmit" style="border:0;border-radius:10px;background:#7c3aed;color:#fff;padding:10px 14px;font-weight:800">Jiunge na Challenge</button></form><div id="sellerChallengeStatus" style="margin-top:10px;font-size:11px;color:#64748b"></div>';
+ const challengeSelect=$('#sellerChallengeSelect'),reelSelect=$('#sellerChallengeReel'),status=$('#sellerChallengeStatus'),button=$('#sellerChallengeSubmit');
+ try{
+  const now=new Date().toISOString();
+  const [challenges,reels,entries]=await Promise.all([
+   db.from('zune_reel_challenges').select('id,title,hashtag,ends_at,reward_description').eq('status','active').lte('starts_at',now).gte('ends_at',now).order('ends_at').limit(100),
+   db.from('zune_reels').select('id,caption,created_at').eq('creator_id',ownerId).eq('status','published').order('created_at',{ascending:false}).limit(100),
+   db.from('zune_reel_challenge_entries').select('challenge_id,reel_id,status').eq('creator_id',ownerId)
+  ]);
+  if(challenges.error)throw challenges.error;if(reels.error)throw reels.error;if(entries.error)throw entries.error;
+  challengeSelect.innerHTML='<option value="">Chagua challenge</option>'+(challenges.data||[]).map(x=>'<option value="'+esc(x.id)+'">'+esc(x.title)+' · #'+esc(x.hashtag)+'</option>').join('');
+  reelSelect.innerHTML='<option value="">Chagua Reel iliyochapishwa</option>'+(reels.data||[]).map(x=>'<option value="'+esc(x.id)+'">'+esc((x.caption||'Reel').slice(0,90))+'</option>').join('');
+  const submitted=new Set((entries.data||[]).map(x=>x.challenge_id+':'+x.reel_id));
+  status.textContent=(entries.data||[]).length?'Mawasilisho yako: '+entries.data.length+' · '+(entries.data||[]).map(x=>x.status).join(', '):'Bado hujajiunga na challenge.';
+  if(!(challenges.data||[]).length||!(reels.data||[]).length){button.disabled=true;status.textContent=!(challenges.data||[]).length?'Hakuna challenge inayoendelea kwa sasa.':'Chapisha Reel kwanza ili uweze kujiunga.';}
+  $('#sellerChallengeForm').onsubmit=async e=>{
+   e.preventDefault();const challengeId=challengeSelect.value,reelId=reelSelect.value;if(!challengeId||!reelId)return;
+   if(submitted.has(challengeId+':'+reelId)){toast('Reel hii tayari imewasilishwa kwenye challenge hii.');return;}
+   button.disabled=true;
+   try{const result=await db.from('zune_reel_challenge_entries').insert({challenge_id:challengeId,reel_id:reelId,creator_id:ownerId,status:'pending'});if(result.error)throw result.error;submitted.add(challengeId+':'+reelId);status.textContent='Reel yako imewasilishwa. Inasubiri ukaguzi wa Admin.';toast('Umejiunga na Creator Challenge.');}
+   catch(err){toast(err.message||'Imeshindikana kujiunga.');button.disabled=false;}
+  };
+ }catch(err){status.textContent='Challenges hazipatikani kwa sasa.';console.warn('Seller Reel challenges:',err);}
 }
 
 async function loadProducts(){
