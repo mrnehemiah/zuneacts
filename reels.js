@@ -7,6 +7,7 @@ const db=createClient(URL,KEY,{auth:{storageKey:'zune-seller-portal-auth',persis
 const $=s=>document.querySelector(s);
 let ownerId='',authUserId='',uploadPermission=false,storeName='Duka langu',previewUrl='';
 let activeTusUpload=null,activeTusFile=null,activeTusPath='';
+let completedUpload=null;
 const sounds=new Map();
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500)}
@@ -137,18 +138,27 @@ $('#reelForm').addEventListener('submit',async e=>{
   button.disabled=true;button.textContent='Inapakia video...';message.textContent='Tafadhali subiri. Video inapakiwa kwa vipande salama.';
   let path='',videoUploaded=false;
   try{
-    let id=crypto.randomUUID();
-    const ext=(file.name.split('.').pop()||'mp4').toLowerCase().replace(/[^a-z0-9]/g,'');
-    path=authUserId+'/'+id+'.'+ext;
-    const upload=await uploadReelWithTus(file,path);
-    path=upload.path;videoUploaded=true;
-    id=path.split('/').pop().replace(/\.[^.]+$/,'');
+    let id;
+    if(completedUpload && completedUpload.file===file){
+      path=completedUpload.path;id=completedUpload.id;videoUploaded=true;
+      message.textContent='Video tayari imepakiwa. Inaendelea kuhifadhi taarifa za Reel...';
+      setUploadProgress(100,'Video tayari ipo ZUNE Storage. Inahifadhi taarifa...');
+    }else{
+      id=crypto.randomUUID();
+      const ext=(file.name.split('.').pop()||'mp4').toLowerCase().replace(/[^a-z0-9]/g,'');
+      path=authUserId+'/'+id+'.'+ext;
+      const upload=await uploadReelWithTus(file,path);
+      path=upload.path;videoUploaded=true;
+      id=path.split('/').pop().replace(/\.[^.]+$/,'');
+      completedUpload={file,path,id};
+    }
     const hashtags=$('#hashtags').value.split(/[\s,]+/).map(x=>x.trim().replace(/^#/,'')).filter(Boolean).slice(0,20);
     const payload={id,creator_id:ownerId,video_path:path,caption,hashtags,product_id:$('#productSelect').value||null,status:'pending',creator_display_name:storeName};
     const sound=sounds.get($('#soundSelect').value);
     if(sound){payload.sound_id=sound.id;payload.audio_source='library';payload.audio_title=sound.title;payload.audio_artist=sound.artist||null;}
     const {error:insertError}=await db.from('zune_reels').insert(payload);
     if(insertError)throw insertError;
+    completedUpload=null;
     message.textContent='Reel imetumwa kwa Admin kwa ukaguzi.';
     reelForm.reset();$('#captionCount').textContent='0';clearUploadProgress();
     if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl='';
@@ -157,9 +167,11 @@ $('#reelForm').addEventListener('submit',async e=>{
     await loadMyReels();
   }catch(error){
     console.error('ZUNE Seller Reel upload:',error);
-    if(path&&videoUploaded)await db.storage.from('zune-reels').remove([path]).catch(()=>{});
     const raw=String(error?.message||error||'');
-    if(/failed to fetch|network|timeout|connection/i.test(raw)){
+    if(videoUploaded){
+      message.textContent='Video imepakiwa lakini taarifa za Reel hazijahifadhiwa. Usibadilishe faili; bonyeza “Jaribu tena” ili kuhifadhi Reel bila kupakia video upya.';
+      button.textContent='Jaribu tena';
+    }else if(/failed to fetch|network|timeout|connection/i.test(raw)){
       message.textContent='Muunganisho umekatika wakati wa kupakia. Chagua faili hilohilo kisha bonyeza “Jaribu tena”; mfumo utaendelea pale iliposimama ikiwa sehemu zilizopakiwa bado zinapatikana.';
       button.textContent='Jaribu tena';
     }else{
