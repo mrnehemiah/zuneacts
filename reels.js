@@ -4,6 +4,7 @@ const KEY='sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf';
 const db=createClient(URL,KEY,{auth:{storageKey:'zune-seller-portal-auth',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
 const $=s=>document.querySelector(s);
 let ownerId='',authUserId='',uploadPermission=false,storeName='Duka langu',previewUrl='';
+const sounds=new Map();
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500)}
 function statusLabel(s){return ({pending:'Inasubiri Admin',published:'Imechapishwa',rejected:'Imekataliwa',archived:'Imefichwa'}[s]||s)}
@@ -20,13 +21,20 @@ async function init(){
   storeName=current?.store_name||current?.name||'Duka langu';
   $('#sellerBadge').textContent=profile?.is_verified===true?'Verified Seller':'Seller Account';
   if(ownerId!==authUserId&&!uploadPermission){$('#formMessage').textContent='Seller Portal identity inatumia owner ID tofauti na Auth ID. Backend ya sasa haijaruhusu mapping hii ya usalama; upload itawashwa baada ya kuidhinisha na kutumia RLS extension iliyopendekezwa.';$('#publishBtn').disabled=true;}
-  await Promise.all([loadProducts(),loadMyReels()]);
+  await Promise.all([loadProducts(),loadSounds(),loadMyReels()]);
 }
 async function loadProducts(){
   const {data,error}=await db.from('products').select('id,title,price,stock_quantity').eq('vendor_id',ownerId).order('created_at',{ascending:false}).limit(300);
   if(error){console.warn('Seller Reel products:',error);return}
   const select=$('#productSelect');
   select.innerHTML='<option value="">Bila bidhaa maalumu</option>'+(data||[]).map(p=>'<option value="'+esc(p.id)+'">'+esc(p.title)+' — TSh '+Number(p.price||0).toLocaleString('en-TZ')+' · Stock '+Number(p.stock_quantity||0)+'</option>').join('');
+}
+async function loadSounds(){
+  const select=$('#soundSelect');if(!select)return;
+  const {data,error}=await db.from('zune_reel_sounds').select('id,title,artist').eq('is_active',true).eq('commercial_use_allowed',true).order('title').limit(100);
+  if(error){select.innerHTML='<option value="">Music Library itafunguliwa baada ya backend kuidhinishwa</option>';return}
+  (data||[]).forEach(sound=>sounds.set(sound.id,sound));
+  select.innerHTML='<option value="">Tumia Original Audio ya video</option>'+(data||[]).map(sound=>'<option value="'+esc(sound.id)+'">'+esc(sound.title)+(sound.artist?' — '+esc(sound.artist):'')+'</option>').join('');
 }
 async function loadMyReels(){
   const {data,error}=await db.from('zune_reels').select('id,caption,status,views_count,created_at,video_path,product_id').eq('creator_id',ownerId).order('created_at',{ascending:false}).limit(100);
@@ -66,6 +74,8 @@ $('#reelForm').addEventListener('submit',async e=>{
     if(uploadError)throw uploadError;
     const hashtags=$('#hashtags').value.split(/[\s,]+/).map(x=>x.trim().replace(/^#/,'')).filter(Boolean).slice(0,20);
     const payload={id,creator_id:ownerId,video_path:upload.path,caption,hashtags,product_id:$('#productSelect').value||null,status:'pending',creator_display_name:storeName};
+    const sound=sounds.get($('#soundSelect').value);
+    if(sound){payload.sound_id=sound.id;payload.audio_source='library';payload.audio_title=sound.title;payload.audio_artist=sound.artist||null;}
     const {error:insertError}=await db.from('zune_reels').insert(payload);
     if(insertError)throw insertError;
     message.textContent='Reel imetumwa kwa Admin kwa ukaguzi.';
