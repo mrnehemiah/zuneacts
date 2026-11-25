@@ -20,7 +20,7 @@ async function init(){
   const current=Array.isArray(store)?store[0]:store;
   storeName=current?.store_name||current?.name||'Duka langu';
   $('#sellerBadge').textContent=profile?.is_verified===true?'Verified Seller':'Seller Account';
-  if(ownerId!==authUserId&&!uploadPermission){$('#formMessage').textContent='Seller Portal identity inatumia owner ID tofauti na Auth ID. Backend ya sasa haijaruhusu mapping hii ya usalama; upload itawashwa baada ya kuidhinisha na kutumia RLS extension iliyopendekezwa.';$('#publishBtn').disabled=true;}
+  if(!uploadPermission){$('#formMessage').textContent='Akaunti hii bado haina ruhusa ya kupakia Reels kulingana na RLS. Backend mapping ya Seller Portal inahitaji ukaguzi/idhini kabla ya kuendelea.';$('#publishBtn').disabled=true;}
   await Promise.all([loadProducts(),loadSounds(),loadMyReels()]);
 }
 async function loadProducts(){
@@ -64,7 +64,7 @@ $('#reelForm').addEventListener('submit',async e=>{
   const file=$('#videoFile').files?.[0],caption=$('#caption').value.trim(),button=$('#publishBtn'),message=$('#formMessage');
   if(!file||!caption||!$('#rightsConfirm').checked)return;
   if(!ownerId){message.textContent='Akaunti ya Seller haijathibitishwa.';return}
-  if(ownerId!==authUserId&&!uploadPermission){message.textContent='RLS haijaruhusu Seller Portal owner mapping. Upload imesitishwa hadi backend extension ipitishwe.';return}
+  if(!uploadPermission){message.textContent='RLS haijaruhusu Seller Portal kupakia Reels. Upload imesitishwa hadi ruhusa ya backend ithibitishwe.';return}
   button.disabled=true;button.textContent='Inapakia video...';message.textContent='Tafadhali subiri, video inapakiwa kwenye ZUNE Storage.';
   let path='';
   try{
