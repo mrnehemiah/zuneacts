@@ -227,6 +227,59 @@ $('#videoFile').addEventListener('change',()=>{
   previewUrl=URL.createObjectURL(file);
   host.innerHTML='<video src="'+previewUrl+'" controls playsinline></video>';
 });
+
+
+const editorState={exporting:false};
+$('#videoFile').addEventListener('change',()=>{
+ const file=$('#videoFile').files?.[0],editor=$('#zuneVideoEditor');
+ if(editor)editor.hidden=!file;
+ const preview=$('#videoPreview')?.querySelector('video');
+ if(!file||!preview)return;
+ preview.addEventListener('loadedmetadata',()=>{
+  $('#editStart').value='0';$('#editEnd').value=String(Math.max(0,Math.floor(preview.duration*10)/10));$('#editEnd').max=String(preview.duration);
+  $('#editorMessage').textContent='Video iko tayari. Weka trim, kasi, filter au maandishi kisha tengeneza toleo jipya.';
+ },{once:true});
+});
+$('#exportEditedVideo').addEventListener('click',async()=>{
+ const button=$('#exportEditedVideo'),message=$('#editorMessage'),progress=$('#editorProgress'),progressText=$('#editorProgressText'),progressBar=$('#editorProgressBar'),source=$('#videoPreview')?.querySelector('video');
+ if(!source||!source.duration||!Number.isFinite(source.duration)){message.textContent='Chagua video halali kwanza.';return;}
+ if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream){message.textContent='Browser hii haiungi mkono video export. Unaweza kupakia original video.';return;}
+ const start=Math.max(0,Number($('#editStart').value)||0),end=Math.min(source.duration,Number($('#editEnd').value)||source.duration),speed=Number($('#editSpeed').value)||1;
+ if(end<=start||end-start<1){message.textContent='Muda wa mwisho lazima uzidi mwanzo kwa angalau sekunde 1.';return;}
+ const mime=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'].find(x=>MediaRecorder.isTypeSupported(x));
+ if(!mime){message.textContent='Browser haiwezi kutengeneza WebM export. Tumia original video.';return;}
+ button.disabled=true;editorState.exporting=true;progress.hidden=false;progressBar.style.width='0%';message.textContent='Inaandaa export...';
+ const canvas=document.createElement('canvas');canvas.width=720;canvas.height=1280;const ctx=canvas.getContext('2d',{alpha:false}),output=canvas.captureStream(30);
+ let sourceStream=null,recorder=null,raf=0,chunks=[];
+ try{
+  sourceStream=source.captureStream?source.captureStream():(source.mozCaptureStream?source.mozCaptureStream():null);
+  if(sourceStream)sourceStream.getAudioTracks().forEach(track=>output.addTrack(track));
+  const filter=$('#editFilter').value||'none',overlay=$('#editOverlayText').value.trim();
+  const draw=()=>{
+   const vw=source.videoWidth||720,vh=source.videoHeight||1280,scale=Math.max(canvas.width/vw,canvas.height/vh),dw=vw*scale,dh=vh*scale;
+   ctx.fillStyle='#000';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.save();ctx.filter=filter;ctx.drawImage(source,(canvas.width-dw)/2,(canvas.height-dh)/2,dw,dh);ctx.restore();
+   if(overlay){ctx.font='800 34px Arial';ctx.textAlign='center';ctx.lineWidth=5;ctx.strokeStyle='rgba(0,0,0,.72)';ctx.fillStyle='#fff';const words=overlay.split(/\s+/),lines=[];let line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>620&&line){lines.push(line);line=word;}else line=test;}if(line)lines.push(line);const base=canvas.height-100-lines.length*43;lines.slice(0,3).forEach((txt,i)=>{ctx.strokeText(txt,360,base+i*43,640);ctx.fillText(txt,360,base+i*43,640);});}
+  };
+  await new Promise((resolve,reject)=>{
+   let done=false;
+   const finish=()=>{if(done)return;done=true;cancelAnimationFrame(raf);source.pause();if(recorder&&recorder.state!=='inactive')recorder.stop();else reject(new Error('Recorder haikuanza.'));};
+   const tick=()=>{if(done)return;draw();const pct=Math.min(100,Math.max(0,(source.currentTime-start)/(end-start)*100));progressBar.style.width=pct+'%';progressText.textContent='Inatengeneza video... '+Math.round(pct)+'%';if(source.currentTime>=end-.04){finish();return;}raf=requestAnimationFrame(tick);};
+   try{
+    recorder=new MediaRecorder(output,{mimeType:mime,videoBitsPerSecond:4500000,audioBitsPerSecond:128000});
+    recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data);};
+    recorder.onerror=e=>{if(!done){done=true;reject(e.error||new Error('MediaRecorder export failed'));}};
+    recorder.onstop=()=>{if(chunks.length)resolve();else reject(new Error('Video export haikutoa data.'));};
+    const begin=()=>{try{draw();recorder.start(250);source.playbackRate=speed;source.play().then(()=>{raf=requestAnimationFrame(tick);}).catch(reject);}catch(err){reject(err);}};
+    if(Math.abs(source.currentTime-start)<0.03)begin();else{source.addEventListener('seeked',begin,{once:true});source.currentTime=start;}
+   }catch(err){reject(err);}
+  });
+  const blob=new Blob(chunks,{type:mime});if(!blob.size)throw new Error('Video export imeshindikana.');
+  const edited=new File([blob],'zune-reel-edited.webm',{type:'video/webm',lastModified:Date.now()}),transfer=new DataTransfer();transfer.items.add(edited);$('#videoFile').files=transfer.files;$('#videoFile').dispatchEvent(new Event('change',{bubbles:true}));
+  progressBar.style.width='100%';progressText.textContent='Export imekamilika.';message.textContent='Video iliyohaririwa imewekwa kwenye upload. Unaweza kuendelea kuchapisha Reel.';toast('Video iliyohaririwa iko tayari.');
+ }catch(err){console.error('ZUNE video editor:',err);message.textContent=err.message||'Export imeshindikana. Jaribu video fupi au tumia original.';}
+ finally{if(raf)cancelAnimationFrame(raf);source.pause();source.playbackRate=1;if(sourceStream)sourceStream.getTracks().forEach(t=>t.stop());output.getTracks().forEach(t=>t.stop());editorState.exporting=false;button.disabled=false;}
+});
+
 $('#caption').addEventListener('input',()=>$('#captionCount').textContent=$('#caption').value.length);
 $('#reelForm').addEventListener('submit',async e=>{
   e.preventDefault();
