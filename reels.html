@@ -8,6 +8,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="reels.css?v=20261125-2">
+
+  <style>
+  .video-editor{margin:14px 0;padding:15px;border:1px solid #d9d2fe;border-radius:16px;background:#faf9ff;color:#17152b}.editor-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.editor-head h3{margin:4px 0;font:800 18px Manrope}.editor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.editor-grid .field{font-size:12px}.editor-grid input,.editor-grid select{width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border:1px solid #d8dce8;border-radius:9px;background:white;color:#17152b}.editor-wide{grid-column:1/-1}.editor-note{font-size:11px;line-height:1.5;color:#64748b}.editor-progress>div{height:6px;background:#e5e7eb;border-radius:9px;overflow:hidden;margin-top:7px}.editor-progress i{display:block;width:0;height:100%;background:#7c3aed}.video-editor button{margin-top:8px}@media(max-width:520px){.editor-grid{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
   <main class="reels-shell">
@@ -27,6 +31,19 @@
           <small>MP4, WebM au MOV · Kiwango cha juu 100 MB · Video ya wima inapendekezwa.</small>
         </label>
         <div class="video-preview" id="videoPreview"><div class="preview-placeholder"><span>▶</span><strong>Video preview</strong><small>Chagua video ili kuona preview hapa.</small></div></div>
+        <section class="video-editor" id="zuneVideoEditor" hidden>
+          <div class="editor-head"><div><span class="eyebrow">ZUNE CREATOR TOOLS</span><h3>Video Editor</h3><small>Hariri video kabla ya kuituma kwa Admin.</small></div><span class="step-chip">9:16 · WebM</span></div>
+          <div class="editor-grid">
+            <label class="field">Anza (sekunde)<input id="editStart" type="number" min="0" step="0.1" value="0"></label>
+            <label class="field">Maliza (sekunde)<input id="editEnd" type="number" min="0" step="0.1"></label>
+            <label class="field">Kasi<select id="editSpeed"><option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label>
+            <label class="field">Mwonekano<select id="editFilter"><option value="none">Original</option><option value="contrast(1.12) saturate(1.2)">Vivid</option><option value="grayscale(1)">Black & White</option><option value="sepia(.35) saturate(1.15)">Warm</option><option value="saturate(.8) contrast(1.08)">Soft</option></select></label>
+            <label class="field editor-wide">Maandishi kwenye video<input id="editOverlayText" maxlength="90" placeholder="Andika ujumbe mfupi (hiari)"></label>
+          </div>
+          <p class="editor-note" id="editorMessage">Unaweza kukata mwanzo/mwisho, kubadilisha kasi, kuweka filter na maandishi. Original audio itahifadhiwa pale browser inapoiruhusu.</p>
+          <button class="secondary-btn" type="button" id="exportEditedVideo">Tengeneza video iliyohaririwa</button>
+          <div class="editor-progress" id="editorProgress" hidden><span id="editorProgressText">Inaandaa...</span><div><i id="editorProgressBar"></i></div></div>
+        </section>
         <label class="field">Maelezo ya Reel
           <textarea id="caption" maxlength="2200" rows="4" placeholder="Eleza bidhaa yako, faida zake na namna ya kuagiza..." required></textarea>
           <small><span id="captionCount">0</span>/2200</small>
