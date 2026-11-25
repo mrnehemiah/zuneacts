@@ -8,29 +8,45 @@ function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
 function status(p){if(p.removed_at)return"removed";if(p.seller_archived_at)return"archived";if(p.moderation_status==="approved"&&p.published_at)return"published";return"pending"}
 function render(){const q=$("#searchInput").value.trim().toLowerCase(),activeRows=rows.filter(p=>!p.removed_at&&!p.seller_archived_at);const list=rows.filter(p=>{const st=status(p),match=(filter==="all"&&st!=="archived"&&st!=="removed")||(filter==="archived"&&st==="archived")||(filter==="published"&&st==="published")||(filter==="pending"&&st==="pending")||(filter==="out"&&Number(p.stock_quantity)===0&&st!=="archived");return match&&(!q||String(p.title||"").toLowerCase().includes(q)||String(p.category||"").toLowerCase().includes(q))});$("#totalCount").textContent=activeRows.length;$("#publishedCount").textContent=activeRows.filter(p=>status(p)==="published").length;$("#pendingCount").textContent=activeRows.filter(p=>status(p)==="pending").length;$("#stockCount").textContent=activeRows.filter(p=>Number(p.stock_quantity)===0).length;$("#resultCount").textContent=list.length+(lang==="sw"?" bidhaa":" products");$("#productGrid").innerHTML=list.map(p=>{const st=status(p),label=st==="published"?(lang==="sw"?"Imechapishwa":"Published"):st==="archived"?(lang==="sw"?"Imefichwa":"Archived"):st==="removed"?(lang==="sw"?"Imeondolewa":"Removed"):(lang==="sw"?"Inasubiri":"Pending"),img=p.image_url||((p.image_urls||[])[0])||"",off=Number(p.discount_percent)||0,shown=Number(p.price)*(1-off/100),actions=st==="archived"?'<button data-action="restore" data-id="'+p.id+'">'+(lang==="sw"?"Rejesha":"Restore")+'</button>':'<button data-action="edit" data-id="'+p.id+'">'+(lang==="sw"?"Hariri":"Edit")+'</button><button class="delete" data-action="delete" data-id="'+p.id+'">'+(lang==="sw"?"Ficha dukani":"Archive")+'</button>';return '<article class="product-card" data-id="'+p.id+'"><div class="product-image">'+(img?'<img loading="lazy" src="'+esc(img)+'" alt="'+esc(p.title)+'">':'<span class="no-photo">ZUNE PRODUCT</span>')+'<span class="product-status '+(st==="pending"?"pending":st==="archived"?"removed":"")+'">'+label+'</span></div><div class="product-info"><h3 title="'+esc(p.title)+'">'+esc(p.title)+'</h3><div class="price">TSh '+money(shown)+'</div>'+(off>0?'<div class="old-price">TSh '+money(p.price)+' · -'+off+'%</div>':'')+'<div class="meta"><span>'+esc(p.category||"—")+'</span><span>Stock: '+Number(p.stock_quantity||0)+'</span></div><div class="card-actions">'+actions+'</div></div></article>'}).join("");$("#emptyState").hidden=list.length!==0;$("#productGrid").hidden=list.length===0}
 async function loadCategories(){
- const{data,error}=await db.from("product_categories").select("id,name,parent_id,sort_order").eq("is_active",true).order("sort_order",{ascending:true}).order("name");
- if(error){console.error("Product categories:",error);categories=[]}else categories=data||[];
  const sel=$("#categorySelect");
- if(!categories.length){sel.innerHTML='<option value="">Hakuna category inayopatikana</option>';sel.disabled=true;return}
- const byParent=new Map();categories.forEach(c=>{const key=c.parent_id||null;if(!byParent.has(key))byParent.set(key,[]);byParent.get(key).push(c)});
+ sel.disabled=true;
+ sel.innerHTML='<option value="">Inapakia categories…</option>';
+ const{data,error}=await db.from("product_categories").select("id,name,parent_id,sort_order").eq("is_active",true).order("sort_order",{ascending:true}).order("name",{ascending:true});
+ if(error){
+  console.error("Product categories:",error);
+  categories=[];
+  sel.innerHTML='<option value="">Imeshindikana kupakia categories</option>';
+  let retry=$("#retryCategories");
+  if(!retry){retry=document.createElement("button");retry.type="button";retry.id="retryCategories";retry.className="secondary";retry.style.marginTop="8px";sel.insertAdjacentElement("afterend",retry)}
+  retry.textContent=lang==="sw"?"Jaribu tena":"Retry categories";
+  retry.hidden=false;
+  retry.onclick=async()=>{retry.disabled=true;retry.textContent=lang==="sw"?"Inajaribu…":"Retrying…";await loadCategories();retry.disabled=false};
+  toast((lang==="sw"?"Categories hazijapakia: ":"Categories failed to load: ")+error.message);
+  return false;
+ }
+ categories=data||[];
+ const byParent=new Map();categories.forEach(item=>{const key=item.parent_id||null;if(!byParent.has(key))byParent.set(key,[]);byParent.get(key).push(item)});
  const output=[],visited=new Set();
  function walk(parentId,path,ancestors){
-  (byParent.get(parentId)||[]).forEach(c=>{
-   if(ancestors.has(c.id)||visited.has(c.id))return;
-   visited.add(c.id);const next=new Set(ancestors);next.add(c.id);const label=[...path,c.name].join(" › ");
-   output.push('<option value="'+esc(c.id)+'">'+esc(label)+'</option>');
-   walk(c.id,[...path,c.name],next);
+  (byParent.get(parentId)||[]).forEach(item=>{
+   if(ancestors.has(item.id)||visited.has(item.id))return;
+   visited.add(item.id);const next=new Set(ancestors);next.add(item.id);
+   output.push('<option value="'+esc(item.id)+'">'+esc([...path,item.name].join(" › "))+'</option>');
+   walk(item.id,[...path,item.name],next);
   });
  }
  walk(null,[],new Set());
- // Keep valid categories visible even if legacy data contains an orphaned parent reference.
- categories.filter(c=>!visited.has(c.id)).forEach(c=>{visited.add(c.id);output.push('<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>');walk(c.id,[c.name],new Set([c.id]))});
- sel.disabled=false;sel.innerHTML='<option value="">Chagua category / subcategory</option>'+output.join("");
+ categories.filter(item=>!visited.has(item.id)).forEach(item=>{visited.add(item.id);output.push('<option value="'+esc(item.id)+'">'+esc(item.name)+'</option>');walk(item.id,[item.name],new Set([item.id]))});
+ sel.innerHTML='<option value="">Chagua category / subcategory</option>'+output.join("");
+ sel.disabled=categories.length===0;
+ const retry=$("#retryCategories");if(retry)retry.hidden=true;
+ if(!categories.length){sel.innerHTML='<option value="">Hakuna category inayopatikana</option>';toast(lang==="sw"?"Hakuna category iliyo active.":"No active categories found.");return false}
+ return true;
 }
 async function load(){const{data:{session},error}=await db.auth.getSession();if(error||!session){location.replace("./index.html");return}const{data:owner,error:ownerError}=await db.rpc("zune_seller_owner_id");if(ownerError||!owner){console.error("Seller owner lookup:",ownerError);$("#productGrid").innerHTML='<div class="loading">Imeshindikana kuthibitisha duka.</div>';return}ownerId=owner;const{data,error:e}=await db.from("products").select("id,title,description,price,stock_quantity,image_url,image_urls,category,category_id,discount_percent,moderation_status,published_at,removed_at,seller_archived_at,created_at").eq("vendor_id",ownerId).is("removed_at",null).order("created_at",{ascending:false}).limit(2000);if(e){console.error(e);$("#productGrid").innerHTML='<div class="loading">Imeshindikana kupakia bidhaa. '+esc(e.message)+'</div>';return}rows=data||[];render()}
 function paintImages(){const box=$("#imagePreview");box.replaceChildren();existingImages.forEach((url,i)=>{const wrap=document.createElement("div");wrap.className="existing-image";const img=document.createElement("img");img.src=url;img.alt="Picha iliyopo";const remove=document.createElement("button");remove.type="button";remove.textContent="×";remove.setAttribute("aria-label","Ondoa picha");remove.onclick=()=>{existingImages.splice(i,1);paintImages()};wrap.append(img,remove);box.append(wrap)});selectedFiles.forEach(file=>{const img=document.createElement("img");img.src=URL.createObjectURL(file);img.alt=file.name;box.append(img)})}
 function addEditVariantRow(v={}){const row=document.createElement("div");row.className="edit-variant-row";row.innerHTML='<input type="hidden" data-variant-id value="'+esc(v.id||"")+'"><label>Jina / Option<input data-variant-label required maxlength="120" placeholder="Rangi Nyekundu / Size XL" value="'+esc(v.label||"")+'"></label><label>SKU<input data-variant-sku maxlength="80" value="'+esc(v.sku||"")+'" placeholder="SKU (hiari)"></label><label>Bei (TSh)<input data-variant-price type="number" min="1" step="1" required value="'+(v.price??"")+'"></label><label>Stock<input data-variant-stock type="number" min="0" step="1" required value="'+(v.stock_quantity??0)+'"></label><button type="button" aria-label="Remove variant">×</button>';row.querySelector("button").onclick=()=>row.remove();$("#editVariantRows").append(row)}
-async function loadEditVariants(productId){const host=$("#editVariantRows"),button=$("#saveProduct");host.replaceChildren();if(!productId)return;button.disabled=true;try{const{data,error}=await db.from("product_variants").select("id,label,sku,price,stock_quantity,attributes").eq("product_id",productId).eq("is_active",true).order("sort_order",{ascending:true});if(error)throw error;(data||[]).forEach(addEditVariantRow);button.disabled=false}catch(error){toast("Imeshindikana kupakia variants: "+error.message);button.disabled=true}}
+async function loadEditVariants(productId){const host=$("#editVariantRows"),button=$("#saveProduct");host.replaceChildren();button.disabled=false;if(!productId)return;button.disabled=true;try{const{data,error}=await db.from("product_variants").select("id,label,sku,price,stock_quantity,attributes").eq("product_id",productId).eq("is_active",true).order("sort_order",{ascending:true});if(error)throw error;(data||[]).forEach(addEditVariantRow);button.disabled=false}catch(error){console.error("Seller variant load:",error);toast("Imeshindikana kupakia variants: "+error.message);button.disabled=true}}
 function readEditVariants(){return [...document.querySelectorAll("#editVariantRows .edit-variant-row")].map(row=>({id:row.querySelector("[data-variant-id]").value||null,label:row.querySelector("[data-variant-label]").value.trim(),sku:row.querySelector("[data-variant-sku]").value.trim()||null,price:Number(row.querySelector("[data-variant-price]").value),stock_quantity:Number(row.querySelector("[data-variant-stock]").value)}))}
 function openModal(p=null){editing=p?.id||null;selectedFiles=[];existingImages=p?(Array.isArray(p.image_urls)?p.image_urls.slice():(p.image_url?[p.image_url]:[])):[];$("#productImages").value="";const f=$("#productForm");f.reset();$("#editVariantRows").replaceChildren();$("#modalTitle").textContent=p?(lang==="sw"?"Hariri bidhaa":"Edit product"):(lang==="sw"?"Ongeza bidhaa":"Add product");if(p){f.elements.title.value=p.title||"";f.elements.price.value=p.price;f.elements.stock_quantity.value=p.stock_quantity;f.elements.category_id.value=p.category_id||(categories.find(x=>x.name===p.category)?.id||"");f.elements.discount_percent.value=Number(p.discount_percent)||0;f.elements.description.value=p.description||""}paintImages();updateDiscountPreview();$("#modal").hidden=false;loadEditVariants(p?.id||null)}
 
