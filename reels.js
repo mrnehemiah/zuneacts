@@ -87,8 +87,23 @@ async function init(){
   storeName=current?.store_name||current?.name||'Duka langu';
   $('#sellerBadge').textContent=profile?.is_verified===true?'Verified Seller':'Seller Account';
   if(!uploadPermission){$('#formMessage').textContent='Akaunti hii bado haina ruhusa ya kupakia Reels kulingana na RLS. Backend mapping ya Seller Portal inahitaji ukaguzi/idhini kabla ya kuendelea.';$('#publishBtn').disabled=true;}
-  await Promise.all([loadProducts(),loadSounds(),loadMyReels()]);
+  await Promise.all([loadProducts(),loadSounds(),loadMyReels(),mountMonetizationApplication()]);
 }
+
+async function mountMonetizationApplication(){
+ const anchor=$('#myReels')||$('#publishBtn')?.closest('form');if(!anchor)return;
+ let panel=$('#creatorMonetizationApplication');
+ if(!panel){panel=document.createElement('section');panel.id='creatorMonetizationApplication';panel.style.cssText='margin:18px 0;padding:16px;border:1px solid #d9d2fe;border-radius:16px;background:#faf9ff;color:#17152b';anchor.insertAdjacentElement('beforebegin',panel);}
+ panel.innerHTML='<strong>Creator Monetization</strong><p style="font-size:12px;color:#64748b;line-height:1.6">Omba kujiunga na mpango wa mapato wa ZUNE. Admin atakagua ombi lako; views zitahakikiwa kabla ya kuhesabiwa.</p><form id="creatorMonetizationForm"><textarea id="creatorMonetizationNote" maxlength="1200" rows="3" placeholder="Eleza aina ya maudhui unayounda (hiari)" style="width:100%;box-sizing:border-box;border:1px solid #d8dce8;border-radius:10px;padding:10px;background:#fff;color:#17152b"></textarea><button id="creatorMonetizationSubmit" type="submit" style="margin-top:9px;border:0;border-radius:10px;background:#7c3aed;color:#fff;padding:10px 14px;font-weight:800">Tuma ombi</button><span id="creatorMonetizationStatus" style="display:block;margin-top:8px;font-size:11px;color:#6d5bd0">Inakagua hali...</span></form>';
+ const form=$('#creatorMonetizationForm'),button=$('#creatorMonetizationSubmit'),note=$('#creatorMonetizationNote'),status=$('#creatorMonetizationStatus');
+ try{
+  const {data,error}=await db.from('zune_creator_monetization_applications').select('id,status,application_note,review_note').eq('creator_id',ownerId).maybeSingle();if(error)throw error;
+  if(data){status.textContent=({pending:'Inasubiri ukaguzi wa Admin',approved:'Umeidhinishwa',rejected:'Ombi limekataliwa — unaweza kutuma tena',suspended:'Imesimamishwa'})[data.status]||data.status;note.value=data.application_note||'';if(data.status==='approved'||data.status==='suspended'){form.hidden=true;return;}button.textContent=data.status==='rejected'?'Tuma ombi upya':'Sasisha ombi';}
+  else status.textContent='Bado hujaomba';
+  form.onsubmit=async e=>{e.preventDefault();button.disabled=true;try{const payload={creator_id:ownerId,status:'pending',application_note:note.value.trim()||null};const result=data?await db.from('zune_creator_monetization_applications').update(payload).eq('id',data.id):await db.from('zune_creator_monetization_applications').insert(payload);if(result.error)throw result.error;status.textContent='Ombi limetumwa — linasubiri ukaguzi wa Admin';form.hidden=true;toast('Ombi la Creator Monetization limetumwa.');}catch(err){toast(err.message||'Ombi halikutumwa.');button.disabled=false;}};
+ }catch(err){status.textContent='Huduma haipatikani kwa sasa';console.warn('Creator monetization application:',err);}
+}
+
 async function loadProducts(){
   const {data,error}=await db.from('products').select('id,title,price,stock_quantity,image_url,moderation_status,removed_at,seller_archived_at').eq('vendor_id',ownerId).eq('moderation_status','approved').is('removed_at',null).is('seller_archived_at',null).order('created_at',{ascending:false}).limit(300);
   if(error){console.warn('Seller Reel products:',error);return}
