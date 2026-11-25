@@ -44,3 +44,5 @@
   .form-actions{position:sticky;bottom:-1px;z-index:3;background:#fff;padding:12px 0 max(8px,env(safe-area-inset-bottom));margin-top:12px}
   .form-actions .primary,.form-actions .secondary{min-height:44px}
 }
+
+.variant-card-meta{display:grid;gap:3px;margin-top:9px;padding:8px 9px;border:1px solid #e4eee7;border-radius:9px;background:#f7fbf8;color:#47715e;font-size:10px}.variant-card-meta span{font-weight:800}.variant-card-meta small{color:#82958a;font-size:9px;line-height:1.4;white-space:normal;overflow-wrap:anywhere}
