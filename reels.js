@@ -87,7 +87,7 @@ async function init(){
   storeName=current?.store_name||current?.name||'Duka langu';
   $('#sellerBadge').textContent=profile?.is_verified===true?'Verified Seller':'Seller Account';
   if(!uploadPermission){$('#formMessage').textContent='Akaunti hii bado haina ruhusa ya kupakia Reels kulingana na RLS. Backend mapping ya Seller Portal inahitaji ukaguzi/idhini kabla ya kuendelea.';$('#publishBtn').disabled=true;}
-  await Promise.all([loadProducts(),loadSounds(),loadMyReels(),mountMonetizationApplication(),mountReelChallenges()]);
+  await Promise.all([loadProducts(),loadSounds(),loadMyReels(),mountMonetizationApplication(),mountReelChallenges(),mountCreatorWallet()]);
 }
 
 async function mountMonetizationApplication(){
@@ -132,6 +132,40 @@ async function mountReelChallenges(){
    catch(err){toast(err.message||'Imeshindikana kujiunga.');button.disabled=false;}
   };
  }catch(err){status.textContent='Challenges hazipatikani kwa sasa.';console.warn('Seller Reel challenges:',err);}
+}
+
+
+async function mountCreatorWallet(){
+ const anchor=$('#myReels')||$('#publishBtn')?.closest('form');if(!anchor)return;
+ let panel=$('#creatorWalletPanel');
+ if(!panel){panel=document.createElement('section');panel.id='creatorWalletPanel';panel.style.cssText='margin:18px 0;padding:16px;border:1px solid #ddd6fe;border-radius:16px;background:#faf9ff;color:#17152b';anchor.insertAdjacentElement('beforebegin',panel);}
+ panel.innerHTML='<strong>Creator Wallet</strong><p id="creatorWalletBalance" style="font-size:22px;font-weight:900;margin:8px 0">TZS —</p><p style="font-size:12px;color:#64748b">Mapato ya views zilizothibitishwa na historia ya withdrawals zako.</p><form id="creatorWithdrawalForm"><label style="display:block;font-size:12px;margin:8px 0">Kiasi (TZS)<input id="creatorWithdrawalAmount" type="number" min="1" step="1" required style="display:block;width:100%;padding:10px;border:1px solid #d8dce8;border-radius:10px;margin-top:5px"></label><label style="display:block;font-size:12px;margin:8px 0">Njia ya malipo<select id="creatorWithdrawalMethod" style="display:block;width:100%;padding:10px;border:1px solid #d8dce8;border-radius:10px;margin-top:5px"><option value="mobile_money">Mobile Money</option><option value="bank_transfer">Bank Transfer</option></select></label><label style="display:block;font-size:12px;margin:8px 0">Jina la akaunti<input id="creatorWithdrawalName" required maxlength="120" style="display:block;width:100%;padding:10px;border:1px solid #d8dce8;border-radius:10px;margin-top:5px"></label><label style="display:block;font-size:12px;margin:8px 0">Namba ya simu / Akaunti ya benki<input id="creatorWithdrawalRef" required maxlength="160" style="display:block;width:100%;padding:10px;border:1px solid #d8dce8;border-radius:10px;margin-top:5px"></label><button id="creatorWithdrawalSubmit" type="submit" style="border:0;border-radius:10px;background:#7c3aed;color:#fff;padding:10px 14px;font-weight:800">Omba malipo</button><span id="creatorWithdrawalMessage" style="display:block;margin-top:8px;font-size:11px;color:#6d5bd0"></span></form><div id="creatorWithdrawalHistory" style="margin-top:12px"></div>';
+ const balance=$('#creatorWalletBalance'),form=$('#creatorWithdrawalForm'),button=$('#creatorWithdrawalSubmit'),message=$('#creatorWithdrawalMessage'),history=$('#creatorWithdrawalHistory');
+ try{
+  const [earnings,withdrawals,settings,application]=await Promise.all([
+   db.from('zune_creator_earnings').select('net_amount,status,source_type,created_at').eq('creator_id',ownerId).order('created_at',{ascending:false}).limit(500),
+   db.from('zune_creator_withdrawals').select('id,amount,payout_method,status,created_at,payout_reference,admin_note').eq('creator_id',ownerId).order('created_at',{ascending:false}).limit(100),
+   db.from('zune_creator_monetization_settings').select('minimum_withdrawal_tzs').eq('id',true).maybeSingle(),
+   db.from('zune_creator_monetization_applications').select('status').eq('creator_id',ownerId).maybeSingle()
+  ]);
+  for(const x of [earnings,withdrawals,settings,application])if(x.error)throw x.error;
+  const earned=(earnings.data||[]).filter(x=>x.status==='available').reduce((n,x)=>n+Number(x.net_amount||0),0);
+  const paid=(withdrawals.data||[]).filter(x=>x.status==='paid').reduce((n,x)=>n+Number(x.amount||0),0);
+  const reserved=(withdrawals.data||[]).filter(x=>['pending','approved','processing'].includes(x.status)).reduce((n,x)=>n+Number(x.amount||0),0);
+  const available=Math.max(0,earned-paid-reserved);
+  balance.textContent='TZS '+available.toLocaleString('en-US',{maximumFractionDigits:2});
+  const min=Number(settings.data?.minimum_withdrawal_tzs||10000);
+  $('#creatorWithdrawalAmount').min=String(min);$('#creatorWithdrawalAmount').placeholder='Kiwango cha chini '+min.toLocaleString('en-US')+' TZS';
+  if(application.data?.status!=='approved'){form.hidden=true;message.textContent='Wallet itafunguliwa baada ya Admin kuidhinisha Creator Monetization.';}
+  history.innerHTML=(withdrawals.data||[]).map(x=>'<div style="border-top:1px solid #e5e7eb;padding:9px 0;font-size:12px"><strong>TZS '+Number(x.amount).toLocaleString('en-US')+'</strong> · '+esc(x.payout_method)+' · '+esc(x.status)+'<div style="color:#64748b">'+new Date(x.created_at).toLocaleString('sw-TZ')+(x.payout_reference?' · Ref: '+esc(x.payout_reference):'')+(x.admin_note?' · '+esc(x.admin_note):'')+'</div></div>').join('')||'<p style="font-size:12px;color:#64748b">Bado hakuna withdrawal.</p>';
+  form.onsubmit=async e=>{e.preventDefault();button.disabled=true;message.textContent='Inatuma ombi...';try{
+   const amount=Number($('#creatorWithdrawalAmount').value);if(!Number.isFinite(amount)||amount<min)throw new Error('Kiasi kiko chini ya kiwango cha chini.');
+   const key='creator-withdrawal:'+ownerId+':'+crypto.randomUUID();
+   const result=await db.from('zune_creator_withdrawals').insert({creator_id:ownerId,amount,payout_method:$('#creatorWithdrawalMethod').value,account_name:$('#creatorWithdrawalName').value.trim(),account_reference:$('#creatorWithdrawalRef').value.trim(),status:'pending',idempotency_key:key});
+   if(result.error)throw result.error;message.textContent='Ombi limetumwa kwa Admin kwa ajili ya ukaguzi.';form.reset();await mountCreatorWallet();
+  }catch(err){message.textContent=err.message||'Ombi halijatumwa.';}finally{button.disabled=false;}
+  };
+ }catch(err){balance.textContent='Wallet haipatikani';message.textContent=err.message||'Imeshindikana kupakia wallet.';console.warn('Creator wallet:',err);}
 }
 
 async function loadProducts(){
