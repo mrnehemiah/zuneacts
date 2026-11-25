@@ -40,15 +40,17 @@ async function loadSounds(){
   select.innerHTML='<option value="">Tumia Original Audio ya video</option>'+(data||[]).map(sound=>'<option value="'+esc(sound.id)+'">'+esc(sound.title)+(sound.artist?' — '+esc(sound.artist):'')+'</option>').join('');
 }
 async function loadMyReels(){
-  const {data,error}=await db.from('zune_reels').select('id,caption,status,views_count,created_at,video_path,product_id').eq('creator_id',ownerId).order('created_at',{ascending:false}).limit(100);
+  const {data,error}=await db.from('zune_reels').select('*').eq('creator_id',ownerId).order('created_at',{ascending:false}).limit(100);
   if(error){$('#myReels').innerHTML='<div class="empty-state">'+esc(error.message)+'</div>';return}
-  const rows=data||[];
-  $('#totalReels').textContent=rows.length;
-  $('#publishedReels').textContent=rows.filter(x=>x.status==='published').length;
-  $('#pendingReels').textContent=rows.filter(x=>x.status==='pending').length;
+  const rows=data||[],ids=rows.map(x=>x.id);
+  const [likes,comments]=await Promise.all([ids.length?db.from('zune_reel_likes').select('reel_id').in('reel_id',ids):Promise.resolve({data:[]}),ids.length?db.from('zune_reel_comments').select('reel_id').in('reel_id',ids):Promise.resolve({data:[]})]);
+  const countBy=(list)=> (list||[]).reduce((m,x)=>{m[x.reel_id]=(m[x.reel_id]||0)+1;return m},{}),likeCounts=countBy(likes.data),commentCounts=countBy(comments.data);
+  const totalViews=rows.reduce((n,x)=>n+Number(x.views_count||0),0),totalLikes=rows.reduce((n,x)=>n+(likeCounts[x.id]||0),0),totalComments=rows.reduce((n,x)=>n+(commentCounts[x.id]||0),0);
+  $('#totalReels').textContent=rows.length;$('#publishedReels').textContent=rows.filter(x=>x.status==='published').length;$('#pendingReels').textContent=rows.filter(x=>x.status==='pending').length;
+  $('#totalViews').textContent=totalViews.toLocaleString();$('#totalLikes').textContent=totalLikes.toLocaleString();$('#totalComments').textContent=totalComments.toLocaleString();
   $('#myReels').innerHTML=rows.length?rows.map(r=>{
     const url=db.storage.from('zune-reels').getPublicUrl(r.video_path).data.publicUrl;
-    return '<article class="reel-row"><div class="reel-thumb"><video src="'+esc(url)+'" muted playsinline preload="metadata"></video></div><div class="reel-meta"><strong>'+esc(r.caption||'Reel ya bidhaa')+'</strong><small>'+Number(r.views_count||0).toLocaleString()+' views · '+new Date(r.created_at).toLocaleDateString('sw-TZ')+'</small></div><span class="status '+esc(r.status)+'">'+esc(statusLabel(r.status))+'</span></article>';
+    return '<article class="reel-row"><div class="reel-thumb"><video src="'+esc(url)+'" muted playsinline preload="metadata"></video></div><div class="reel-meta"><strong>'+esc(r.caption||'Reel ya bidhaa')+'</strong><small>'+Number(r.views_count||0).toLocaleString()+' views · '+(likeCounts[r.id]||0)+' likes · '+(commentCounts[r.id]||0)+' comments · '+Number(r.shares_count||0)+' shares</small></div><span class="status '+esc(r.status)+'">'+esc(statusLabel(r.status))+'</span></article>';
   }).join(''):'<div class="empty-state">Bado hujapakia Reel. Video yako ya kwanza inaweza kuonekana hapa.</div>';
 }
 $('#videoFile').addEventListener('change',()=>{
