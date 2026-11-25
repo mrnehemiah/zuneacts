@@ -38,6 +38,7 @@ async function loadCategories(){
  walk(null,[],new Set());
  categories.filter(item=>!visited.has(item.id)).forEach(item=>{visited.add(item.id);output.push('<option value="'+esc(item.id)+'">'+esc(item.name)+'</option>');walk(item.id,[item.name],new Set([item.id]))});
  sel.innerHTML='<option value="">Chagua category / subcategory</option>'+output.join("");
+ if(editing){const current=rows.find(item=>item.id===editing);if(current)sel.value=current.category_id||(categories.find(item=>item.name===current.category)?.id||"")}
  sel.disabled=categories.length===0;
  const retry=$("#retryCategories");if(retry)retry.hidden=true;
  if(!categories.length){sel.innerHTML='<option value="">Hakuna category inayopatikana</option>';toast(lang==="sw"?"Hakuna category iliyo active.":"No active categories found.");return false}
