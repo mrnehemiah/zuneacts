@@ -111,11 +111,11 @@ async function loadMyReels(){
   const totalViews=rows.reduce((n,x)=>n+Number(x.views_count||0),0),totalLikes=rows.reduce((n,x)=>n+(likeCounts[x.id]||0),0),totalComments=rows.reduce((n,x)=>n+(commentCounts[x.id]||0),0);
   $('#totalReels').textContent=rows.length;$('#publishedReels').textContent=rows.filter(x=>x.status==='published').length;$('#pendingReels').textContent=rows.filter(x=>x.status==='pending').length;
   $('#totalViews').textContent=totalViews.toLocaleString();$('#totalLikes').textContent=totalLikes.toLocaleString();$('#totalComments').textContent=totalComments.toLocaleString();
-  $('#myReels').querySelectorAll('video').forEach(video=>video.addEventListener('error',()=>{const host=video.closest('.reel-thumb');if(host)host.innerHTML='<div class="empty-state">Video haipatikani. Pakia upya kama bado unayo.</div>';},{once:true}));
   $('#myReels').innerHTML=rows.length?rows.map(r=>{
     const url=db.storage.from('zune-reels').getPublicUrl(r.video_path).data.publicUrl;
     return '<article class="reel-row"><div class="reel-thumb"><video src="'+esc(url)+'" muted playsinline preload="metadata"></video></div><div class="reel-meta"><strong>'+esc(r.caption||'Reel ya bidhaa')+'</strong><small>'+Number(r.views_count||0).toLocaleString()+' views · '+(likeCounts[r.id]||0)+' likes · '+(commentCounts[r.id]||0)+' comments · '+Number(r.shares_count||0)+' shares</small></div><span class="status '+esc(r.status)+'">'+esc(statusLabel(r.status))+'</span></article>';
   }).join(''):'<div class="empty-state">Bado hujapakia Reel. Video yako ya kwanza inaweza kuonekana hapa.</div>';
+  $('#myReels').querySelectorAll('video').forEach(video=>video.addEventListener('error',()=>{const host=video.closest('.reel-thumb');if(host)host.innerHTML='<div class="empty-state">Video haipatikani. Pakia upya kama bado unayo.</div>';},{once:true}));
 }
 $('#videoFile').addEventListener('change',()=>{
   const file=$('#videoFile').files?.[0],host=$('#videoPreview');
