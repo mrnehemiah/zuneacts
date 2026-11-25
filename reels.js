@@ -3,7 +3,7 @@ const URL='https://rpkogiieegqgxqbzwxwo.supabase.co';
 const KEY='sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf';
 const db=createClient(URL,KEY,{auth:{storageKey:'zune-seller-portal-auth',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
 const $=s=>document.querySelector(s);
-let ownerId='',authUserId='',storeName='Duka langu',previewUrl='';
+let ownerId='',authUserId='',uploadPermission=false,storeName='Duka langu',previewUrl='';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500)}
 function statusLabel(s){return ({pending:'Inasubiri Admin',published:'Imechapishwa',rejected:'Imekataliwa',archived:'Imefichwa'}[s]||s)}
@@ -13,11 +13,13 @@ async function init(){
   const {data:owner,error:ownerError}=await db.rpc('zune_seller_owner_id');
   if(ownerError||!owner){$('#formMessage').textContent=ownerError?.message||'Akaunti ya Seller haijathibitishwa.';return}
   ownerId=owner;authUserId=session.user.id;
-  const [{data:store},{data:profile}]=await Promise.all([db.rpc('zune_seller_portal_current_store'),db.from('profiles').select('is_verified,role').eq('id',ownerId).maybeSingle()]);
+  const [{data:store},{data:profile},{data:canUpload,error:canUploadError}]=await Promise.all([db.rpc('zune_seller_portal_current_store'),db.from('profiles').select('is_verified,role').eq('id',ownerId).maybeSingle(),db.rpc('zune_can_upload_reel')]);
+  uploadPermission=canUpload===true;
+  if(canUploadError)console.warn('Seller Reels permission check:',canUploadError);
   const current=Array.isArray(store)?store[0]:store;
   storeName=current?.store_name||current?.name||'Duka langu';
   $('#sellerBadge').textContent=profile?.is_verified===true?'Verified Seller':'Seller Account';
-  if(ownerId!==authUserId){$('#formMessage').textContent='Seller Portal identity haifanani na profile owner ID. RLS ya sasa inahitaji auth.uid() na creator_id vifanane; hakuna video itakayopakiwa hadi ruhusa ya backend irekebishwe kwa idhini.';$('#publishBtn').disabled=true;}
+  if(ownerId!==authUserId&&!uploadPermission){$('#formMessage').textContent='Seller Portal identity inatumia owner ID tofauti na Auth ID. Backend ya sasa haijaruhusu mapping hii ya usalama; upload itawashwa baada ya kuidhinisha na kutumia RLS extension iliyopendekezwa.';$('#publishBtn').disabled=true;}
   await Promise.all([loadProducts(),loadMyReels()]);
 }
 async function loadProducts(){
@@ -54,12 +56,12 @@ $('#reelForm').addEventListener('submit',async e=>{
   const file=$('#videoFile').files?.[0],caption=$('#caption').value.trim(),button=$('#publishBtn'),message=$('#formMessage');
   if(!file||!caption||!$('#rightsConfirm').checked)return;
   if(!ownerId){message.textContent='Akaunti ya Seller haijathibitishwa.';return}
-  if(ownerId!==authUserId){message.textContent='RLS ya sasa inahitaji Auth ID na Seller owner ID vifanane. Upload imesitishwa ili kuepuka kuacha video isiyounganishwa.';return}
+  if(ownerId!==authUserId&&!uploadPermission){message.textContent='RLS haijaruhusu Seller Portal owner mapping. Upload imesitishwa hadi backend extension ipitishwe.';return}
   button.disabled=true;button.textContent='Inapakia video...';message.textContent='Tafadhali subiri, video inapakiwa kwenye ZUNE Storage.';
   let path='';
   try{
     const id=crypto.randomUUID(),ext=(file.name.split('.').pop()||'mp4').toLowerCase().replace(/[^a-z0-9]/g,'');
-    path=ownerId+'/'+id+'.'+ext;
+    path=authUserId+'/'+id+'.'+ext;
     const {data:upload,error:uploadError}=await db.storage.from('zune-reels').upload(path,file,{contentType:file.type,cacheControl:'3600',upsert:false});
     if(uploadError)throw uploadError;
     const hashtags=$('#hashtags').value.split(/[\s,]+/).map(x=>x.trim().replace(/^#/,'')).filter(Boolean).slice(0,20);
