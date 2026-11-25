@@ -14,7 +14,10 @@ async function init(){
   const {data:owner,error:ownerError}=await db.rpc('zune_seller_owner_id');
   if(ownerError||!owner){$('#formMessage').textContent=ownerError?.message||'Akaunti ya Seller haijathibitishwa.';return}
   ownerId=owner;authUserId=session.user.id;
-  const [{data:store},{data:profile},{data:canUpload,error:canUploadError}]=await Promise.all([db.rpc('zune_seller_portal_current_store'),db.from('profiles').select('is_verified,role').eq('id',ownerId).maybeSingle(),db.rpc('zune_can_upload_reel')]);
+  const [{data:store},{data:profileRows,error:profileRpcError},{data:canUpload,error:canUploadError}]=await Promise.all([db.rpc('zune_seller_portal_current_store'),db.rpc('zune_seller_reel_profile'),db.rpc('zune_can_upload_reel')]);
+  let profile=Array.isArray(profileRows)?profileRows[0]:profileRows;
+  if(!profile&&ownerId===authUserId){const fallback=await db.from('profiles').select('is_verified,role').eq('id',ownerId).maybeSingle();profile=fallback.data;}
+  if(profileRpcError)console.warn('Seller verification profile lookup:',profileRpcError);
   uploadPermission=canUpload===true;
   if(canUploadError)console.warn('Seller Reels permission check:',canUploadError);
   const current=Array.isArray(store)?store[0]:store;
