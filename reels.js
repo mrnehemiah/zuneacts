@@ -141,8 +141,8 @@ $('#reelForm').addEventListener('submit',async e=>{
     path=authUserId+'/'+id+'.'+ext;
     const upload=await uploadReelWithTus(file,path);
     path=upload.path;videoUploaded=true;
-    id=path.split('/').pop().replace(/\\.[^.]+$/,'');
-    const hashtags=$('#hashtags').value.split(/[\\s,]+/).map(x=>x.trim().replace(/^#/,'')).filter(Boolean).slice(0,20);
+    id=path.split('/').pop().replace(/\.[^.]+$/,'');
+    const hashtags=$('#hashtags').value.split(/[\s,]+/).map(x=>x.trim().replace(/^#/,'')).filter(Boolean).slice(0,20);
     const payload={id,creator_id:ownerId,video_path:path,caption,hashtags,product_id:$('#productSelect').value||null,status:'pending',creator_display_name:storeName};
     const sound=sounds.get($('#soundSelect').value);
     if(sound){payload.sound_id=sound.id;payload.audio_source='library';payload.audio_title=sound.title;payload.audio_artist=sound.artist||null;}
