@@ -66,6 +66,7 @@ $('#videoFile').addEventListener('change',()=>{
 $('#caption').addEventListener('input',()=>$('#captionCount').textContent=$('#caption').value.length);
 $('#reelForm').addEventListener('submit',async e=>{
   e.preventDefault();
+  const reelForm=e.currentTarget;
   const file=$('#videoFile').files?.[0],caption=$('#caption').value.trim(),button=$('#publishBtn'),message=$('#formMessage');
   if(!file||!caption||!$('#rightsConfirm').checked)return;
   if(!ownerId){message.textContent='Akaunti ya Seller haijathibitishwa.';return}
@@ -84,7 +85,7 @@ $('#reelForm').addEventListener('submit',async e=>{
     const {error:insertError}=await db.from('zune_reels').insert(payload);
     if(insertError)throw insertError;
     message.textContent='Reel imetumwa kwa Admin kwa ukaguzi.';
-    $('#reelForm').reset();$('#captionCount').textContent='0';
+    reelForm.reset();$('#captionCount').textContent='0';
     if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl='';
     $('#videoPreview').innerHTML='<div class="preview-placeholder"><span>▶</span><strong>Video preview</strong><small>Chagua video ili kuona preview hapa.</small></div>';
     toast('Reel imetumwa kwa ukaguzi.');
