@@ -1,5 +1,6 @@
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
-import {Upload} from 'https://esm.sh/tus-js-client@4.3.1';
+const Upload=window.tus?.Upload;
+if(!Upload)throw new Error('TUS browser library haijapakia. Refresh ukurasa kisha ujaribu tena.');
 const URL='https://rpkogiieegqgxqbzwxwo.supabase.co';
 const KEY='sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf';
 const db=createClient(URL,KEY,{auth:{storageKey:'zune-seller-portal-auth',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
