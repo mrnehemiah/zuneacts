@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="sw">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#073f32">
+  <title>ZUNE Seller | Reels Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="reels.css?v=20261125-1">
+</head>
+<body>
+  <main class="reels-shell">
+    <header class="reels-top">
+      <a class="brand" href="dashboard.html"><span class="brand-mark">Z</span><span>ZUNE<small>SELLER REELS STUDIO</small></span></a>
+      <div class="top-actions"><a href="dashboard.html">← Dashboard</a><button id="logoutBtn" type="button">Toka</button></div>
+    </header>
+    <section class="reels-intro">
+      <div><span class="eyebrow">SELLER CONTENT STUDIO</span><h1>Reels za duka lako</h1><p>Onyesha bidhaa kwa video fupi, ongeza maelezo na uunganishe bidhaa ili wateja wanunue moja kwa moja.</p></div>
+      <div class="reels-badge" id="sellerBadge">Seller Account</div>
+    </section>
+    <section class="reels-layout">
+      <form class="panel upload-panel" id="reelForm">
+        <div class="panel-head"><div><span class="eyebrow">CREATE CONTENT</span><h2>Pakia Reel mpya</h2></div><span class="step-chip">9:16 video</span></div>
+        <label class="field">Video ya Reel
+          <input id="videoFile" type="file" accept="video/mp4,video/webm,video/quicktime" required>
+          <small>MP4, WebM au MOV · Kiwango cha juu 100 MB · Video ya wima inapendekezwa.</small>
+        </label>
+        <div class="video-preview" id="videoPreview"><div class="preview-placeholder"><span>▶</span><strong>Video preview</strong><small>Chagua video ili kuona preview hapa.</small></div></div>
+        <label class="field">Maelezo ya Reel
+          <textarea id="caption" maxlength="2200" rows="4" placeholder="Eleza bidhaa yako, faida zake na namna ya kuagiza..." required></textarea>
+          <small><span id="captionCount">0</span>/2200</small>
+        </label>
+        <label class="field">Hashtags
+          <input id="hashtags" maxlength="300" placeholder="#ZUNE #Fashion #NewArrival">
+          <small>Tenganisha hashtags kwa nafasi au koma.</small>
+        </label>
+        <label class="field">Unganisha bidhaa (hiari)
+          <select id="productSelect"><option value="">Bila bidhaa maalumu</option></select>
+          <small>Mteja ataweza kufungua bidhaa na kuendelea kununua kutoka kwenye Reel.</small>
+        </label>
+        <div class="sound-note"><span>♫</span><div><strong>Original audio</strong><p>Sauti iliyo ndani ya video yako itachezwa kwenye Reel. Music Library itaunganishwa baada ya kuweka leseni za matumizi ya kibiashara na backend yake.</p></div></div>
+        <label class="check-row"><input id="rightsConfirm" type="checkbox" required><span>Nina haki ya kutumia video na sauti zote zilizomo ndani yake.</span></label>
+        <p id="formMessage" class="message" role="status" aria-live="polite"></p>
+        <button class="primary-btn" id="publishBtn" type="submit">Tuma Reel kwa ukaguzi</button>
+        <p class="fine-print">Reel mpya itawekwa Pending na itaonekana kwa wateja baada ya kuidhinishwa na Admin.</p>
+      </form>
+      <aside class="panel side-panel">
+        <div class="panel-head"><div><span class="eyebrow">YOUR CONTENT</span><h2>Reels zako</h2></div><button type="button" class="refresh-btn" id="refreshReels">Refresh</button></div>
+        <div class="stats-row"><div><strong id="totalReels">—</strong><small>Jumla</small></div><div><strong id="publishedReels">—</strong><small>Published</small></div><div><strong id="pendingReels">—</strong><small>Pending</small></div></div>
+        <div id="myReels" class="my-reels"><div class="empty-state">Inapakia Reels zako...</div></div>
+        <div class="guidance"><strong>Vidokezo vya Reel bora</strong><ul><li>Tumia video wima ya 9:16.</li><li>Onyesha bidhaa mapema ndani ya sekunde chache za kwanza.</li><li>Hakikisha bei na bidhaa zilizounganishwa ni sahihi.</li><li>Tumia sauti na muziki ulio na ruhusa.</li></ul></div>
+      </aside>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status"></div>
+  <script type="module" src="reels.js?v=20261125-1"></script>
+</body>
+</html>
