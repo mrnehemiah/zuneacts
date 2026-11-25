@@ -110,7 +110,7 @@ async function loadProducts(){
     const count=$('#productTagCount');if(count)count.textContent=selected+'/10';
     boxes.forEach(box=>{box.disabled=!box.checked&&selected>=10;box.closest('label').style.opacity=box.disabled?'.45':'1';});
   };
-  picker.addEventListener('change',e=>{if(e.target.matches('[data-product-tag]'))updateCount();});
+  picker.onchange=e=>{if(e.target.matches('[data-product-tag]'))updateCount();};
   updateCount();
 }
 function selectedReelProductIds(){
