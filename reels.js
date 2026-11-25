@@ -90,10 +90,31 @@ async function init(){
   await Promise.all([loadProducts(),loadSounds(),loadMyReels()]);
 }
 async function loadProducts(){
-  const {data,error}=await db.from('products').select('id,title,price,stock_quantity').eq('vendor_id',ownerId).order('created_at',{ascending:false}).limit(300);
+  const {data,error}=await db.from('products').select('id,title,price,stock_quantity,image_url,moderation_status,removed_at,seller_archived_at').eq('vendor_id',ownerId).eq('moderation_status','approved').is('removed_at',null).is('seller_archived_at',null).order('created_at',{ascending:false}).limit(300);
   if(error){console.warn('Seller Reel products:',error);return}
+  const rows=data||[];
   const select=$('#productSelect');
-  select.innerHTML='<option value="">Bila bidhaa maalumu</option>'+(data||[]).map(p=>'<option value="'+esc(p.id)+'">'+esc(p.title)+' — TSh '+Number(p.price||0).toLocaleString('en-TZ')+' · Stock '+Number(p.stock_quantity||0)+'</option>').join('');
+  select.innerHTML='<option value="">Bila bidhaa maalumu</option>'+rows.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.title)+' — TSh '+Number(p.price||0).toLocaleString('en-TZ')+' · Stock '+Number(p.stock_quantity||0)+'</option>').join('');
+  select.value='';
+  select.style.display='none';
+  let picker=$('#productTagPicker');
+  if(!picker){
+    picker=document.createElement('section');
+    picker.id='productTagPicker';
+    picker.style.cssText='margin-top:10px;padding:13px;border:1px solid #d8deea;border-radius:14px;background:#fff;color:#182033';
+    select.insertAdjacentElement('afterend',picker);
+  }
+  picker.innerHTML='<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:9px"><strong style="font-size:13px">Tag bidhaa kwenye Reel</strong><span id="productTagCount" style="font-size:11px;color:#64748b">0/10</span></div><p style="margin:0 0 10px;color:#64748b;font-size:11px">Chagua bidhaa zako zilizoidhinishwa. Unaweza kuchagua hadi bidhaa 10.</p><div id="productTagOptions" style="display:grid;gap:7px;max-height:230px;overflow:auto">'+(rows.length?rows.map(p=>'<label style="display:flex;gap:9px;align-items:center;padding:8px;border:1px solid #e6eaf1;border-radius:10px;font-size:12px"><input type="checkbox" value="'+esc(p.id)+'" data-product-tag style="width:17px;height:17px;accent-color:#7c3aed"><span style="min-width:0;flex:1"><strong style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(p.title)+'</strong><small style="color:#64748b">TSh '+Number(p.price||0).toLocaleString('en-TZ')+' · Stock '+Number(p.stock_quantity||0)+'</small></span></label>').join(''):'<small style="color:#64748b">Hakuna bidhaa zilizoidhinishwa zinazopatikana kwa sasa.</small>')+'</div>';
+  const updateCount=()=>{
+    const boxes=[...picker.querySelectorAll('[data-product-tag]')],selected=boxes.filter(x=>x.checked).length;
+    const count=$('#productTagCount');if(count)count.textContent=selected+'/10';
+    boxes.forEach(box=>{box.disabled=!box.checked&&selected>=10;box.closest('label').style.opacity=box.disabled?'.45':'1';});
+  };
+  picker.addEventListener('change',e=>{if(e.target.matches('[data-product-tag]'))updateCount();});
+  updateCount();
+}
+function selectedReelProductIds(){
+  return [...($('#productTagPicker')?.querySelectorAll('[data-product-tag]:checked')||[])].map(x=>x.value).slice(0,10);
 }
 async function loadSounds(){
   const select=$('#soundSelect');if(!select)return;
@@ -145,16 +166,23 @@ $('#reelForm').addEventListener('submit',async e=>{
     path=upload.path;videoUploaded=true;
     id=path.split('/').pop().replace(/\.[^.]+$/,'');
     const hashtags=$('#hashtags').value.split(/[\s,]+/).map(x=>x.trim().replace(/^#/,'')).filter(Boolean).slice(0,20);
-    const payload={id,creator_id:ownerId,video_path:path,caption,hashtags,product_id:$('#productSelect').value||null,status:'pending',creator_display_name:storeName};
+    const taggedProductIds=selectedReelProductIds();
+    const payload={id,creator_id:ownerId,video_path:path,caption,hashtags,product_id:taggedProductIds[0]||null,status:'pending',creator_display_name:storeName};
     const sound=sounds.get($('#soundSelect').value);
     if(sound){payload.sound_id=sound.id;payload.audio_source='library';payload.audio_title=sound.title;payload.audio_artist=sound.artist||null;}
     const {error:insertError}=await db.from('zune_reels').insert(payload);
     if(insertError)throw insertError;
-    message.textContent='Reel imetumwa kwa Admin kwa ukaguzi.';
+    videoUploaded=false;
+    let tagWarning='';
+    if(taggedProductIds.length){
+      const {error:tagError}=await db.from('zune_reel_products').insert(taggedProductIds.map(product_id=>({reel_id:id,product_id})));
+      if(tagError){console.error('ZUNE Reel product tags:',tagError);tagWarning=' Reel imehifadhiwa, lakini bidhaa hazikuunganishwa zote. Unaweza kujaribu tena baada ya refresh.';}
+    }
+    message.textContent=tagWarning?'Reel imetumwa kwa Admin kwa ukaguzi.'+tagWarning:'Reel imetumwa kwa Admin kwa ukaguzi.';
     reelForm.reset();$('#captionCount').textContent='0';clearUploadProgress();
     if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl='';
     $('#videoPreview').innerHTML='<div class="preview-placeholder"><span>▶</span><strong>Video preview</strong><small>Chagua video ili kuona preview hapa.</small></div>';
-    toast('Reel imetumwa kwa ukaguzi.');
+    toast(tagWarning?'Reel imehifadhiwa; product tags zina tatizo.':'Reel imetumwa kwa ukaguzi.');
     await loadMyReels();
   }catch(error){
     console.error('ZUNE Seller Reel upload:',error);
