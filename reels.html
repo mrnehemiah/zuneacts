@@ -7,7 +7,7 @@
   <title>ZUNE Seller | Reels Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="reels.css?v=20261125-1">
+  <link rel="stylesheet" href="reels.css?v=20261125-2">
 </head>
 <body>
   <main class="reels-shell">
@@ -42,6 +42,11 @@
         <label class="field">Music Library ya ZUNE (hiari)<select id="soundSelect"><option value="">Tumia Original Audio ya video</option></select><small>Nyimbo zilizoidhinishwa kwa matumizi ya kibiashara pekee ndizo zitaonekana hapa.</small></label><div class="sound-note"><span>♫</span><div><strong>Original audio</strong><p>Sauti iliyo ndani ya video yako itachezwa kwenye Reel. Music Library itaunganishwa baada ya kuweka leseni za matumizi ya kibiashara na backend yake.</p></div></div>
         <label class="check-row"><input id="rightsConfirm" type="checkbox" required><span>Nina haki ya kutumia video na sauti zote zilizomo ndani yake.</span></label>
         <p id="formMessage" class="message" role="status" aria-live="polite"></p>
+        <div class="upload-progress" id="uploadProgress" hidden aria-live="polite">
+          <div class="upload-progress-head"><strong>Maendeleo ya upload</strong><span id="uploadProgressPercent">0%</span></div>
+          <div class="upload-progress-track"><div id="uploadProgressFill" class="upload-progress-fill"></div></div>
+          <small id="uploadProgressDetail">Inasubiri kuanza...</small>
+        </div>
         <button class="primary-btn" id="publishBtn" type="submit">Tuma Reel kwa ukaguzi</button>
         <p class="fine-print">Reel mpya itawekwa Pending na itaonekana kwa wateja baada ya kuidhinishwa na Admin.</p>
       </form>
@@ -54,6 +59,6 @@
     </section>
   </main>
   <div id="toast" class="toast" role="status"></div>
-  <script type="module" src="reels.js?v=20261125-1"></script>
+  <script type="module" src="reels.js?v=20261125-2"></script>
 </body>
 </html>
