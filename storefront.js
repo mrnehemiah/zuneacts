@@ -22,6 +22,25 @@ async function toggleFollowStore(){const b=$("#followStoreButton");if(!storeData
 async function init(){if(!storeId){$("#productsGrid").innerHTML='<div class="empty-state">Kiungo cha duka hakijakamilika. Fungua duka kupitia Marketplace.</div>';return}const auth=await supabase.auth.getSession();sessionUser=auth.data?.session?.user||null;
 const{data:store,error}=await supabase.from("stores").select("id,owner_id,store_name,description,category,phone,region,district,address,verification_status,is_active,logo_url,email,website,store_status,vacation_reopen_at,cover_image_url,theme_config,storefront_template").eq("id",storeId).eq("is_active",true).maybeSingle();
 if(error||!store){$("#storeName").textContent="Duka halijapatikana";$("#productsGrid").innerHTML='<div class="empty-state">Duka hili halipatikani au halijawekwa wazi kwa wateja.</div>';$("#reviewsGrid").innerHTML='<div class="reviews-empty">Maoni hayapatikani.</div>';return}storeData=store;
+const chatStoreButton=$("#chatStoreButton");
+if(sessionUser?.id===store.owner_id){chatStoreButton.disabled=true;chatStoreButton.textContent="Hii ni akaunti yako";}
+chatStoreButton?.addEventListener("click",async()=>{
+ if(!sessionUser?.id){message("Ingia kwenye ZUNE ili kuzungumza na duka hili.");return}
+ if(sessionUser.id===store.owner_id)return;
+ chatStoreButton.disabled=true;
+ const original=chatStoreButton.textContent;chatStoreButton.textContent="Inafungua chat...";
+ try{
+  const existing=await supabase.from("chat_conversations").select("id").eq("buyer_id",sessionUser.id).eq("seller_id",store.owner_id).is("product_id",null).maybeSingle();
+  if(existing.error)throw existing.error;
+  let conversationId=existing.data?.id;
+  if(!conversationId){
+   const created=await supabase.from("chat_conversations").insert({buyer_id:sessionUser.id,seller_id:store.owner_id,product_id:null}).select("id").single();
+   if(created.error)throw created.error;
+   conversationId=created.data.id;
+  }
+  location.assign("https://mrnehemiah.github.io/messages.html?conversation="+encodeURIComponent(conversationId));
+ }catch(error){console.error("ZUNE store chat:",error);message("Imeshindikana kuanzisha chat. Jaribu tena.");chatStoreButton.disabled=false;chatStoreButton.textContent=original}
+});
 const followButton=$("#followStoreButton");if(sessionUser?.id===store.owner_id){followButton.textContent="Duka lako";followButton.disabled=true}await refreshFollowStats();
 const theme=store.theme_config&&typeof store.theme_config==="object"?store.theme_config:{},colors=theme.colors||{},root=document.documentElement;if(colors.forest)root.style.setProperty("--forest",colors.forest);if(colors.emerald)root.style.setProperty("--emerald",colors.emerald);if(colors.accent)root.style.setProperty("--gold",colors.accent);if(theme.fontFamily)document.body.style.fontFamily=theme.fontFamily+",sans-serif";document.body.dataset.template=store.storefront_template||"classic";document.body.dataset.mode=theme.mode==="dark"?"dark":"light";const productGrid=$("#productsGrid");if(productGrid&&["grid","compact","list"].includes(theme.layout))productGrid.classList.add("layout-"+theme.layout);
 const name=store.store_name||"Duka la ZUNE";document.title="ZUNE | "+name;$("#storeName").textContent=name;$("#storeDescription").textContent=store.description||"Karibu kwenye duka letu la ZUNE.";$("#aboutText").textContent=store.description||"Duka hili linapatikana kwenye ZUNE Marketplace.";$("#categoryText").textContent=store.category||"";$("#storeLocation").textContent=[store.district,store.region,"Tanzania"].filter(Boolean).join(" · ");$("#addressText").textContent=[store.address,store.district,store.region,"Tanzania"].filter(Boolean).join(", ");$("#locationSummary").textContent=[store.address,store.district,store.region,"Tanzania"].filter(Boolean).join(", ")||"Eneo halijawekwa";$("#mapButton").href="https://www.openstreetmap.org/search?query="+encodeURIComponent([store.address,store.district,store.region,"Tanzania"].filter(Boolean).join(", "));$("#emailText").textContent=store.email||store.website||"";const schedule=theme.schedule||{},dayNames={mon:"Jumatatu",tue:"Jumanne",wed:"Jumatano",thu:"Alhamisi",fri:"Ijumaa",sat:"Jumamosi",sun:"Jumapili"};const hours=Object.entries(dayNames).map(([key,label])=>{const day=schedule[key];return label+": "+(day&&day.enabled!==false?(day.open||"08:00")+"–"+(day.close||"18:00"):"Imefungwa")});$("#hoursText").textContent=hours.join(" · ");
