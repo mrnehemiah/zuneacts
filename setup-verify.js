@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-const SUPABASE_URL="https://rpkogiieegqgxqbzwxwo.supabase.co",KEY="sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf",AUTH=URL+"/functions/v1/seller-portal-auth";
+const SUPABASE_URL="https://rpkogiieegqgxqbzwxwo.supabase.co",KEY="sb_publishable_2TEqZv-NBM9n5knU46ngqA_wqO3V1uf",AUTH=SUPABASE_URL+"/functions/v1/seller-portal-auth";
 const supabase=createClient(SUPABASE_URL,KEY,{auth:{storageKey:"zune-seller-portal-auth",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
 const p=new URLSearchParams(location.search),store=p.get("store")||"",mode=p.get("mode")==="reset"?"reset":"setup";
 const otp=document.querySelector("#otpCode"),msg=document.querySelector("#verifyMessage"),btn=document.querySelector("#saveBtn");
