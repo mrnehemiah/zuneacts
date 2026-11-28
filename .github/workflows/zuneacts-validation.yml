@@ -1,0 +1,35 @@
+name: ZUNEACTS validation
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate root JavaScript modules
+        shell: bash
+        run: |
+          shopt -s nullglob
+          files=(./*.js)
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "No root JavaScript files found."
+            exit 1
+          fi
+          for file in "${files[@]}"; do
+            echo "Checking ${file}"
+            node --input-type=module --check < "${file}"
+          done
